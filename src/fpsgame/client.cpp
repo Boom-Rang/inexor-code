@@ -875,7 +875,7 @@ namespace game
 		int size; //in KB
 		string name; //packname eg. "reissen"
 		string author;
-		struct file { int filesize; string name; uint crc; };
+		struct file { string name; int filesize, crc; };
 		vector<file *> files; //all included files and dependencies
 	};
 	vector<contentpack *> contentpacks;
@@ -1939,8 +1939,7 @@ namespace game
 						
 						getstring(text, p);
 						int size = getint(p);
-					//	uint crc;
-					//	p.get((uchar*)&crc, 1);
+						int crc = getint(p);
 						if(p.overread()) break;
 						if(contentpacks.inrange(pack) && contentpacks[pack]) {
 							contentpack *cp = contentpacks[pack];
@@ -1948,9 +1947,9 @@ namespace game
 							contentpack::file *file = cp->files.add(new contentpack::file);
 							copystring(file->name, text);
 							file->filesize = size;
-							//file->crc = crc;
+							file->crc = crc;
 						}
-						//conoutf("%s is %d KB big", text, size);
+						conoutf("%s is %d KB big and is registered as %d", text, size, crc);
 					}
 					sendfilerequest(pack, 0); //not in the loop anymore, just the first file, go for the next file afterwards
 				}				
