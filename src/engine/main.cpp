@@ -1223,6 +1223,8 @@ int main(int argc, char **argv)
     inputgrab(grabinput = true);
     ignoremousemotion();
 
+    init_particles();
+
     for(;;)
     {
         static int frames = 0;
@@ -1254,7 +1256,9 @@ int main(int argc, char **argv)
 
         // miscellaneous general game effects
         recomputecamera();
-        updateparticles();
+//        updateparticles();
+        apply_particle_modifiers();
+        render_particles();
         updatesounds();
 
         if(minimized) continue;
