@@ -1,3 +1,16 @@
+# Ambient Occlusion (short: AO)
+Pictures are louder than words: [Fruitbowl with AO](http://ucbugg.github.io/learn.ucbugg/images/lighting-a-scene/FruitbowlAO.jpg)
+								[Comparison Car](http://www.independentdeveloper.com/images/ambient-occlusion.jpg)
+								[Comparison Monster](http://img.techpowerup.org/090402/Capture453.png)
+### Is it fps-expensive?
+No its not, unlike tesseract i implemented it via a pre-baked ao-map (like a lightmap)
+Thou the calclight process will take some longer. 
+
+###Todo:
+* write the ambient calculation [done]
+* generate and render the ambient map
+* load and save the ambient map
+
 # Sauerbraten Fork
 
 Sauerbraten Fork is a fork of the quake-like fps Sauerbraten/Cube2. It is compatible to the current Sauerbraten/Cube 2 release.
