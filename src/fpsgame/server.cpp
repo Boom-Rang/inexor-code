@@ -1194,6 +1194,8 @@ namespace server
 				if(!f) return;
 				
 				filesize =  ((int)f->size())/1024; 
+				f->seek(0, SEEK_END);
+				crc = f->getcrc();
 				delete f;
 			}
 		};
