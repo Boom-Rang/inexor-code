@@ -474,37 +474,59 @@ static bool packlightmap(lightmapinfo &l, layoutinfo &surface)
 //(rays-hitting-a-wall / total-rays-sent -> value between 0 and 1.0) 1.0 = totally occlued, 0.0 = no occlusion
 
 VARR(ambientocclusion, 0, 255, 255); //factor how much the scene will be darkened
-FVARR(ambientocclusionradius, 1.0, 5.0, 1e16);
-VARP(testao, 0, 1, 1);
-static float calcocclusion(const vec &o, const vec &normal, float tolerance, int flags = RAY_ALPHAPOLY)
+FVARR(ambientocclusionradius, 1.0, 2.0, 1e16);
+VARP(testao, 0, 1, 2);
+FVARR(testborder, 0, 4., 17.); 
+static float calcocclusion(const vec &o, const vec &normal, float tolerance)
 {
-	static const vec rays[14] = //to make the calculations not to heavy, 14 ray paths (in the main directions) are enough.. todo
-    {
-		vec( 1,  0,  0),  //forwards
-		vec(-1,  0,  0),  //backwards
-		vec( 0,  1,  0),  //rightwards
-		vec( 0, -1,  0),  //leftwards
-		vec( 0,  0,  1),  //upwards
-		vec( 0,  0, -1),  //downwards
-		vec( 1,  1,  1),  //upper forward right
-		vec( 1, -1,  1),  //upper forward left
-		vec( 1,  1, -1),  //lower forward right
-		vec( 1, -1, -1),  //lower forward left
-		vec(-1,  1,  1),  //upper backward right
-		vec(-1, -1,  1),  //upper backward left
-		vec(-1,  1, -1),  //lower backward right
-		vec(-1, -1, -1),  //lower backward left
+	static const vec rays[17] =
+    { 
+		vec(0, 0, 1), //the main direction of the rays: upwards
+        
+		vec(cosf(21*RAD)*cosf(50*RAD), sinf(21*RAD)*cosf(50*RAD), sinf(50*RAD)),   //21 and 50
+        vec(cosf(111*RAD)*cosf(50*RAD), sinf(111*RAD)*cosf(50*RAD), sinf(50*RAD)), // + 90 degrees around x 
+        vec(cosf(201*RAD)*cosf(50*RAD), sinf(201*RAD)*cosf(50*RAD), sinf(50*RAD)), 
+        vec(cosf(291*RAD)*cosf(50*RAD), sinf(291*RAD)*cosf(50*RAD), sinf(50*RAD)),
+
+        vec(cosf(43*RAD)*cosf(60*RAD), sinf(43*RAD)*cosf(60*RAD), sinf(60*RAD)), // (+22) 43 and 60
+        vec(cosf(133*RAD)*cosf(60*RAD), sinf(133*RAD)*cosf(60*RAD), sinf(60*RAD)),
+        vec(cosf(223*RAD)*cosf(60*RAD), sinf(223*RAD)*cosf(60*RAD), sinf(60*RAD)),
+        vec(cosf(313*RAD)*cosf(60*RAD), sinf(313*RAD)*cosf(60*RAD), sinf(60*RAD)),
+
+        vec(cosf(66*RAD)*cosf(70*RAD), sinf(66*RAD)*cosf(70*RAD), sinf(70*RAD)), // (+45) 66 and 70
+        vec(cosf(156*RAD)*cosf(70*RAD), sinf(156*RAD)*cosf(70*RAD), sinf(70*RAD)),
+        vec(cosf(246*RAD)*cosf(70*RAD), sinf(246*RAD)*cosf(70*RAD), sinf(70*RAD)),
+        vec(cosf(336*RAD)*cosf(70*RAD), sinf(336*RAD)*cosf(70*RAD), sinf(70*RAD)),
+
+        vec(cosf(88*RAD)*cosf(80*RAD), sinf(88*RAD)*cosf(80*RAD), sinf(80*RAD)), // (+67) 88 and 80
+        vec(cosf(178*RAD)*cosf(80*RAD), sinf(178*RAD)*cosf(80*RAD), sinf(80*RAD)),
+        vec(cosf(268*RAD)*cosf(80*RAD), sinf(268*RAD)*cosf(80*RAD), sinf(80*RAD)),
+        vec(cosf(358*RAD)*cosf(80*RAD), sinf(358*RAD)*cosf(80*RAD), sinf(80*RAD)),
+       //degrees around z     21  43  66  88  111 133 156 178 201 223 246 268 291 313 336 358         (building the circle)
+       //degrees around xandy 50  60  70  80   50  60  70  80  50  60  70  80  50  60  70  80         (making it an upwardly open cone)					  
     };
-	 
-    flags |= RAY_SHADOW;
-    if(skytexturelight) flags |= RAY_SKIPSKY;
-	int occluedray = 14;
-	loopi(14) 
-    {
-        if(normal.dot(rays[i])<0 //skip the rays on the invisible side of the cube
-			|| shadowray(vec(rays[i]).mul(tolerance).add(o), rays[i], ambientocclusionradius, flags, NULL)>(ambientocclusionradius-1.0f)) occluedray--; //check whether there's a wall in the field around the sample
+	//rotate the rays into the normal direction
+	vec axis; 
+	axis.cross(rays[0], normal);
+	bool needsrotation = axis.magnitude() != 0;
+	float angle;
+	if(needsrotation)
+	{
+		angle = acos(rays[0].dot(normal));
+		axis.normalize();
+	}
+
+	int occluedrays = 0;
+	loopi(17) 
+    {	
+		if(occluedrays >= testborder) break;		
+		vec ray(rays[i]);
+		if(needsrotation) ray.rotate(angle, axis);//ray.mul(rotmat.a).mul(rotmat.b).mul(rotmat.c);
+		if(shadowray(vec(ray).mul(tolerance).add(o), ray, ambientocclusionradius, RAY_ALPHAPOLY|RAY_SHADOW, NULL) <= (ambientocclusionradius-1.0f)) occluedrays++; 
+				//check whether there's a wall in the field around the sample
     }
-	return float(occluedray)/4.0f; //4 occluedrays only todo
+
+	return min(1.0f, max( 0.0f, float(occluedrays)/testborder));
 }
 
 static void updatelightmap(const layoutinfo &surface)
@@ -644,9 +666,14 @@ static uint generatelumel(lightmapworker *w, const float tolerance, uint lightma
             w->raydata[y*w->w+x].add(vec(S.dot(avgray)/S.magnitude(), T.dot(avgray)/T.magnitude(), normal.dot(avgray)));
             break;
     }
-	float occlusion = calcocclusion(target, normal, tolerance, RAY_ALPHAPOLY);
+	float occlusion = calcocclusion(target, normal, tolerance);
 
-	if(testao) { 
+	if(testao == 1) { 
+		sample.r = min(255.0f, max(r, float(ambientcolor[0])) - ambientocclusion * occlusion);
+		sample.g = min(255.0f, max(g, float(ambientcolor[1])) - ambientocclusion * occlusion);
+		sample.b = min(255.0f, max(b, float(ambientcolor[2])) - ambientocclusion * occlusion);
+	}
+	else if(testao == 2) {
 		sample.r = min(255.0f, ambientocclusion * occlusion); //colorize every occlued part red
 		sample.g = 0;
 		sample.b = 0;

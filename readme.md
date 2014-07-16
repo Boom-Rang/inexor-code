@@ -3,13 +3,11 @@ Pictures are louder than words: [Fruitbowl with AO](http://ucbugg.github.io/lear
 								[Comparison Car](http://www.independentdeveloper.com/images/ambient-occlusion.jpg)
 								[Comparison Monster](http://img.techpowerup.org/090402/Capture453.png)
 ### Is it fps-expensive?
-No its not, unlike tesseract i implemented it via a pre-baked ao-map (like a lightmap)
-Thou the calclight process will take some longer. 
+No its not, unlike tesseract I implemented it into the current lightmap-system. 
+Even in other Branches (without this extension), your maps will still be the same, because it depends just on the lightmap creation process.
+However this calclight process may take a little longer. 
 
-###Todo:
-* write the ambient calculation [done]
-* generate and render the ambient map
-* load and save the ambient map
+![no-ao](http://www.bilderhoster.net/safeforgallerie/t83s44hg.jpg)![with ao](http://www.bilderhoster.net/safeforgallerie/4sj2nxmk.jpg)
 
 # Sauerbraten Fork
 
