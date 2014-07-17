@@ -466,8 +466,56 @@ static bool packlightmap(lightmapinfo &l, layoutinfo &surface)
     else insertlightmap(l, surface);
     return true;
 }
-//calculate the ambient occlusion factor: 
-//ao works as follows:
+
+static void updatelightmap(const layoutinfo &surface)
+{
+    if(max(LM_PACKW, LM_PACKH) > hwtexsize) return;
+
+    LightMap &lm = lightmaps[surface.lmid-LMID_RESERVED];
+    if(lm.tex < 0)
+    {
+        lm.offsetx = lm.offsety = 0;
+        lm.tex = lightmaptexs.length();
+        LightMapTexture &tex = lightmaptexs.add();
+        tex.type = renderpath==R_FIXEDFUNCTION ? (lm.type&~LM_TYPE) | LM_DIFFUSE : lm.type;
+        tex.w = LM_PACKW;
+        tex.h = LM_PACKH;
+        tex.unlitx = lm.unlitx;
+        tex.unlity = lm.unlity;
+        glGenTextures(1, &tex.id);
+        createtexture(tex.id, tex.w, tex.h, NULL, 3, 1, tex.type&LM_ALPHA ? GL_RGBA : GL_RGB);
+        if(renderpath!=R_FIXEDFUNCTION && (lm.type&LM_TYPE)==LM_BUMPMAP0 && lightmaps.inrange(surface.lmid+1-LMID_RESERVED))
+        {
+            LightMap &lm2 = lightmaps[surface.lmid+1-LMID_RESERVED];
+            lm2.offsetx = lm2.offsety = 0;
+            lm2.tex = lightmaptexs.length();
+            LightMapTexture &tex2 = lightmaptexs.add();
+            tex2.type = (lm.type&~LM_TYPE) | LM_BUMPMAP0;
+            tex2.w = LM_PACKW;
+            tex2.h = LM_PACKH;
+            tex2.unlitx = lm2.unlitx;
+            tex2.unlity = lm2.unlity;
+            glGenTextures(1, &tex2.id);
+            createtexture(tex2.id, tex2.w, tex2.h, NULL, 3, 1, GL_RGB);
+        }
+    }
+
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    glPixelStorei(GL_UNPACK_ROW_LENGTH, LM_PACKW);
+
+    glBindTexture(GL_TEXTURE_2D, lightmaptexs[lm.tex].id);
+    glTexSubImage2D(GL_TEXTURE_2D, 0, lm.offsetx + surface.x, lm.offsety + surface.y, surface.w, surface.h, lm.type&LM_ALPHA ? GL_RGBA : GL_RGB, GL_UNSIGNED_BYTE, &lm.data[(surface.y*LM_PACKW + surface.x)*lm.bpp]);
+    if(renderpath!=R_FIXEDFUNCTION && (lm.type&LM_TYPE)==LM_BUMPMAP0 && lightmaps.inrange(surface.lmid+1-LMID_RESERVED))
+    {
+        LightMap &lm2 = lightmaps[surface.lmid+1-LMID_RESERVED];
+        glBindTexture(GL_TEXTURE_2D, lightmaptexs[lm2.tex].id);
+        glTexSubImage2D(GL_TEXTURE_2D, 0, lm2.offsetx + surface.x, lm2.offsety + surface.y, surface.w, surface.h, GL_RGB, GL_UNSIGNED_BYTE, &lm2.data[(surface.y*LM_PACKW + surface.x)*3]);
+    }
+ 
+    glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
+}
+ 
+//ambient occlusion (darkening of corners) works as follows:
 //you check for every point how much light possible comes onto it when the light comes from the whole sky (no lights/spotlights, whatever)
 //this will darken cracks and sharp edges and hence give a more realistic rendering output.
 //from every point we send out ray casts into the main directions (see below) and get a hit back if it touched the sky (or a skytextured cube, see RAY_SKIPSKY)
@@ -534,55 +582,6 @@ static float calcocclusion(const vec &o, const vec &normal, float tolerance)
 	return min(1.0f, max( 0.0f, float(occluedrays)/ambientocclusionprecision));
 }
 
-static void updatelightmap(const layoutinfo &surface)
-{
-    if(max(LM_PACKW, LM_PACKH) > hwtexsize) return;
-
-    LightMap &lm = lightmaps[surface.lmid-LMID_RESERVED];
-    if(lm.tex < 0)
-    {
-        lm.offsetx = lm.offsety = 0;
-        lm.tex = lightmaptexs.length();
-        LightMapTexture &tex = lightmaptexs.add();
-        tex.type = renderpath==R_FIXEDFUNCTION ? (lm.type&~LM_TYPE) | LM_DIFFUSE : lm.type;
-        tex.w = LM_PACKW;
-        tex.h = LM_PACKH;
-        tex.unlitx = lm.unlitx;
-        tex.unlity = lm.unlity;
-        glGenTextures(1, &tex.id);
-        createtexture(tex.id, tex.w, tex.h, NULL, 3, 1, tex.type&LM_ALPHA ? GL_RGBA : GL_RGB);
-        if(renderpath!=R_FIXEDFUNCTION && (lm.type&LM_TYPE)==LM_BUMPMAP0 && lightmaps.inrange(surface.lmid+1-LMID_RESERVED))
-        {
-            LightMap &lm2 = lightmaps[surface.lmid+1-LMID_RESERVED];
-            lm2.offsetx = lm2.offsety = 0;
-            lm2.tex = lightmaptexs.length();
-            LightMapTexture &tex2 = lightmaptexs.add();
-            tex2.type = (lm.type&~LM_TYPE) | LM_BUMPMAP0;
-            tex2.w = LM_PACKW;
-            tex2.h = LM_PACKH;
-            tex2.unlitx = lm2.unlitx;
-            tex2.unlity = lm2.unlity;
-            glGenTextures(1, &tex2.id);
-            createtexture(tex2.id, tex2.w, tex2.h, NULL, 3, 1, GL_RGB);
-        }
-    }
-
-    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-    glPixelStorei(GL_UNPACK_ROW_LENGTH, LM_PACKW);
-
-    glBindTexture(GL_TEXTURE_2D, lightmaptexs[lm.tex].id);
-    glTexSubImage2D(GL_TEXTURE_2D, 0, lm.offsetx + surface.x, lm.offsety + surface.y, surface.w, surface.h, lm.type&LM_ALPHA ? GL_RGBA : GL_RGB, GL_UNSIGNED_BYTE, &lm.data[(surface.y*LM_PACKW + surface.x)*lm.bpp]);
-    if(renderpath!=R_FIXEDFUNCTION && (lm.type&LM_TYPE)==LM_BUMPMAP0 && lightmaps.inrange(surface.lmid+1-LMID_RESERVED))
-    {
-        LightMap &lm2 = lightmaps[surface.lmid+1-LMID_RESERVED];
-        glBindTexture(GL_TEXTURE_2D, lightmaptexs[lm2.tex].id);
-        glTexSubImage2D(GL_TEXTURE_2D, 0, lm2.offsetx + surface.x, lm2.offsety + surface.y, surface.w, surface.h, GL_RGB, GL_UNSIGNED_BYTE, &lm2.data[(surface.y*LM_PACKW + surface.x)*3]);
-    }
- 
-    glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
-}
- 
-        
 static uint generatelumel(lightmapworker *w, const float tolerance, uint lightmask, const vector<const extentity *> &lights, const vec &target, const vec &normal, vec &sample, int x, int y)
 {
     vec avgray(0, 0, 0);
