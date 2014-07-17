@@ -226,7 +226,8 @@ void setsurface(cube &c, int orient, const surfaceinfo &src, const vertinfo *src
 VARN(lmshadows, lmshadows_, 0, 2, 2);
 VARN(lmaa, lmaa_, 0, 3, 3);
 VARN(lerptjoints, lerptjoints_, 0, 1, 1);
-static int lmshadows = 2, lmaa = 3, lerptjoints = 1;
+VARN(lmao, lmao_, 0, 1, 1);
+static int lmshadows = 2, lmaa = 3, lerptjoints = 1, lmao = 1;
 
 static uint progress = 0, taskprogress = 0;
 static GLuint progresstex = 0;
@@ -656,7 +657,7 @@ static uint generatelumel(lightmapworker *w, const float tolerance, uint lightma
         }
     }
 	float occlusion = 0;
-	if(ambientocclusion) occlusion = calcocclusion(target, normal, tolerance);
+	if(ambientocclusion && lmao) occlusion = calcocclusion(target, normal, tolerance);
 
 	switch(w->type&LM_TYPE)
     {
@@ -2121,9 +2122,9 @@ bool setlightmapquality(int quality)
 {
     switch(quality)
     {
-        case  1: lmshadows = 2; lmaa = 3; lerptjoints = 1; break;
-        case  0: lmshadows = lmshadows_; lmaa = lmaa_; lerptjoints = lerptjoints_; break;
-        case -1: lmshadows = 1; lmaa = 0; lerptjoints = 0; break;
+        case  1: lmshadows = 2; lmaa = 3; lerptjoints = 1; lmao = 1; break;
+        case  0: lmshadows = lmshadows_; lmaa = lmaa_; lerptjoints = lerptjoints_; lmao = lmao_; break;
+        case -1: lmshadows = 1; lmaa = 0; lerptjoints = 0; lmao = 0; break;
         default: return false;
     }
     return true;
