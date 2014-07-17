@@ -473,10 +473,12 @@ static bool packlightmap(lightmapinfo &l, layoutinfo &surface)
 //we then darken the lightmap color depending on how much the pixel is occlued. 
 //(rays-hitting-a-wall / total-rays-sent -> value between 0 and 1.0) 1.0 = totally occlued, 0.0 = no occlusion
 
-VARR(ambientocclusion, 0, 255, 255); //factor how much the scene will be darkened
-FVARR(ambientocclusionradius, 1.0, 2.0, 1e16);
-VARP(testao, 0, 1, 2);
-FVARR(testborder, 0, 4., 17.); 
+VARR(ambientocclusion, 0, 128, 255); //factor how much the corners will be darkened
+FVARR(ambientocclusionradius, 1.0, 2.0, 40.0);
+FVARR(ambientocclusionprecision, 0, 4., 17.); 
+
+VAR(debugao, 0, 0, 1);
+
 static float calcocclusion(const vec &o, const vec &normal, float tolerance)
 {
 	static const vec rays[17] =
@@ -506,27 +508,29 @@ static float calcocclusion(const vec &o, const vec &normal, float tolerance)
        //degrees around xandy 50  60  70  80   50  60  70  80  50  60  70  80  50  60  70  80         (making it an upwardly open cone)					  
     };
 	//rotate the rays into the normal direction
-	vec axis; 
-	axis.cross(rays[0], normal);
-	bool needsrotation = axis.magnitude() != 0;
-	float angle;
-	if(needsrotation)
+	//(normals have to be normalized!)
+	matrix3x3 rotationmatrix;
+	bool needsrotation = false;
+	if( normal != rays[0]) 
 	{
-		angle = acos(rays[0].dot(normal));
-		axis.normalize();
+	vec axis; 
+		axis.cross(rays[0], normal); //todo (?) special case null normal (?)
+		if(axis.magnitude() == 0)  axis = vec(1, 0, 0);// special case angle == 180 (cross product == 0)
+		float angle = acos(rays[0].dot(normal));
+		rotationmatrix.rotate(angle, axis); //create a matrix
+		needsrotation = true;
 	}
 
 	int occluedrays = 0;
 	loopi(17) 
     {	
-		if(occluedrays >= testborder) break;		
-		vec ray(rays[i]);
-		if(needsrotation) ray.rotate(angle, axis);//ray.mul(rotmat.a).mul(rotmat.b).mul(rotmat.c);
+		if(occluedrays >= ambientocclusionprecision) break;		
+		vec ray(needsrotation ? rotationmatrix.transform(rays[i]) : rays[i]);
 		if(shadowray(vec(ray).mul(tolerance).add(o), ray, ambientocclusionradius, RAY_ALPHAPOLY|RAY_SHADOW, NULL) <= (ambientocclusionradius-1.0f)) occluedrays++; 
 				//check whether there's a wall in the field around the sample
     }
 
-	return min(1.0f, max( 0.0f, float(occluedrays)/testborder));
+	return min(1.0f, max( 0.0f, float(occluedrays)/ambientocclusionprecision));
 }
 
 static void updatelightmap(const layoutinfo &surface)
@@ -651,6 +655,8 @@ static uint generatelumel(lightmapworker *w, const float tolerance, uint lightma
             b += intensity * (sunlightcolor.z*sunlightscale);
         }
     }
+	float occlusion = 0;
+	if(ambientocclusion) occlusion = calcocclusion(target, normal, tolerance);
 
 	switch(w->type&LM_TYPE)
     {
@@ -666,22 +672,17 @@ static uint generatelumel(lightmapworker *w, const float tolerance, uint lightma
             w->raydata[y*w->w+x].add(vec(S.dot(avgray)/S.magnitude(), T.dot(avgray)/T.magnitude(), normal.dot(avgray)));
             break;
     }
-	float occlusion = calcocclusion(target, normal, tolerance);
 
-	if(testao == 1) { 
-		sample.r = min(255.0f, max(r, float(ambientcolor[0])) - ambientocclusion * occlusion);
-		sample.g = min(255.0f, max(g, float(ambientcolor[1])) - ambientocclusion * occlusion);
-		sample.b = min(255.0f, max(b, float(ambientcolor[2])) - ambientocclusion * occlusion);
-	}
-	else if(testao == 2) {
+
+	if(debugao) {
 		sample.r = min(255.0f, ambientocclusion * occlusion); //colorize every occlued part red
 		sample.g = 0;
 		sample.b = 0;
 	}
 	else {
-		sample.r = min(255.0f, max(r, float(ambientcolor[0])));
-		sample.g = min(255.0f, max(g, float(ambientcolor[1])));
-		sample.b = min(255.0f, max(b, float(ambientcolor[2])));
+		sample.r = min(255.0f, max(r, float(ambientcolor[0])) - ambientocclusion * occlusion);
+		sample.g = min(255.0f, max(g, float(ambientcolor[1])) - ambientocclusion * occlusion);
+		sample.b = min(255.0f, max(b, float(ambientcolor[2])) - ambientocclusion * occlusion);	
 	}
     return lightused;
 }
