@@ -42,7 +42,7 @@ namespace aiman
                 for(int j = teams.length() - 2; j >= 0; j--)
                 {
                     if(teams[j].score >= teams[j+1].score) break;
-                    swap(teams[j], teams[j+1]);
+                    std::swap(teams[j], teams[j+1]);
                 }
                 break;
             }

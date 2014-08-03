@@ -550,7 +550,7 @@ struct BlendBrush
             }
             dst += stridey;
         }
-        if(swapxy) swap(w, h);
+        if(swapxy) std::swap(w, h);
         delete[] data;
         data = rdata;
         if(tex) gentex();

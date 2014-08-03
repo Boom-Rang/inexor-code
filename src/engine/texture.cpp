@@ -77,7 +77,7 @@ static inline void reorienttexture(uchar *src, int sw, int sh, int bpp, int stri
             {
                 if(flipx) curdst[0] = 255-curdst[0];
                 if(flipy) curdst[1] = 255-curdst[1];
-                if(swapxy) swap(curdst[0], curdst[1]);
+                if(swapxy) std::swap(curdst[0], curdst[1]);
             }
             curdst += stridex;
         }
@@ -100,7 +100,7 @@ static void reorients3tc(GLenum format, int blocksize, int w, int h, uchar *src,
             {
                 ullong salpha = lilswap(*(ullong *)src), dalpha = 0;
                 uint xmask = flipx ? 15 : 0, ymask = flipy ? 15 : 0, xshift = 2, yshift = 4;
-                if(swapxy) swap(xshift, yshift);
+                if(swapxy) std::swap(xshift, yshift);
                 for(int y = by1; y < by2; y++) for(int x = bx1; x < bx2; x++)
                 {
                     dalpha |= ((salpha&15) << (((xmask^x)<<xshift) + ((ymask^y)<<yshift)));
@@ -115,7 +115,7 @@ static void reorients3tc(GLenum format, int blocksize, int w, int h, uchar *src,
                 uchar alpha1 = src[0], alpha2 = src[1];
                 ullong salpha = lilswap(*(ushort *)&src[2]) + ((ullong)lilswap(*(ushort *)&src[4])<<16) + ((ullong)lilswap(*(ushort *)&src[6])<<32), dalpha = 0;
                 uint xmask = flipx ? 7 : 0, ymask = flipy ? 7 : 0, xshift = 0, yshift = 2;
-                if(swapxy) swap(xshift, yshift);
+                if(swapxy) std::swap(xshift, yshift);
                 for(int y = by1; y < by2; y++) for(int x = bx1; x < bx2; x++)
                 {
                     dalpha |= ((salpha&7) << (3*((xmask^x)<<xshift) + ((ymask^y)<<yshift)));
@@ -154,7 +154,7 @@ static void reorients3tc(GLenum format, int blocksize, int w, int h, uchar *src,
                 else { color1 = ncolor1; color2 = ncolor2; }
             }
             uint dbits = 0, xmask = flipx ? 3 : 0, ymask = flipy ? 3 : 0, xshift = 1, yshift = 3;
-            if(swapxy) swap(xshift, yshift);
+            if(swapxy) std::swap(xshift, yshift);
             for(int y = by1; y < by2; y++) for(int x = bx1; x < bx2; x++)
             {
                 dbits |= ((sbits&3) << (((xmask^x)<<xshift) + ((ymask^y)<<yshift)));
@@ -1442,7 +1442,7 @@ int compactvslots()
     loopv(vslots) 
     {
         while(vslots[i]->index >= 0 && vslots[i]->index != i)     
-            swap(vslots[i], vslots[vslots[i]->index]); 
+            std::swap(vslots[i], vslots[vslots[i]->index]); 
     }
     for(int i = compactedvslots; i < vslots.length(); i++) delete vslots[i];
     vslots.setsize(compactedvslots);
@@ -1466,7 +1466,7 @@ static void clampvslotoffset(VSlot &dst, Slot *slot = NULL)
     {
         if(!slot->loaded) loadslot(*slot, false);
         int xs = slot->sts[0].t->xs, ys = slot->sts[0].t->ys;
-        if((dst.rotation&5)==1) swap(xs, ys);
+        if((dst.rotation&5)==1) std::swap(xs, ys);
         dst.xoffset %= xs; if(dst.xoffset < 0) dst.xoffset += xs;
         dst.yoffset %= ys; if(dst.yoffset < 0) dst.yoffset += ys;
     }
@@ -2412,12 +2412,12 @@ GLuint genenvmap(const vec &o, int envmapsize, int blur)
         if(rendersize > texsize)
         {
             scaletexture(src, rendersize, rendersize, 3, 3*rendersize, dst, texsize, texsize);
-            swap(src, dst);
+            std::swap(src, dst);
         }
         if(blur > 0)
         {
             blurtexture(blur, 3, texsize, texsize, dst, src);
-            swap(src, dst);
+            std::swap(src, dst);
         }
         createtexture(tex, texsize, texsize, src, 3, 2, GL_RGB5, side.target);
     }

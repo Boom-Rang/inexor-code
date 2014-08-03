@@ -158,7 +158,7 @@ void BIH::build(vector<BIHNode> &buildnodes, ushort *indices, int numindices, co
             else 
             {    
                 --right; 
-                swap(indices[left], indices[right]); 
+                std::swap(indices[left], indices[right]);
                 splitright = min(splitright, amin);
                 rightmin.min(tri.a).min(tri.b).min(tri.c);
                 rightmax.max(tri.a).max(tri.b).max(tri.c);

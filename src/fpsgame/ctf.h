@@ -950,7 +950,7 @@ struct ctfclientmode : clientmode
                 {
                     float sdist = flagspawns[k]->o.dist(goal);
                     if(dist >= sdist) continue;
-                    swap(e, flagspawns[k]);
+                    std::swap(e, flagspawns[k]);
                     dist = sdist;
                 }
                 if(numflagspawns < int(sizeof(flagspawns)/sizeof(flagspawns[0]))) flagspawns[numflagspawns++] = e;

@@ -975,7 +975,7 @@ void gencubeedges(cube &c, int x, int y, int z, int size)
             if(d[axis] < 0)
             {
                 d.neg();
-                swap(e1, e2);
+                std::swap(e1, e2);
             }
             reduceslope(d);
 

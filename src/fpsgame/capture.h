@@ -381,7 +381,7 @@ struct captureclientmode : clientmode
             if(b.owner[0])
             {
                 bool isowner = !strcmp(b.owner, player1->team);
-                if(b.enemy[0]) { mtype = PART_METER_VS; mcolor = 0xFF1932; mcolor2 = 0x3219FF; if(!isowner) swap(mcolor, mcolor2); }
+                if(b.enemy[0]) { mtype = PART_METER_VS; mcolor = 0xFF1932; mcolor2 = 0x3219FF; if(!isowner) std::swap(mcolor, mcolor2); }
                 if(!b.name[0]) formatstring(b.info)("base %d: %s", i+1, b.owner);
                 else if(basenumbers) formatstring(b.info)("%s (%d): %s", b.name, i+1, b.owner);
                 else formatstring(b.info)("%s: %s", b.name, b.owner);

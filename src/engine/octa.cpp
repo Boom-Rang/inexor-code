@@ -1661,7 +1661,7 @@ bool mergepolys(int orient, hashset<plink> &links, vector<plink *> &queue, int o
     {
         pedge e(p.verts[prev], p.verts[j]);
         int order = e.from.x > e.to.x || (e.from.x == e.to.x && e.from.y > e.to.y) ? 1 : 0;
-        if(order) swap(e.from, e.to);
+        if(order) std::swap(e.from, e.to);
         plink &l = links.access(e, e);
         bool shouldqueue = l.polys[order] < 0 && l.polys[order^1] >= 0;
         l.polys[order] = owner;
@@ -1749,7 +1749,7 @@ void mergepolys(int orient, const ivec &co, const ivec &n, int offset, vector<po
         {
             pedge e(p.verts[prev], p.verts[j]);
             int order = e.from.x > e.to.x || (e.from.x == e.to.x && e.from.y > e.to.y) ? 1 : 0;
-            if(order) swap(e.from, e.to);
+            if(order) std::swap(e.from, e.to);
             plink &l = links.access(e, e);
             l.polys[order] = i;
             if(l.polys[0] >= 0 && l.polys[1] >= 0) queue.add(&l);

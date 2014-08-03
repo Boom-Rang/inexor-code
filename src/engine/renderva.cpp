@@ -1604,7 +1604,7 @@ static void changetexgen(renderstate &cur, int dim, Slot &slot, VSlot &vslot)
             float xs = vslot.rotation>=2 && vslot.rotation<=4 ? -tex->xs : tex->xs,
                   ys = (vslot.rotation>=1 && vslot.rotation<=2) || vslot.rotation==5 ? -tex->ys : tex->ys,
                   scrollS = vslot.scrollS, scrollT = vslot.scrollT;
-            if((vslot.rotation&5)==1) swap(scrollS, scrollT);
+            if((vslot.rotation&5)==1) std::swap(scrollS, scrollT);
             scrollS *= lastmillis*tex->xs/xs;
             scrollT *= lastmillis*tex->ys/ys;
             if(cur.texgenscrollS != scrollS || cur.texgenscrollT != scrollT)

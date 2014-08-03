@@ -732,8 +732,8 @@ struct varenderer : partrenderer
                 float tx = 0.5f*((p->flags>>5)&1), ty = 0.5f*((p->flags>>6)&1);
                 SETTEXCOORDS(tx, tx + 0.5f, ty, ty + 0.5f,
                 {
-                    if(p->flags&0x01) swap(u1, u2);
-                    if(p->flags&0x02) swap(v1, v2);
+                    if(p->flags&0x01) std::swap(u1, u2);
+                    if(p->flags&0x02) std::swap(v1, v2);
                 });
             } 
             else if(type&PT_ICON)
@@ -1302,7 +1302,7 @@ void regularshape(int type, int radius, int color, int dir, int num, int fade, c
         }
         else from = to = p; 
 
-        if(inv) swap(from, to);
+        if(inv) std::swap(from, to);
 
         if(taper)
         {

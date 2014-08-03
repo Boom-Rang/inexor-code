@@ -203,7 +203,7 @@ COMMAND(selextend, "");
 ICOMMAND(selmoved, "", (), { if(noedit(true)) return; intret(sel.o != savedsel.o ? 1 : 0); });
 ICOMMAND(selsave, "", (), { if(noedit(true)) return; savedsel = sel; });
 ICOMMAND(selrestore, "", (), { if(noedit(true)) return; sel = savedsel; });
-ICOMMAND(selswap, "", (), { if(noedit(true)) return; swap(sel, savedsel); });
+ICOMMAND(selswap, "", (), { if(noedit(true)) return; std::swap(sel, savedsel); });
 
 ///////// selection support /////////////
 
@@ -1971,13 +1971,13 @@ uint mflip(uint face) { return (face&0xFF0000FF) | ((face&0x00FF0000)>>8) | ((fa
 
 void flipcube(cube &c, int d)
 {
-    swap(c.texture[d*2], c.texture[d*2+1]);
+    std::swap(c.texture[d*2], c.texture[d*2+1]);
     c.faces[D[d]] = dflip(c.faces[D[d]]);
     c.faces[C[d]] = cflip(c.faces[C[d]]);
     c.faces[R[d]] = rflip(c.faces[R[d]]);
     if(c.children)
     {
-        loopi(8) if(i&octadim(d)) swap(c.children[i], c.children[i-octadim(d)]);
+        loopi(8) if(i&octadim(d)) std::swap(c.children[i], c.children[i-octadim(d)]);
         loopi(8) flipcube(c.children[i], d);
     }
 }
@@ -1992,11 +1992,11 @@ void rotatecube(cube &c, int d)   // rotates cube clockwise. see pics in cvs for
     c.faces[D[d]] = cflip (mflip(c.faces[D[d]]));
     c.faces[C[d]] = dflip (mflip(c.faces[C[d]]));
     c.faces[R[d]] = rflip (mflip(c.faces[R[d]]));
-    swap(c.faces[R[d]], c.faces[C[d]]);
+    std::swap(c.faces[R[d]], c.faces[C[d]]);
 
-    swap(c.texture[2*R[d]], c.texture[2*C[d]+1]);
-    swap(c.texture[2*C[d]], c.texture[2*R[d]+1]);
-    swap(c.texture[2*C[d]], c.texture[2*C[d]+1]);
+    std::swap(c.texture[2*R[d]], c.texture[2*C[d]+1]);
+    std::swap(c.texture[2*C[d]], c.texture[2*R[d]+1]);
+    std::swap(c.texture[2*C[d]], c.texture[2*C[d]+1]);
 
     if(c.children)
     {
@@ -2028,7 +2028,7 @@ void mpflip(selinfo &sel, bool local)
         {
             cube &a = selcube(x, y, z);
             cube &b = selcube(x, y, zs-z-1);
-            swap(a, b);
+            std::swap(a, b);
         }
     }
     changed(sel);
@@ -2290,7 +2290,7 @@ void rendertexturepanel(int w, int h)
                 float xoff = vslot.xoffset, yoff = vslot.yoffset;
                 if(vslot.rotation)
                 {
-                    if((vslot.rotation&5) == 1) { swap(xoff, yoff); loopk(4) swap(tc[k][0], tc[k][1]); }
+                    if((vslot.rotation&5) == 1) { std::swap(xoff, yoff); loopk(4) std::swap(tc[k][0], tc[k][1]); }
                     if(vslot.rotation >= 2 && vslot.rotation <= 4) { xoff *= -1; loopk(4) tc[k][0] *= -1; }
                     if(vslot.rotation <= 2 || vslot.rotation == 5) { yoff *= -1; loopk(4) tc[k][1] *= -1; }
                 }

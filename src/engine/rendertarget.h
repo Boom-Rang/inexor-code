@@ -404,11 +404,11 @@ struct rendertarget
             if(blursize && !blurtex) setupblur();
             if(swaptexs() && blursize)
             {
-                swap(rendertex, blurtex);
+                std::swap(rendertex, blurtex);
                 if(!rtsharefb)
                 {
-                    swap(renderfb, blurfb);
-                    swap(renderdb, blurdb);
+                    std::swap(renderfb, blurfb);
+                    std::swap(renderdb, blurdb);
                 }
             }
             glBindFramebuffer_(GL_FRAMEBUFFER_EXT, renderfb);
@@ -542,7 +542,7 @@ struct rendertarget
             tx2 /= vieww;
             ty2 /= viewh;
         }
-        if(flipdebug()) swap(ty1, ty2);
+        if(flipdebug()) std::swap(ty1, ty2);
         glBegin(GL_TRIANGLE_STRIP);
         glTexCoord2f(tx1, ty1); glVertex2i(0, 0);
         glTexCoord2f(tx2, ty1); glVertex2i(w, 0);

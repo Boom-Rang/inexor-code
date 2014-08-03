@@ -290,7 +290,7 @@ struct aviwriter
         f->putlil<uint>(videow); // horizontal total
         f->putlil<uint>(videoh); // vertical total
         int gcd = screen->w, rem = screen->h;
-        while(rem > 0) { gcd %= rem; swap(gcd, rem); }
+        while(rem > 0) { gcd %= rem; std::swap(gcd, rem); }
         f->putlil<ushort>(screen->h/gcd); // aspect denominator
         f->putlil<ushort>(screen->w/gcd); // aspect numerator
         f->putlil<uint>(videow); // frame width
@@ -1071,7 +1071,7 @@ namespace recorder
                     drawquad(tw, th, 0, 0, dw, dh);
                     tw = dw;
                     th = dh;
-                    swap(scaletex[0], scaletex[1]);
+                    std::swap(scaletex[0], scaletex[1]);
                 } while(tw > m.w || th > m.h);
                 glDisable(GL_TEXTURE_RECTANGLE_ARB);
             }

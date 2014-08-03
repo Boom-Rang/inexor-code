@@ -1275,9 +1275,9 @@ struct glmatrixf
 
     void transpose()
     {
-        swap(v[1], v[4]); swap(v[2], v[8]); swap(v[3], v[12]);
-        swap(v[6], v[9]); swap(v[7], v[13]);
-        swap(v[11], v[14]);
+        std::swap(v[1], v[4]); std::swap(v[2], v[8]); std::swap(v[3], v[12]);
+        std::swap(v[6], v[9]); std::swap(v[7], v[13]);
+        std::swap(v[11], v[14]);
     }
 
     void frustum(float left, float right, float bottom, float top, float znear, float zfar)
