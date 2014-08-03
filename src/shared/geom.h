@@ -43,10 +43,10 @@ struct vec
     vec &sub(float f)        { x -= f;         y -= f;         z -= f;         return *this; }
     vec &neg2()              { x = -x;         y = -y;                         return *this; }
     vec &neg()               { x = -x;         y = -y;         z = -z;         return *this; }
-    vec &min(const vec &o)   { x = ::min(x, o.x);  y = ::min(y, o.y);  z = ::min(z, o.z);  return *this; }
-    vec &max(const vec &o)   { x = ::max(x, o.x);  y = ::max(y, o.y);  z = ::max(z, o.z);  return *this; }
-    vec &min(float f)        { x = ::min(x, f);    y = ::min(y, f);    z = ::min(z, f);    return *this; }
-    vec &max(float f)        { x = ::max(x, f);    y = ::max(y, f);    z = ::max(z, f);    return *this; }
+    vec &min(const vec &o)   { x = std::min(x, o.x);  y = std::min(y, o.y);  z = std::min(z, o.z);  return *this; }
+    vec &max(const vec &o)   { x = std::max(x, o.x);  y = std::max(y, o.y);  z = std::max(z, o.z);  return *this; }
+    vec &min(float f)        { x = std::min(x, f);    y = std::min(y, f);    z = std::min(z, f);    return *this; }
+    vec &max(float f)        { x = std::max(x, f);    y = std::max(y, f);    z = std::max(z, f);    return *this; }
     vec &clamp(float f, float h) { x = ::clamp(x, f, h);   y = ::clamp(y, f, h);   z = ::clamp(z, f, h);   return *this; }
     float magnitude2() const { return sqrtf(dot2(*this)); }
     float magnitude() const  { return sqrtf(squaredlen()); }
@@ -69,14 +69,14 @@ struct vec
     {
         float m = squaredlen(), k = dot(n);
         projectxydir(n);
-        rescale(sqrtf(::max(m - k*k, 0.0f)));
+        rescale(sqrtf(std::max(m - k*k, 0.0f)));
         return *this;
     }
     vec &projectxy(const vec &n, float threshold)
     {
-        float m = squaredlen(), k = ::min(dot(n), threshold);
+        float m = squaredlen(), k = std::min(dot(n), threshold);
         projectxydir(n);
-        rescale(sqrtf(::max(m - k*k, 0.0f)));
+        rescale(sqrtf(std::max(m - k*k, 0.0f)));
         return *this;
     }
     vec &lerp(const vec &b, float t) { x += (b.x-x)*t; y += (b.y-y)*t; z += (b.z-z)*t; return *this; }
@@ -603,7 +603,7 @@ struct matrix3x3
         }
         else if(a.x >= b.y && a.x >= c.z)
         {
-            float r = sqrtf(max(1 + a.x - b.y - c.z, 0.0f));
+            float r = sqrtf(std::max(1 + a.x - b.y - c.z, 0.0f));
             if(r <= threshold) return false;
             axis.x = 0.5f*r;
             axis.y = a.y/r;
@@ -611,7 +611,7 @@ struct matrix3x3
         }
         else if(b.y >= c.z)
         {
-            float r = sqrtf(max(1 + b.y - a.x - c.z, 0.0f));
+            float r = sqrtf(std::max(1 + b.y - a.x - c.z, 0.0f));
             if(r <= threshold) return false;
             axis.y = 0.5f*r;
             axis.x = a.y/r;
@@ -619,7 +619,7 @@ struct matrix3x3
         }
         else
         {
-            float r = sqrtf(max(1 + b.y - a.x - c.z, 0.0f));
+            float r = sqrtf(std::max(1 + b.y - a.x - c.z, 0.0f));
             if(r <= threshold) return false;
             axis.z = 0.5f*r;
             axis.x = a.z/r;
@@ -1046,10 +1046,10 @@ struct ivec
     ivec &sub(const ivec &v) { x -= v.x; y -= v.y; z -= v.z; return *this; }
     ivec &mask(int n) { x &= n; y &= n; z &= n; return *this; }
     ivec &neg() { return mul(-1); }
-    ivec &min(const ivec &o) { x = ::min(x, o.x); y = ::min(y, o.y); z = ::min(z, o.z); return *this; }
-    ivec &max(const ivec &o) { x = ::max(x, o.x); y = ::max(y, o.y); z = ::max(z, o.z); return *this; }
-    ivec &min(int n) { x = ::min(x, n); y = ::min(y, n); z = ::min(z, n); return *this; }
-    ivec &max(int n) { x = ::max(x, n); y = ::max(y, n); z = ::max(z, n); return *this; }
+    ivec &min(const ivec &o) { x = std::min(x, o.x); y = std::min(y, o.y); z = std::min(z, o.z); return *this; }
+    ivec &max(const ivec &o) { x = std::max(x, o.x); y = std::max(y, o.y); z = std::max(z, o.z); return *this; }
+    ivec &min(int n) { x = std::min(x, n); y = std::min(y, n); z = std::min(z, n); return *this; }
+    ivec &max(int n) { x = std::max(x, n); y = std::max(y, n); z = std::max(z, n); return *this; }
     ivec &abs() { x = ::abs(x); y = ::abs(y); z = ::abs(z); return *this; }
     ivec &cross(const ivec &a, const ivec &b) { x = a.y*b.z-a.z*b.y; y = a.z*b.x-a.x*b.z; z = a.x*b.y-a.y*b.x; return *this; }
     int dot(const ivec &o) const { return x*o.x + y*o.y + z*o.z; }

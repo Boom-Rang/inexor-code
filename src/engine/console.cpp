@@ -121,7 +121,7 @@ ICOMMAND(clearconsole, "", (), { while(conlines.length()) delete[] conlines.pop(
 
 int drawconlines(int conskip, int confade, int conwidth, int conheight, int conoff, int filter, int y = 0, int dir = 1)
 {
-    int numl = conlines.length(), offset = min(conskip, numl);
+    int numl = conlines.length(), offset = std::min(conskip, numl);
 
     if(confade)
     {
@@ -180,7 +180,7 @@ int renderconsole(int w, int h, int abovehud)                   // render buffer
 {
     int conpad = fullconsole ? 0 : FONTH/4,
         conoff = fullconsole ? FONTH : FONTH/3,
-        conheight = min(fullconsole ? ((h*fullconsize/100)/FONTH)*FONTH : FONTH*consize, h - 2*(conpad + conoff)),
+        conheight = std::min(fullconsole ? ((h*fullconsize/100)/FONTH)*FONTH : FONTH*consize, h - 2*(conpad + conoff)),
         conwidth = w - 2*(conpad + conoff) - (fullconsole ? 0 : game::clipconsole(w, h));
     
     extern void consolebox(int x1, int y1, int x2, int y2);
@@ -188,7 +188,7 @@ int renderconsole(int w, int h, int abovehud)                   // render buffer
     
     int y = drawconlines(conskip, fullconsole ? 0 : confade, conwidth, conheight, conpad+conoff, fullconsole ? fullconfilter : confilter);
     if(!fullconsole && (miniconsize && miniconwidth))
-        drawconlines(miniconskip, miniconfade, (miniconwidth*(w - 2*(conpad + conoff)))/100, min(FONTH*miniconsize, abovehud - y), conpad+conoff, miniconfilter, abovehud, -1);
+        drawconlines(miniconskip, miniconfade, (miniconwidth*(w - 2*(conpad + conoff)))/100, std::min(FONTH*miniconsize, abovehud - y), conpad+conoff, miniconfilter, abovehud, -1);
     return fullconsole ? conheight + 2*(conpad + conoff) : y;
 }
 
@@ -335,11 +335,11 @@ void pasteconsole()
     switch(fmt)
     {
         case CF_UNICODETEXT:
-            decoded = min(int(sizeof(commandbuf)-1-commandlen), cblen/2);
+            decoded = std::min(int(sizeof(commandbuf)-1-commandlen), cblen/2);
             loopi(decoded) commandbuf[commandlen++] = uni2cube(cb[i]);
             break;
         case CF_TEXT:
-            decoded = min(int(sizeof(commandbuf)-1-commandlen), cblen);
+            decoded = std::min(int(sizeof(commandbuf)-1-commandlen), cblen);
             memcpy(&commandbuf[commandlen], cb, decoded);
             break;
     }    
@@ -374,7 +374,7 @@ void pasteconsole()
             commandlen += decodeutf8((uchar *)&commandbuf[commandlen], commandmax, cbline, cblen);
             goto nextline;
         }
-        cblen = min(cblen, commandmax);
+        cblen = std::min(cblen, commandmax);
         loopi(cblen) commandbuf[commandlen++] = uni2cube(*cbline++);
     nextline:
         commandbuf[commandlen] = '\n';
@@ -836,7 +836,7 @@ void complete(char *s, const char *cmdprefix)
         if(end)
         {
             string command;
-            copystring(command, &s[cmdlen], min(size_t(end-&s[cmdlen]+1), sizeof(command)));
+            copystring(command, &s[cmdlen], std::min(size_t(end-&s[cmdlen]+1), sizeof(command)));
             filesval **hasfiles = completions.access(command);
             if(hasfiles) f = *hasfiles;
         }
@@ -847,7 +847,7 @@ void complete(char *s, const char *cmdprefix)
     if(f) // complete using filenames
     {
         int commandsize = strchr(&s[cmdlen], ' ')+1-s;
-        copystring(prefix, s, min(size_t(commandsize+1), sizeof(prefix)));
+        copystring(prefix, s, std::min(size_t(commandsize+1), sizeof(prefix)));
         f->update();
         loopv(f->files)
         {

@@ -784,7 +784,7 @@ static char *conc(tagval *v, int n, bool space, const char *prefix, int prefixle
         default: vlen[i] = 0; break;
     }
 overflow:
-    if(space) len += max(prefix ? i : i-1, 0);
+    if(space) len += std::max(prefix ? i : i-1, 0);
     char *buf = newstring(len + numlen);
     int offset = 0, numoffset = 0;
     if(prefix)
@@ -1611,8 +1611,8 @@ static inline void callcommand(ident *id, tagval *args, int numargs, bool lookup
 #ifndef STANDALONE
         case 'D': if(++i < numargs) freearg(args[i]); args[i].setint(addreleaseaction(conc(args, i, true, id->name)) ? 1 : 0); fakeargs++; break;
 #endif
-        case 'C': { i = max(i+1, numargs); vector<char> buf; ((comfun1)id->fun)(conc(buf, args, i, true)); goto cleanup; }
-        case 'V': i = max(i+1, numargs); ((comfunv)id->fun)(args, i); goto cleanup;
+        case 'C': { i = std::max(i+1, numargs); vector<char> buf; ((comfun1)id->fun)(conc(buf, args, i, true)); goto cleanup; }
+        case 'V': i = std::max(i+1, numargs); ((comfunv)id->fun)(args, i); goto cleanup;
         case '1': case '2': case '3': case '4': if(i+1 < numargs) { fmt -= *fmt-'0'+1; rep = true; } break;
     }
     #define ARG(n) (id->argmask&(1<<n) ? (void *)args[n].s : (void *)&args[n].i)
@@ -2587,7 +2587,7 @@ COMMAND(substr, "siiN");
 
 void sublist(const char *s, int *skip, int *count, int *numargs)
 {
-    int offset = max(*skip, 0), len = *numargs >= 3 ? max(*count, 0) : -1;
+    int offset = std::max(*skip, 0), len = *numargs >= 3 ? std::max(*count, 0) : -1;
     loopi(offset) if(!parselist(s)) break;
     if(len < 0) { if(offset > 0) skiplist(s); commandret->setstr(newstring(s)); return; }
     const char *list = s, *start, *end, *qstart, *qend = s;
@@ -2758,7 +2758,7 @@ ICOMMAND(listdel, "ss", (char *list, char *del), commandret->setstr(listdel(list
 
 void listsplice(const char *s, const char *vals, int *skip, int *count, int *numargs)
 {
-    int offset = max(*skip, 0), len = *numargs >= 4 ? max(*count, 0) : -1;
+    int offset = std::max(*skip, 0), len = *numargs >= 4 ? std::max(*count, 0) : -1;
     const char *list = s, *start, *end, *qstart, *qend = s;
     loopi(offset) if(!parselist(s, start, end, qstart, qend)) break;
     vector<char> p;
@@ -2875,7 +2875,7 @@ void sortlist(char *list, ident *x, ident *y, uint *body)
     poparg(*y);
     
     char *sorted = macros;
-    int sortedlen = total + max(items.length() - 1, 0);
+    int sortedlen = total + std::max(items.length() - 1, 0);
     if(macrolen < sortedlen)
     {
         delete[] macros;
@@ -2965,25 +2965,25 @@ ICOMMAND(exp, "f", (float *a), floatret(exp(*a)));
 ICOMMAND(min, "V", (tagval *args, int numargs),
 {
     int val = numargs > 0 ? args[numargs - 1].getint() : 0;
-    loopi(numargs - 1) val = min(val, args[i].getint());
+    loopi(numargs - 1) val = std::min(val, args[i].getint());
     intret(val);
 });
 ICOMMAND(max, "V", (tagval *args, int numargs),
 {
     int val = numargs > 0 ? args[numargs - 1].getint() : 0;
-    loopi(numargs - 1) val = max(val, args[i].getint());
+    loopi(numargs - 1) val = std::max(val, args[i].getint());
     intret(val);
 });
 ICOMMAND(minf, "V", (tagval *args, int numargs),
 {
     float val = numargs > 0 ? args[numargs - 1].getfloat() : 0.0f;
-    loopi(numargs - 1) val = min(val, args[i].getfloat());
+    loopi(numargs - 1) val = std::min(val, args[i].getfloat());
     floatret(val);
 });
 ICOMMAND(maxf, "V", (tagval *args, int numargs),
 {
     float val = numargs > 0 ? args[numargs - 1].getfloat() : 0.0f;
-    loopi(numargs - 1) val = max(val, args[i].getfloat());
+    loopi(numargs - 1) val = std::max(val, args[i].getfloat());
     floatret(val);
 });
 ICOMMAND(abs, "i", (int *n), intret(abs(*n)));
@@ -3078,7 +3078,7 @@ vector<sleepcmd> sleepcmds;
 void addsleep(int *msec, char *cmd)
 {
     sleepcmd &s = sleepcmds.add();
-    s.delay = max(*msec, 1);
+    s.delay = std::max(*msec, 1);
     s.millis = lastmillis;
     s.command = newstring(cmd);
     s.flags = identflags;

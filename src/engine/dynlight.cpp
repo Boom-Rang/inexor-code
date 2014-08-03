@@ -1,7 +1,7 @@
 #include "engine.h"
 
-VARP(ffdynlights, 0, min(5, DYNLIGHTMASK), DYNLIGHTMASK);
-VARP(maxdynlights, 0, min(3, MAXDYNLIGHTS), MAXDYNLIGHTS);
+VARP(ffdynlights, 0, std::min(5, DYNLIGHTMASK), DYNLIGHTMASK);
+VARP(maxdynlights, 0, std::min(3, MAXDYNLIGHTS), MAXDYNLIGHTS);
 VARP(dynlightdist, 0, 1024, 10000);
 
 struct dynlight

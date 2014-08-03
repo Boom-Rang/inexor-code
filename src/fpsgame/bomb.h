@@ -149,7 +149,7 @@ struct bombclientmode : clientmode
             int pw, ph, tw, th;
             text_bounds("  ", pw, ph);
             text_bounds(m_teammode ? "YOUR TEAM WINS" : "YOU WIN", tw, th);
-            th = max(th, ph);
+            th = std::max(th, ph);
             draw_text(m_teammode ? "YOUR TEAM WINS" : "YOU WIN", w*1800/h - tw - pw, 1650 - th);
         }
         else if(player1->state != CS_ALIVE && !game::intermission)
@@ -159,7 +159,7 @@ struct bombclientmode : clientmode
             if(player1->deaths > 0)
             {
                 text_bounds("YOU ARE DEAD", tw, th);
-                th = max(th, ph);
+                th = std::max(th, ph);
                 draw_text("YOU ARE DEAD", w*1800/h - tw - pw, 1420 - th);
             }
             text_bounds("PLEASE WAIT UNTIL ROUND ENDS", fw, fh);
@@ -288,7 +288,7 @@ struct bombclientmode : clientmode
     	int numsploc = getint(p);
     	loopi(numsploc){
     		vec o;
-    		loopk(3) o[k] = max(getint(p)/DMF, 0.0f);
+    		loopk(3) o[k] = std::max(getint(p)/DMF, 0.0f);
     		int team = getint(p), index = getint(p);
     		if(p.overread()) break;
         	if(m_teammode ? team < 1 || team > 2 : team) return false;

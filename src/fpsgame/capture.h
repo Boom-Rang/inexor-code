@@ -117,7 +117,7 @@ struct captureclientmode : clientmode
         bool addammo(int i)
         {
             if(ammo>=MAXAMMO) return false;
-            ammo = min(ammo+i, int(MAXAMMO));
+            ammo = std::min(ammo+i, int(MAXAMMO));
             return true;
         }
 
@@ -182,7 +182,7 @@ struct captureclientmode : clientmode
     {
         if(bases.length() >= MAXBASES) return;
         baseinfo &b = bases.add();
-        b.ammogroup = min(ammotype, 0);
+        b.ammogroup = std::min(ammotype, 0);
         b.ammotype = ammotype > 0 ? ammotype : rnd(I_GRENADES-I_SHELLS+1)+1;
         b.o = o;
 
@@ -237,7 +237,7 @@ struct captureclientmode : clientmode
         {
             baseinfo &e = bases[i];
             if(e.owner[0] && strcmp(b.owner, e.owner))
-                dist = min(dist, b.o.dist(e.o));
+                dist = std::min(dist, b.o.dist(e.o));
         }
         return dist;
     }
@@ -354,7 +354,7 @@ struct captureclientmode : clientmode
             rendermodel(&b.light, basename, ANIM_MAPMODEL|ANIM_LOOP, b.o, 0, 0, MDL_SHADOW | MDL_CULL_VFC | MDL_CULL_OCCLUDED);
             float fradius = 1.0f, fheight = 0.5f;
             regular_particle_flame(PART_FLAME, vec(b.ammopos.x, b.ammopos.y, b.ammopos.z - 4.5f), fradius, fheight, b.owner[0] ? (strcmp(b.owner, player1->team) ? 0x802020 : 0x2020FF) : 0x208020, 3, 2.0f);
-            //regular_particle_flame(PART_SMOKE, vec(b.ammopos.x, b.ammopos.y, b.ammopos.z - 4.5f + 4.0f*min(fradius, fheight)), fradius, fheight, 0x303020, 1, 4.0f, 100.0f, 2000.0f, -20);
+            //regular_particle_flame(PART_SMOKE, vec(b.ammopos.x, b.ammopos.y, b.ammopos.z - 4.5f + 4.0f*std::min(fradius, fheight)), fradius, fheight, 0x303020, 1, 4.0f, 100.0f, 2000.0f, -20);
 
 //            particle_fireball(b.ammopos, 4.8f, PART_EXPLOSION, 0, b.owner[0] ? (strcmp(b.owner, player1->team) ? 0x802020 : 0x2020FF) : 0x208020, 4.8f);
 
@@ -456,7 +456,7 @@ struct captureclientmode : clientmode
     int respawnwait(fpsent *d)
     {
         if(m_regencapture) return -1;
-        return max(0, RESPAWNSECS-(lastmillis-d->lastpain)/1000);
+        return std::max(0, RESPAWNSECS-(lastmillis-d->lastpain)/1000);
     }
 
     int clipconsole(int w, int h)
@@ -884,7 +884,7 @@ ICOMMAND(insidebases, "", (),
                 bool notify = false;
                 if(ci->state.health < ci->state.maxhealth)
                 {
-                    ci->state.health = min(ci->state.health + ticks*REGENHEALTH, ci->state.maxhealth);
+                    ci->state.health = std::min(ci->state.health + ticks*REGENHEALTH, ci->state.maxhealth);
                     notify = true;
                 }
                 if(ci->state.armourtype != A_GREEN || ci->state.armour < itemstats[I_GREENARMOUR-I_SHELLS].max)
@@ -894,7 +894,7 @@ ICOMMAND(insidebases, "", (),
                         ci->state.armourtype = A_GREEN;
                         ci->state.armour = 0;
                     }
-                    ci->state.armour = min(ci->state.armour + ticks*REGENARMOUR, itemstats[I_GREENARMOUR-I_SHELLS].max);
+                    ci->state.armour = std::min(ci->state.armour + ticks*REGENARMOUR, itemstats[I_GREENARMOUR-I_SHELLS].max);
                     notify = true;
                 }
                 if(b.valid())
@@ -1066,9 +1066,9 @@ ICOMMAND(insidebases, "", (),
         {
             int ammotype = getint(p);
             vec o;
-            loopk(3) o[k] = max(getint(p)/DMF, 0.0f);
+            loopk(3) o[k] = std::max(getint(p)/DMF, 0.0f);
             if(p.overread()) break;
-            if(commit && notgotbases) addbase(ammotype>=GUN_SG && ammotype<=GUN_PISTOL ? ammotype : min(ammotype, 0), o);
+            if(commit && notgotbases) addbase(ammotype>=GUN_SG && ammotype<=GUN_PISTOL ? ammotype : std::min(ammotype, 0), o);
         }
         if(commit && notgotbases)
         {

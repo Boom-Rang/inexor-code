@@ -79,7 +79,7 @@ void renderosdimage(osdobject o, int w, int h) {
     int conw = int(w * o.zoom/osdscale);
     int conh = int(h * o.zoom/osdscale);
     int left, top;
-    // float sz = osdscale*h; // min(w,h);
+    // float sz = osdscale*h; // std::min(w,h);
     float sz = osdscale*o.height;
 
     if (o.left >= 0) {
@@ -109,7 +109,7 @@ void renderosdimage(osdobject o, int w, int h) {
     glPopMatrix();
 /*
     float scale = osdscale * o.zoom;
-    float sz = scale*min(w, h); // , msz = (0.75f*min(w, h) - sz)/(infowidth + FONTH), x = 0.5f*(w-sz), y = ly+lh - sz/15;
+    float sz = scale*std::min(w, h); // , msz = (0.75f*std::min(w, h) - sz)/(infowidth + FONTH), x = 0.5f*(w-sz), y = ly+lh - sz/15;
     int left = 0, top = 0;
     if (o.left >= 0) {
         left = o.left;

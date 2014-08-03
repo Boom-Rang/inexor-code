@@ -433,7 +433,7 @@ namespace entities
             if(dist < e.attr2) {
                 /*
                 float addval = ((float) e.attr3) / ((dist*dist)/100); // physics influence depends on distance
-                e.attr3 < 0 ? addval = max((float) e.attr3, addval) : min((float) e.attr3, addval);
+                e.attr3 < 0 ? addval = std::max((float) e.attr3, addval) : std::min((float) e.attr3, addval);
                 */
                 float addval = (float) e.attr3;
                 switch(e.type) {

@@ -41,7 +41,7 @@
         putint(q, ci->state.flags);
         putint(q, ci->state.deaths);
         putint(q, ci->state.teamkills);
-        putint(q, ci->state.damage*100/max(ci->state.shotdamage,1));
+        putint(q, ci->state.damage*100/std::max(ci->state.shotdamage,1));
         putint(q, ci->state.health);
         putint(q, ci->state.armour);
         putint(q, ci->state.gunselect);
@@ -64,7 +64,7 @@
     {
         putint(p, m_teammode ? 0 : 1);
         putint(p, gamemode);
-        putint(p, max((gamelimit - gamemillis)/1000, 0));
+        putint(p, std::max((gamelimit - gamemillis)/1000, 0));
         if(!m_teammode) return;
 
         vector<teamscore> scores;

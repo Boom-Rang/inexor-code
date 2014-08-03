@@ -40,7 +40,7 @@ namespace ai
 
     float weapmindist(int weap)
     {
-        return max(int(guns[weap].exprad), 2);
+        return std::max(int(guns[weap].exprad), 2);
     }
 
     float weapmaxdist(int weap)
@@ -68,7 +68,7 @@ namespace ai
         {
             float x = fmod(fabs(asin((q.z-o.z)/dist)/RAD-pitch), 360);
             float y = fmod(fabs(-atan2(q.x-o.x, q.y-o.y)/RAD-yaw), 360);
-            if(min(x, 360-x) <= fovx && min(y, 360-y) <= fovy) return raycubelos(o, q, v);
+            if(std::min(x, 360-x) <= fovx && std::min(y, 360-y) <= fovy) return raycubelos(o, q, v);
         }
         return false;
     }
@@ -117,7 +117,7 @@ namespace ai
             if(lastmillis >= d->ai->lastaimrnd)
             {
                 const int aiskew[NUMGUNS] = { 1, 10, 50, 5, 20, 1, 100, 1, 10, 10, 10, 1, 1 };
-                #define rndaioffset(r) ((rnd(int(r*aiskew[d->gunselect]*2)+1)-(r*aiskew[d->gunselect]))*(1.f/float(max(d->skill, 1))))
+                #define rndaioffset(r) ((rnd(int(r*aiskew[d->gunselect]*2)+1)-(r*aiskew[d->gunselect]))*(1.f/float(std::max(d->skill, 1))))
                 loopk(3) d->ai->aimrnd[k] = rndaioffset(e->radius);
                 int dur = (d->skill+10)*10;
                 d->ai->lastaimrnd = lastmillis+dur+rnd(dur);
@@ -410,7 +410,7 @@ namespace ai
         switch(e.type)
         {
             case I_HEALTH:
-                if(d->health < min(d->skill, 75)) score = 1e3f;
+                if(d->health < std::min(d->skill, 75)) score = 1e3f;
                 break;
             case I_QUAD: score = 1e3f; break;
             case I_BOOST: score = 1e2f; break;
@@ -489,7 +489,7 @@ namespace ai
         interests.setsize(0);
         if(!m_noitems)
         {
-            if((!m_noammo && !hasgoodammo(d)) || d->health < min(d->skill - 15, 75))
+            if((!m_noammo && !hasgoodammo(d)) || d->health < std::min(d->skill - 15, 75))
                 items(d, b, interests);
             else
             {
@@ -829,7 +829,7 @@ namespace ai
         int last = d->ai->lastcheck ? lastmillis-d->ai->lastcheck : 0;
         if(last < 500 || n < 3) return false; // route length is too short
         d->ai->lastcheck = lastmillis;
-        int w = iswaypoint(d->lastnode) ? d->lastnode : d->ai->route[n], c = min(n-1, NUMPREVNODES);
+        int w = iswaypoint(d->lastnode) ? d->lastnode : d->ai->route[n], c = std::min(n-1, NUMPREVNODES);
         loopj(c) // check ahead to see if we need to go around something
         {
             int p = n-j-1, v = d->ai->route[p];
@@ -993,7 +993,7 @@ namespace ai
     int process(fpsent *d, aistate &b)
     {
         int result = 0, stupify = d->skill <= 10+rnd(15) ? rnd(d->skill*1000) : 0, skmod = 101-d->skill;
-        float frame = d->skill <= 100 ? float(lastmillis-d->ai->lastrun)/float(max(skmod,1)*10) : 1;
+        float frame = d->skill <= 100 ? float(lastmillis-d->ai->lastrun)/float(std::max(skmod,1)*10) : 1;
         vec dp = d->headpos();
 
         bool idle = b.idle == 1 || (stupify && stupify <= skmod);

@@ -98,14 +98,14 @@ struct lightningrenderer : listrenderer
 
     void seedemitter(particleemitter &pe, const vec &o, const vec &d, int fade, float size, int gravity)
     {
-        pe.maxfade = max(pe.maxfade, fade);
+        pe.maxfade = std::max(pe.maxfade, fade);
         pe.extendbb(o, size);
         pe.extendbb(d, size);
     }
 
     void renderpart(listparticle *p, const vec &o, const vec &d, int blend, int ts, uchar *color)
     {
-        blend = min(blend<<2, 255);
+        blend = std::min(blend<<2, 255);
         if(type&PT_MOD) //multiply alpha into color
             glColor3ub((color[0]*blend)>>8, (color[1]*blend)>>8, (color[2]*blend)>>8);
         else

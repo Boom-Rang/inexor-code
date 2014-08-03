@@ -18,7 +18,7 @@ namespace game
     {
         if(!d->ragdoll || !ragdollmillis || (!ragdollfade && lastmillis > d->lastpain + ragdollmillis)) return;
         fpsent *r = new fpsent(*d);
-        r->lastupdate = ragdollfade && lastmillis > d->lastpain + max(ragdollmillis - ragdollfade, 0) ? lastmillis - max(ragdollmillis - ragdollfade, 0) : d->lastpain;
+        r->lastupdate = ragdollfade && lastmillis > d->lastpain + std::max(ragdollmillis - ragdollfade, 0) ? lastmillis - std::max(ragdollmillis - ragdollfade, 0) : d->lastpain;
         r->edit = NULL;
         r->ai = NULL;
         r->attackchan = r->idlechan = -1;
@@ -229,7 +229,7 @@ namespace game
             if(teamskins || m_teammode) team = isteam(player1->team, d->team) ? 1 : 2;
             float fade = 1.0f;
             if(ragdollmillis && ragdollfade) 
-                fade -= clamp(float(lastmillis - (d->lastupdate + max(ragdollmillis - ragdollfade, 0)))/min(ragdollmillis, ragdollfade), 0.0f, 1.0f);
+                fade -= clamp(float(lastmillis - (d->lastupdate + std::max(ragdollmillis - ragdollfade, 0)))/std::min(ragdollmillis, ragdollfade), 0.0f, 1.0f);
             renderplayer(d, getplayermodelinfo(d), team, fade, mainpass);
         } 
         if(isthirdperson() && !followingplayer() && (player1->state!=CS_DEAD || !hidedead)) renderplayer(player1, getplayermodelinfo(player1), teamskins || m_teammode ? 1 : 0, 1, mainpass);
@@ -263,7 +263,7 @@ namespace game
         {
             if(d->physstate >= PHYS_SLOPE)
             {
-                swayspeed = min(sqrtf(d->vel.x*d->vel.x + d->vel.y*d->vel.y), (d->maxspeed+d->p_playerspeed));
+                swayspeed = std::min(sqrtf(d->vel.x*d->vel.x + d->vel.y*d->vel.y), (d->maxspeed+d->p_playerspeed));
                 swaydist += swayspeed*curtime/1000.0f;
                 swaydist = fmod(swaydist, 2*swaystep);
                 swayfade = 1;
@@ -279,7 +279,7 @@ namespace game
             swaydir.mul(k);
             vec vel(d->vel);
             vel.add(d->falling);
-            swaydir.add(vec(vel).mul((1-k)/(15*max(vel.magnitude(), (d->maxspeed+d->p_playerspeed)))));
+            swaydir.add(vec(vel).mul((1-k)/(15*std::max(vel.magnitude(), (d->maxspeed+d->p_playerspeed)))));
         }
     }
 

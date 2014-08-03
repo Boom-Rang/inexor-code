@@ -108,7 +108,7 @@ static inline bool raycubeintersect(const clipplanes &p, const cube &c, const ve
     INTERSECTPLANES(entry = i, return false);
     INTERSECTBOX(bbentry = i, return false);
     if(exitdist < 0) return false;
-    dist = max(enterdist+0.1f, 0.0f);
+    dist = std::max(enterdist+0.1f, 0.0f);
     if(bbentry>=0) { hitsurface = vec(0, 0, 0); hitsurface[bbentry] = ray[bbentry]>0 ? -1 : 1; }
     else hitsurface = p.p[entry];
     return true;
@@ -213,10 +213,10 @@ static float shadowent(octaentities *oc, const vec &o, const vec &ray, float rad
             { \
                 float d = ((invray[i]>0?0:worldsize)-c)*invray[i]; \
                 if(d<0) return (radius>0?radius:-1); \
-                disttoworld = max(disttoworld, 0.1f + d); \
+                disttoworld = std::max(disttoworld, 0.1f + d); \
             } \
             float e = ((invray[i]>0?worldsize:0)-c)*invray[i]; \
-            exitworld = min(exitworld, e); \
+            exitworld = std::min(exitworld, e); \
         } \
         if(disttoworld > exitworld) return (radius>0?radius:-1); \
         v.add(vec(ray).mul(disttoworld)); \
@@ -234,9 +234,9 @@ static float shadowent(octaentities *oc, const vec &o, const vec &ray, float rad
                 float edist = disttoent(lc->ext->ents, o, ray, dent, mode, t); \
                 if(edist < dent) \
                 { \
-                    earlyexit return min(edist, dist); \
+                    earlyexit return std::min(edist, dist); \
                     elvl = lshift; \
-                    dent = min(dent, edist); \
+                    dent = std::min(dent, edist); \
                 } \
             } \
             if(lc->children==NULL) break; \
@@ -293,7 +293,7 @@ float raycube(const vec &o, const vec &ray, float radius, int mode, int size, ex
             dent < dist))
         {
             if(closest >= 0) { hitsurface = vec(0, 0, 0); hitsurface[closest] = ray[closest]>0 ? -1 : 1; }
-            return min(dent, dist);
+            return std::min(dent, dist);
         }
 
         ivec lo(x&(~0<<lshift), y&(~0<<lshift), z&(~0<<lshift));
@@ -303,14 +303,14 @@ float raycube(const vec &o, const vec &ray, float radius, int mode, int size, ex
             const clipplanes &p = getclipplanes(c, lo, lsize, false, 1);
             float f = 0;
             if(raycubeintersect(p, c, v, ray, invray, f) && (dist+f>0 || !(mode&RAY_SKIPFIRST)))
-                return min(dent, dist+f);
+                return std::min(dent, dist+f);
         }
 
         FINDCLOSEST(closest = 0, closest = 1, closest = 2);
 
-        if(radius>0 && dist>=radius) return min(dent, dist);
+        if(radius>0 && dist>=radius) return std::min(dent, dist);
 
-        UPOCTREE(return min(dent, radius>0 ? radius : dist));
+        UPOCTREE(return std::min(dent, radius>0 ? radius : dist));
     }
 }
 
@@ -334,7 +334,7 @@ float shadowray(const vec &o, const vec &ray, float radius, int mode, extentity 
             const clipplanes &p = getclipplanes(c, lo, 1<<lshift, false, 1);
             INTERSECTPLANES(side = p.side[i], goto nextcube);
             INTERSECTBOX(side = (i<<1) + 1 - lsizemask[i], goto nextcube);
-            if(exitdist >= 0) return c.texture[side]==DEFAULT_SKY && mode&RAY_SKIPSKY ? radius : dist+max(enterdist+0.1f, 0.0f);
+            if(exitdist >= 0) return c.texture[side]==DEFAULT_SKY && mode&RAY_SKIPSKY ? radius : dist+std::max(enterdist+0.1f, 0.0f);
         }
 
     nextcube:
@@ -390,7 +390,7 @@ float shadowray(ShadowRayCache *cache, const vec &o, const vec &ray, float radiu
             if(p.owner != &c || p.version != cache->version) { p.owner = &c; p.version = cache->version; genclipplanes(c, lo.x, lo.y, lo.z, 1<<lshift, p, false); }
             INTERSECTPLANES(side = p.side[i], goto nextcube);
             INTERSECTBOX(side = (i<<1) + 1 - lsizemask[i], goto nextcube);
-            if(exitdist >= 0) return c.texture[side]==DEFAULT_SKY && mode&RAY_SKIPSKY ? radius : dist+max(enterdist+0.1f, 0.0f);
+            if(exitdist >= 0) return c.texture[side]==DEFAULT_SKY && mode&RAY_SKIPSKY ? radius : dist+std::max(enterdist+0.1f, 0.0f);
         }
 
     nextcube:
@@ -627,8 +627,8 @@ const vector<physent *> &checkdynentcache(int x, int y)
 }
 
 #define loopdynentcache(curx, cury, o, radius) \
-    for(int curx = max(int(o.x-radius), 0)>>dynentsize, endx = min(int(o.x+radius), worldsize-1)>>dynentsize; curx <= endx; curx++) \
-    for(int cury = max(int(o.y-radius), 0)>>dynentsize, endy = min(int(o.y+radius), worldsize-1)>>dynentsize; cury <= endy; cury++)
+    for(int curx = std::max(int(o.x-radius), 0)>>dynentsize, endx = std::min(int(o.x+radius), worldsize-1)>>dynentsize; curx <= endx; curx++) \
+    for(int cury = std::max(int(o.y-radius), 0)>>dynentsize, endy = std::min(int(o.y+radius), worldsize-1)>>dynentsize; cury <= endy; cury++)
 
 void updatedynentcache(physent *d)
 {
@@ -1441,7 +1441,7 @@ bool bounce(physent *d, float secs, float elasticity, float waterfric, float gra
     if(water)
     {
         d->vel.z -= grav*GRAVITY/16*secs;
-        d->vel.mul(max(1.0f - secs/waterfric, 0.0f));
+        d->vel.mul(std::max(1.0f - secs/waterfric, 0.0f));
     }
     else 
     {
@@ -1500,7 +1500,7 @@ void avoidcollision(physent *d, const vec &dir, physent *obstacle, float space)
     loopi(3) if(dir[i] != 0)
     {
         float dist = ((dir[i] > 0 ? bbmax[i] : bbmin[i]) - d->o[i]) / dir[i];
-        mindist = min(mindist, dist);
+        mindist = std::min(mindist, dist);
     }
     if(mindist >= 0.0f && mindist < 1e15f) d->o.add(vec(dir).mul(mindist));
 }
@@ -1626,7 +1626,7 @@ void modifyvelocity(physent *pl, bool local, bool water, bool floating, int curt
         if(pl->jumping)
         {
             pl->jumping = false;
-            pl->vel.z = max(pl->vel.z, JUMPVEL + (pl->state == CS_ALIVE ? pl->p_jumpvel : 0));
+            pl->vel.z = std::max(pl->vel.z, JUMPVEL + (pl->state == CS_ALIVE ? pl->p_jumpvel : 0));
         }
     }
     else if(pl->physstate >= PHYS_SLOPE || water)
@@ -1636,7 +1636,7 @@ void modifyvelocity(physent *pl, bool local, bool water, bool floating, int curt
         {
             pl->jumping = false;
 
-            pl->vel.z = max(pl->vel.z, JUMPVEL + (pl->state == CS_ALIVE ? pl->p_jumpvel : 0)); // physics impulse upwards
+            pl->vel.z = std::max(pl->vel.z, JUMPVEL + (pl->state == CS_ALIVE ? pl->p_jumpvel : 0)); // physics impulse upwards
             if(water) { pl->vel.x /= 8.0f; pl->vel.y /= 8.0f; } // dampen velocity change even harder, gives correct water feel
 
             game::physicstrigger(pl, local, 1, 0);
@@ -1658,7 +1658,7 @@ void modifyvelocity(physent *pl, bool local, bool water, bool floating, int curt
 	    // move up or down slopes in air
 	    // but only move up slopes in waterfric           
 	    float dz = -(d.x*pl->floor.x + d.y*pl->floor.y)/pl->floor.z;
-            d.z = water ? max(d.z, dz) : dz;
+            d.z = water ? std::max(d.z, dz) : dz;
         }
 	
 	// Len = 1
@@ -1845,7 +1845,7 @@ void interppos(physent *pl)
     if(diff <= 0 || !physinterp) return;
 
     vec deltapos(pl->deltapos);
-    deltapos.mul(min(diff, physframetime)/float(physframetime));
+    deltapos.mul(std::min(diff, physframetime)/float(physframetime));
     pl->o.add(deltapos);
 }
 
@@ -1990,8 +1990,8 @@ bool moveplatform(physent *p, const vec &dir)
 
     static vector<platforment> ents;
     ents.setsize(0);
-    for(int x = int(max(p->o.x-p->radius-PLATFORMBORDER, 0.0f))>>dynentsize, ex = int(min(p->o.x+p->radius+PLATFORMBORDER, worldsize-1.0f))>>dynentsize; x <= ex; x++)
-    for(int y = int(max(p->o.y-p->radius-PLATFORMBORDER, 0.0f))>>dynentsize, ey = int(min(p->o.y+p->radius+PLATFORMBORDER, worldsize-1.0f))>>dynentsize; y <= ey; y++)
+    for(int x = int(std::max(p->o.x-p->radius-PLATFORMBORDER, 0.0f))>>dynentsize, ex = int(std::min(p->o.x+p->radius+PLATFORMBORDER, worldsize-1.0f))>>dynentsize; x <= ex; x++)
+    for(int y = int(std::max(p->o.y-p->radius-PLATFORMBORDER, 0.0f))>>dynentsize, ey = int(std::min(p->o.y+p->radius+PLATFORMBORDER, worldsize-1.0f))>>dynentsize; y <= ey; y++)
     {
         const vector<physent *> &dynents = checkdynentcache(x, y);
         loopv(dynents)

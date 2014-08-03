@@ -213,7 +213,7 @@ struct raceclientmode : clientmode
             loopv(sg.players) {
                 fpsent *d = sg.players[i];
                 if (d->racestate >= 1) {
-                    int secs = max(d->racetime, 0)/1000, mins = secs/60;
+                    int secs = std::max(d->racetime, 0)/1000, mins = secs/60;
                     secs %= 60;
                     g.textf("%d:%02d", 0xFFFFDD, NULL, mins, secs);
                 } else {
@@ -344,7 +344,7 @@ struct raceclientmode : clientmode
         int numsploc = getint(p);
         loopi(numsploc){
             vec o;
-            loopk(3) o[k] = max(getint(p)/DMF, 0.0f);
+            loopk(3) o[k] = std::max(getint(p)/DMF, 0.0f);
             int team = getint(p), index = getint(p);
             if(p.overread()) break;
             if(m_teammode ? team < 1 || team > 2 : team) return false;

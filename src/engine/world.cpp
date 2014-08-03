@@ -204,7 +204,7 @@ static bool modifyoctaent(int flags, int id, extentity &e)
     }
     else
     {
-        int leafsize = octaentsize, limit = max(r.x - o.x, max(r.y - o.y, r.z - o.z));
+        int leafsize = octaentsize, limit = std::max(r.x - o.x, std::max(r.y - o.y, r.z - o.z));
         while(leafsize < limit) leafsize *= 2;
         int diff = ~(leafsize-1) & ((o.x^r.x)|(o.y^r.y)|(o.z^r.z));
         if(diff && (limit > octaentsize/2 || diff < leafsize*2)) leafsize *= 2;
@@ -604,7 +604,7 @@ void renderentattachment(const extentity &e)
 void renderentarrow(const extentity &e, const vec &dir, float radius)
 {
     if(radius <= 0) return;
-    float arrowsize = min(radius/8, 0.5f);
+    float arrowsize = std::min(radius/8, 0.5f);
     vec target = vec(dir).mul(radius).add(e.o), arrowbase = vec(dir).mul(radius - arrowsize).add(e.o), spoke;
     spoke.orthogonal(dir);
     spoke.normalize();
@@ -684,7 +684,7 @@ void renderentradius(extentity &e, bool color)
         {
             extern int envmapradius;
             if(color) glColor3f(0, 1, 1);
-            renderentsphere(e, e.attr1 ? max(0, min(10000, int(e.attr1))) : envmapradius);
+            renderentsphere(e, e.attr1 ? std::max(0, std::min(10000, int(e.attr1))) : envmapradius);
             break;
         }
 
@@ -1013,7 +1013,7 @@ void entpaste()
         extentity *e = newentity(true, o, ET_EMPTY, c.attr1, c.attr2, c.attr3, c.attr4, c.attr5, idx);
         if(!e) continue;
         entadd(idx);
-        keepents = max(keepents, idx+1);
+        keepents = std::max(keepents, idx+1);
     }
     keepents = 0;
     int j = 0;
@@ -1137,7 +1137,7 @@ int findentity(int type, int index, int attr1, int attr2)
         if(e.type==type && (attr1<0 || e.attr1==attr1) && (attr2<0 || e.attr2==attr2))
             return i;
     }
-    loopj(min(index, ents.length())) 
+    loopj(std::min(index, ents.length())) 
     {
         extentity &e = *ents[j];
         if(e.type==type && (attr1<0 || e.attr1==attr1) && (attr2<0 || e.attr2==attr2))
@@ -1325,7 +1325,7 @@ void shrinkmap()
     conoutf("shrunk map to size %d", worldscale);
 }
 
-void newmap(int *i) { bool force = !isconnected(); if(force) game::forceedit(""); if(emptymap(*i, force, NULL)) game::newmap(max(*i, 0)); }
+void newmap(int *i) { bool force = !isconnected(); if(force) game::forceedit(""); if(emptymap(*i, force, NULL)) game::newmap(std::max(*i, 0)); }
 void mapenlarge() { if(enlargemap(false)) game::newmap(-1); }
 COMMAND(newmap, "i");
 COMMAND(mapenlarge, "");

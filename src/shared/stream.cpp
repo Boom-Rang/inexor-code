@@ -91,7 +91,7 @@ int decodeutf8(uchar *dstbuf, int dstlen, const uchar *srcbuf, int srclen, int *
     const uchar *src = srcbuf, *srcend = &srcbuf[srclen];
     if(dstbuf == srcbuf)
     {
-        int len = min(dstlen, srclen);
+        int len = std::min(dstlen, srclen);
         for(const uchar *end4 = &srcbuf[len&~3]; src < end4; src += 4) if(*(const int *)src & 0x80808080) goto decode;
         for(const uchar *end = &srcbuf[len]; src < end; src++) if(*src & 0x80) goto decode;
         if(carry) *carry += len;
@@ -149,7 +149,7 @@ int encodeutf8(uchar *dstbuf, int dstlen, const uchar *srcbuf, int srclen, int *
         if(uni <= 0x7F)
         {
             if(dst >= dstend) goto done;
-            const uchar *end = min(srcend, &src[dstend-dst]);
+            const uchar *end = std::min(srcend, &src[dstend-dst]);
             do 
             { 
                 if(uni == '\f')
@@ -213,7 +213,7 @@ char *makerelpath(const char *dir, const char *file, const char *prefix, const c
         if(end)
         {
             size_t len = strlen(tmp);
-            copystring(&tmp[len], file, min(sizeof(tmp)-len, size_t(end+2-file)));
+            copystring(&tmp[len], file, std::min(sizeof(tmp)-len, size_t(end+2-file)));
             file = end+1;
         }
     }
@@ -702,7 +702,7 @@ struct gzstream : stream
     void readbuf(int size = BUFSIZE)
     {
         if(!zfile.avail_in) zfile.next_in = (Bytef *)buf;
-        size = min(size, int(&buf[BUFSIZE] - &zfile.next_in[zfile.avail_in]));
+        size = std::min(size, int(&buf[BUFSIZE] - &zfile.next_in[zfile.avail_in]));
         int n = file->read(zfile.next_in + zfile.avail_in, size);
         if(n > 0) zfile.avail_in += n;
     }
@@ -719,7 +719,7 @@ struct gzstream : stream
     {
         while(n > 0 && zfile.avail_in > 0)
         {
-            int skipped = min(n, (int)zfile.avail_in);
+            int skipped = std::min(n, (int)zfile.avail_in);
             zfile.avail_in -= skipped;
             zfile.next_in += skipped;
             n -= skipped;
@@ -760,7 +760,7 @@ struct gzstream : stream
         {
             if(inflateInit2(&zfile, -MAX_WBITS) != Z_OK) reading = false;
         }
-        else if(writing && deflateInit2(&zfile, level, Z_DEFLATED, -MAX_WBITS, min(MAX_MEM_LEVEL, 8), Z_DEFAULT_STRATEGY) != Z_OK) writing = false;
+        else if(writing && deflateInit2(&zfile, level, Z_DEFLATED, -MAX_WBITS, std::min(MAX_MEM_LEVEL, 8), Z_DEFAULT_STRATEGY) != Z_OK) writing = false;
         if(!reading && !writing) return false;
 
         autoclose = needclose;
@@ -885,7 +885,7 @@ struct gzstream : stream
         uchar skip[512];
         while(pos > 0)
         {
-            int skipped = (int)min(pos, (offset)sizeof(skip));
+            int skipped = (int)std::min(pos, (offset)sizeof(skip));
             if(read(skip, skipped) != skipped) { stopreading(); return false; }
             pos -= skipped;
         }
@@ -965,7 +965,7 @@ struct utf8stream : stream
     bool readbuf(int size = BUFSIZE)
     {
         if(bufread >= bufcarry) { if(bufcarry > 0 && bufcarry < buflen) memmove(buf, &buf[bufcarry], buflen - bufcarry); buflen -= bufcarry; bufread = bufcarry = 0; }
-        int n = file->read(&buf[buflen], min(size, BUFSIZE - buflen));
+        int n = file->read(&buf[buflen], std::min(size, BUFSIZE - buflen));
         if(n <= 0) return false;
         buflen += n;
         int carry = bufcarry;
@@ -1051,7 +1051,7 @@ struct utf8stream : stream
         uchar skip[512];
         while(off > 0)
         {
-            int skipped = (int)min(off, (offset)sizeof(skip));
+            int skipped = (int)std::min(off, (offset)sizeof(skip));
             if(read(skip, skipped) != skipped) { stopreading(); return false; }
             off -= skipped;
         }
@@ -1066,7 +1066,7 @@ struct utf8stream : stream
         while(next < len)
         {
             if(bufread >= bufcarry) { if(readbuf(BUFSIZE)) continue; stopreading(); break; }
-            int n = min(len - next, bufcarry - bufread);
+            int n = std::min(len - next, bufcarry - bufread);
             memcpy(&((uchar *)dst)[next], &buf[bufread], n);
             next += n;
             bufread += n;
@@ -1083,7 +1083,7 @@ struct utf8stream : stream
         while(next < len)
         {
             if(bufread >= bufcarry) { if(readbuf(BUFSIZE)) continue; stopreading(); if(!next) return false; break; }
-            int n = min(len - next, bufcarry - bufread);
+            int n = std::min(len - next, bufcarry - bufread);
             uchar *endline = (uchar *)memchr(&buf[bufread], '\n', n);
             if(endline) { n = endline+1 - &buf[bufread]; len = next + n; } 
             memcpy(&((uchar *)dst)[next], &buf[bufread], n);

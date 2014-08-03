@@ -126,7 +126,7 @@ static void getbackgroundres(int &w, int &h)
     float wk = 1, hk = 1;
     if(w < 1024) wk = 1024.0f/w;
     if(h < 768) hk = 768.0f/h;
-    wk = hk = max(wk, hk);
+    wk = hk = std::max(wk, hk);
     w = int(ceil(w*wk));
     h = int(ceil(h*hk));
 }
@@ -178,7 +178,7 @@ void renderbackground(const char *caption, Texture *mapshot, const char *mapname
         detailv = rndscale(1);
         numdecals = sizeof(decals)/sizeof(decals[0]);
         numdecals = numdecals/3 + rnd((numdecals*2)/3 + 1);
-        float maxsize = min(w, h)/16.0f;
+        float maxsize = std::min(w, h)/16.0f;
         loopi(numdecals)
         {
             decal d = { rndscale(w), rndscale(h), maxsize/2 + rndscale(maxsize/2), rnd(2) };
@@ -219,9 +219,9 @@ void renderbackground(const char *caption, Texture *mapshot, const char *mapname
             glTexCoord2f(side,   1); glVertex2f(hx-hsz, hy+hsz);
         }
         glEnd();
-        float lh = 0.5f*min(w, h), lw = lh*2,
+        float lh = 0.5f*std::min(w, h), lw = lh*2,
               lx = 0.5f*(w - lw), ly = 0.5f*(h*0.5f - lh);
-        settexture((maxtexsize ? min(maxtexsize, hwtexsize) : hwtexsize) >= 1024 && (screen->w > 1280 || screen->h > 800) ? "data/logo_1024.png" : "data/logo.png", 3);
+        settexture((maxtexsize ? std::min(maxtexsize, hwtexsize) : hwtexsize) >= 1024 && (screen->w > 1280 || screen->h > 800) ? "data/logo_1024.png" : "data/logo.png", 3);
         glBegin(GL_TRIANGLE_STRIP);
         glTexCoord2f(0, 0); glVertex2f(lx,    ly);
         glTexCoord2f(1, 0); glVertex2f(lx+lw, ly);
@@ -232,8 +232,8 @@ void renderbackground(const char *caption, Texture *mapshot, const char *mapname
         if(caption)
         {
             int tw = text_width(caption);
-            float tsz = 0.04f*min(w, h)/FONTH,
-                  tx = 0.5f*(w - tw*tsz), ty = h - 0.075f*1.5f*min(w, h) - 1.25f*FONTH*tsz;
+            float tsz = 0.04f*std::min(w, h)/FONTH,
+                  tx = 0.5f*(w - tw*tsz), ty = h - 0.075f*1.5f*std::min(w, h) - 1.25f*FONTH*tsz;
             glPushMatrix();
             glTranslatef(tx, ty, 0);
             glScalef(tsz, tsz, 1);
@@ -243,7 +243,7 @@ void renderbackground(const char *caption, Texture *mapshot, const char *mapname
         if(mapshot || mapname)
         {
             int infowidth = 12*FONTH;
-            float sz = 0.35f*min(w, h), msz = (0.75f*min(w, h) - sz)/(infowidth + FONTH), x = 0.5f*(w-sz), y = ly+lh - sz/15;
+            float sz = 0.35f*std::min(w, h), msz = (0.75f*std::min(w, h) - sz)/(infowidth + FONTH), x = 0.5f*(w-sz), y = ly+lh - sz/15;
             if(mapinfo)
             {
                 int mw, mh;
@@ -264,7 +264,7 @@ void renderbackground(const char *caption, Texture *mapshot, const char *mapname
             {
                 int qw, qh;
                 text_bounds("?", qw, qh);
-                float qsz = sz*0.5f/max(qw, qh);
+                float qsz = sz*0.5f/std::max(qw, qh);
                 glPushMatrix();
                 glTranslatef(x + 0.5f*(sz - qw*qsz), y + 0.5f*(sz - qh*qsz), 0);
                 glScalef(qsz, qsz, 1);
@@ -351,7 +351,7 @@ void renderprogress(float bar, const char *text, GLuint tex, bool background)   
     defaultshader->set();
     glColor3f(1, 1, 1);
 
-    float fh = 0.075f*min(w, h), fw = fh*10,
+    float fh = 0.075f*std::min(w, h), fw = fh*10,
           fx = renderedframe ? w - fw - fh/4 : 0.5f*(w - fw), 
           fy = renderedframe ? fh/4 : h - fh*1.5f,
           fu1 = 0/512.0f, fu2 = 511/512.0f,
@@ -373,7 +373,7 @@ void renderprogress(float bar, const char *text, GLuint tex, bool background)   
           su1 = 0/32.0f, su2 = 7/32.0f, sw = fw*7/511.0f,
           eu1 = 23/32.0f, eu2 = 30/32.0f, ew = fw*7/511.0f,
           mw = bw - sw - ew,
-          ex = bx+sw + max(mw*bar, fw*7/511.0f);
+          ex = bx+sw + std::max(mw*bar, fw*7/511.0f);
     if(bar > 0)
     {
         settexture("data/loading_bar.png", 3);
@@ -412,7 +412,7 @@ void renderprogress(float bar, const char *text, GLuint tex, bool background)   
     if(tex)
     {
         glBindTexture(GL_TEXTURE_2D, tex);
-        float sz = 0.35f*min(w, h), x = 0.5f*(w-sz), y = 0.5f*min(w, h) - sz/15;
+        float sz = 0.35f*std::min(w, h), x = 0.5f*(w-sz), y = 0.5f*std::min(w, h) - sz/15;
         glBegin(GL_TRIANGLE_STRIP);
         glTexCoord2f(0, 0); glVertex2f(x,    y);
         glTexCoord2f(1, 0); glVertex2f(x+sz, y);
@@ -577,8 +577,8 @@ void setupscreen(int &usedcolorbits, int &useddepthbits, int &usedfsaa)
         }
         else if(best < 0)
         { 
-            scr_w = min(scr_w >= 0 ? scr_w : (scr_h >= 0 ? (scr_h*SCR_DEFAULTW)/SCR_DEFAULTH : SCR_DEFAULTW), (int)modes[widest]->w); 
-            scr_h = min(scr_h >= 0 ? scr_h : (scr_w >= 0 ? (scr_w*SCR_DEFAULTH)/SCR_DEFAULTW : SCR_DEFAULTH), (int)modes[widest]->h);
+            scr_w = std::min(scr_w >= 0 ? scr_w : (scr_h >= 0 ? (scr_h*SCR_DEFAULTW)/SCR_DEFAULTH : SCR_DEFAULTW), (int)modes[widest]->w); 
+            scr_h = std::min(scr_h >= 0 ? scr_h : (scr_w >= 0 ? (scr_w*SCR_DEFAULTH)/SCR_DEFAULTW : SCR_DEFAULTH), (int)modes[widest]->h);
         }
         if(dbgmodes) conoutf(CON_DEBUG, "selected %d x %d", scr_w, scr_h);
     }
@@ -881,7 +881,7 @@ VARP(maxfps, 0, 200, 1000);
 
 void limitfps(int &millis, int curmillis)
 {
-    int limit = (mainmenu || minimized) && menufps ? (maxfps ? min(maxfps, menufps) : menufps) : maxfps;
+    int limit = (mainmenu || minimized) && menufps ? (maxfps ? std::min(maxfps, menufps) : menufps) : maxfps;
     if(!limit) return;
     static int fpserror = 0;
     int delay = 1000/limit - (millis-curmillis);
@@ -957,7 +957,7 @@ void resetfpshistory()
 
 void updatefpshistory(int millis)
 {
-    fpshistory[fpspos++] = max(1, min(1000, millis));
+    fpshistory[fpspos++] = std::max(1, std::min(1000, millis));
     if(fpspos>=MAXFPSHISTORY) fpspos = 0;
 }
 
@@ -1005,7 +1005,7 @@ int getclockmillis()
     int millis = SDL_GetTicks() - clockrealbase;
     if(clockfix) millis = int(millis*(double(clockerror)/1000000));
     millis += clockvirtbase;
-    return max(millis, totalmillis);
+    return std::max(millis, totalmillis);
 }
 
 VAR(numcpus, 1, 1, 16);

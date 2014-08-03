@@ -17,7 +17,7 @@ namespace ai
     int getweight(const vec &o)
     {
         vec pos = o; pos.z += ai::JUMPMIN;
-        if(!insideworld(vec(pos.x, pos.y, min(pos.z, getworldsize() - 1e-3f)))) return -2;
+        if(!insideworld(vec(pos.x, pos.y, std::min(pos.z, getworldsize() - 1e-3f)))) return -2;
         float dist = raycube(pos, vec(0, 0, -1), 0, RAY_CLIPMAT);
         int posmat = lookupmaterial(pos), weight = 1;
         if(isliquid(posmat&MATF_VOLUME)) weight *= 5;
@@ -79,7 +79,7 @@ namespace ai
                 bbmin.min(vec(w.o).sub(radius));
                 bbmax.max(vec(w.o).add(radius));
             }
-            if(first < last) lastwp = max(lastwp, last-1);
+            if(first < last) lastwp = std::max(lastwp, last-1);
             build(indices.getbuf(), indices.length(), bbmin, bbmax);
         }
 
@@ -95,10 +95,10 @@ namespace ai
             {
                 waypoint &w = waypoints[indices[left]];
                 float radius = WAYPOINTRADIUS;
-                if(max(split - (w.o[axis]-radius), 0.0f) > max((w.o[axis]+radius) - split, 0.0f))
+                if(std::max(split - (w.o[axis]-radius), 0.0f) > std::max((w.o[axis]+radius) - split, 0.0f))
                 {
                     ++left;
-                    splitleft = max(splitleft, w.o[axis]+radius);
+                    splitleft = std::max(splitleft, w.o[axis]+radius);
                     leftmin.min(vec(w.o).sub(radius));
                     leftmax.max(vec(w.o).add(radius));
                 }
@@ -106,7 +106,7 @@ namespace ai
                 {
                     --right;
                     std::swap(indices[left], indices[right]);
-                    splitright = min(splitright, w.o[axis]-radius);
+                    splitright = std::min(splitright, w.o[axis]-radius);
                     rightmin.min(vec(w.o).sub(radius));
                     rightmax.max(vec(w.o).add(radius));
                 }
@@ -125,13 +125,13 @@ namespace ai
                     float radius = WAYPOINTRADIUS;
                     if(i < left)
                     {
-                        splitleft = max(splitleft, w.o[axis]+radius);
+                        splitleft = std::max(splitleft, w.o[axis]+radius);
                         leftmin.min(vec(w.o).sub(radius));
                         leftmax.max(vec(w.o).add(radius));
                     }
                     else
                     {
-                        splitright = min(splitright, w.o[axis]-radius);
+                        splitright = std::min(splitright, w.o[axis]-radius);
                         rightmin.min(vec(w.o).sub(radius));
                         rightmax.max(vec(w.o).add(radius));
                     }
@@ -157,7 +157,7 @@ namespace ai
                 if(numindices-right) build(&indices[right], numindices-right, rightmin, rightmax, depth+1);
             }
 
-            maxdepth = max(maxdepth, depth);
+            maxdepth = std::max(maxdepth, depth);
         }
     } wpcaches[NUMWPCACHES];
 
@@ -461,7 +461,7 @@ namespace ai
                 if(iswaypoint(link) && (link == node || link == goal || waypoints[link].links[0]))
                 {
                     waypoint &n = waypoints[link];
-                    int weight = max(n.weight, 1);
+                    int weight = std::max(n.weight, 1);
                     float curscore = prevscore + n.o.dist(m.o)*weight;
                     if(n.route == routeid && curscore >= n.curscore) continue;
                     n.curscore = curscore;

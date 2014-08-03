@@ -114,7 +114,7 @@ namespace game
 
     void triggerplatform(int tag, int newdir)
     {
-        newdir = max(-1, min(1, newdir));
+        newdir = std::max(-1, std::min(1, newdir));
         loopv(movables)
         {
             movable *m = movables[i];
@@ -151,7 +151,7 @@ namespace game
                 if(m->vel.iszero()) continue;
                 for(int remaining = curtime; remaining>0;)
                 {
-                    int step = min(remaining, 20);
+                    int step = std::min(remaining, 20);
                     remaining -= step;
                     if(!moveplatform(m, vec(m->vel).mul(step/1000.0f)))
                     {

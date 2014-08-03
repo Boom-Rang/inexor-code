@@ -14,7 +14,7 @@ namespace game
 
     float calcradarscale()
     {
-        return clamp(max(minimapradius.x, minimapradius.y)/3, float(minradarscale), float(maxradarscale));
+        return clamp(std::max(minimapradius.x, minimapradius.y)/3, float(minradarscale), float(maxradarscale));
     }
 
     void drawminimap(fpsent *d, float x, float y, float s)
@@ -528,7 +528,7 @@ namespace game
     ICOMMAND(getmode, "", (), intret(gamemode));
     ICOMMAND(timeremaining, "i", (int *formatted), 
     {
-        int val = max(maplimit - lastmillis, 0)/1000;
+        int val = std::max(maplimit - lastmillis, 0)/1000;
         if(*formatted)
         {
             defformatstring(str)("%d:%02d", val/60, val%60);
@@ -871,7 +871,7 @@ namespace game
         uchar physstate = d->physstate | ((d->lifesequence&1)<<3) | ((d->move&3)<<4) | ((d->strafe&3)<<6);
         q.put(physstate);
         ivec o = ivec(vec(d->o.x, d->o.y, d->o.z-d->eyeheight).mul(DMF));
-        uint vel = min(int(d->vel.magnitude()*DVELF), 0xFFFF), fall = min(int(d->falling.magnitude()*DVELF), 0xFFFF);
+        uint vel = std::min(int(d->vel.magnitude()*DVELF), 0xFFFF), fall = std::min(int(d->falling.magnitude()*DVELF), 0xFFFF);
         // 3 bits position, 1 bit velocity, 3 bits falling, 1 bit material
         uint flags = 0;
         if(o.x < 0 || o.x > 0xFFFF) flags |= 1<<0;
@@ -1591,7 +1591,7 @@ namespace game
             {
                 int cn = getint(p), unpacklen = getint(p), packlen = getint(p);
                 fpsent *d = getclient(cn);
-                ucharbuf q = p.subbuf(max(packlen, 0));
+                ucharbuf q = p.subbuf(std::max(packlen, 0));
                 if(d) unpackeditinfo(d->edit, q.buf, q.maxlen, unpacklen);
                 break;
             }

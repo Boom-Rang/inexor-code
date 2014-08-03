@@ -111,10 +111,10 @@ struct gui : g3d_gui
         if(color) tcolor = color;
         tpos++; 
         if(!name) name = intstr(tpos); 
-        int w = max(text_width(name) - 2*INSERT, 0);
+        int w = std::max(text_width(name) - 2*INSERT, 0);
         if(layoutpass) 
         {  
-            ty = max(ty, ysize); 
+            ty = std::max(ty, ysize);
             ysize = 0;
         }
         else 
@@ -188,7 +188,7 @@ struct gui : g3d_gui
         {
             l.w = xsize;
             l.h = ysize;
-            if(l.column >= 0) columns[l.column] = max(columns[l.column], ishorizontal() ? ysize : xsize);
+            if(l.column >= 0) columns[l.column] = std::max(columns[l.column], ishorizontal() ? ysize : xsize);
         }
         curlist = l.parent;
         curdepth--;
@@ -225,7 +225,7 @@ struct gui : g3d_gui
         if(curlist < 0) return;
         list &l = lists[curlist];
         if(layoutpass) { if(l.parent >= 0) l.springs += weight; return; }
-        int nextspring = min(l.curspring + weight, l.springs);
+        int nextspring = std::min(l.curspring + weight, l.springs);
         if(nextspring <= l.curspring) return;
         if(ishorizontal())
         {
@@ -254,11 +254,11 @@ struct gui : g3d_gui
             if(ishorizontal())
             {
                 xsize += w;
-                ysize = max(ysize, h);
+                ysize = std::max(ysize, h);
             }
             else
             {
-                xsize = max(xsize, w);
+                xsize = std::max(xsize, w);
                 ysize += h;
             }
             return 0;
@@ -391,7 +391,7 @@ struct gui : g3d_gui
                 light.dir = vec(0, -1, 2).normalize();
                 vec center, radius;
                 m->boundbox(center, radius);
-                float dist =  2.0f*max(radius.magnitude2(), 1.1f*radius.z),
+                float dist =  2.0f*std::max(radius.magnitude2(), 1.1f*radius.z),
                       yaw = fmod(lastmillis/10000.0f*360.0f, 360.0f);
                 vec o(-center.x, dist - center.y, -0.1f*dist - center.z);
                 rendermodel(&light, name, anim, o, yaw, 0, 0, NULL, NULL, 0);
@@ -492,7 +492,7 @@ struct gui : g3d_gui
                 text_bounds(e->lines[0].text, temp, e->pixelheight, e->pixelwidth); //only single line editors can have variable height
             }
             else 
-                e->pixelheight = FONTH*max(height, 1); 
+                e->pixelheight = FONTH*std::max(height, 1);
         }
         int h = e->pixelheight;
         int w = e->pixelwidth + FONTW;
@@ -615,7 +615,7 @@ struct gui : g3d_gui
 
     void icon_(Texture *t, bool overlaid, int x, int y, int size, bool hit)
     {
-        float scale = float(size)/max(t->xs, t->ys); //scale and preserve aspect ratio
+        float scale = float(size)/std::max(t->xs, t->ys); //scale and preserve aspect ratio
         float xs = t->xs*scale, ys = t->ys*scale;
         x += int((size-xs)/2);
         y += int((size-ys)/2);
@@ -658,7 +658,7 @@ struct gui : g3d_gui
         }
         else if(slot.thumbnail && slot.thumbnail != notexture) t = slot.thumbnail;
         else return;
-        float xt = min(1.0f, t->xs/(float)t->ys), yt = min(1.0f, t->ys/(float)t->xs), xs = size, ys = size;
+        float xt = std::min(1.0f, t->xs/(float)t->ys), yt = std::min(1.0f, t->ys/(float)t->xs), xs = size, ys = size;
         if(hit && actionon) 
         {
             glDisable(GL_TEXTURE_2D);
@@ -904,7 +904,7 @@ struct gui : g3d_gui
             if(allowinput) hascursor = true;
         }
         basescale = initscale;
-        if(layoutpass) scale.x = scale.y = scale.z = guifadein ? basescale*min((totalmillis-starttime)/300.0f, 1.0f) : basescale;
+        if(layoutpass) scale.x = scale.y = scale.z = guifadein ? basescale*std::min((totalmillis-starttime)/300.0f, 1.0f) : basescale;
         alpha = allowinput ? 0.80f : 0.60f;
         passthrough = scale.x<basescale || !allowinput;
         curdepth = -1;
@@ -944,7 +944,7 @@ struct gui : g3d_gui
                 vec dir;
                 lightreaching(origin, light, dir, false, 0, 0.5f); 
                 float intensity = vec(yaw, 0.0f).dot(dir);
-                light.mul(1.0f + max(intensity, 0.0f));
+                light.mul(1.0f + std::max(intensity, 0.0f));
             }
 
             drawskin(curx-skinx[2]*SKIN_SCALE, cury-skiny[6]*SKIN_SCALE, xsize, ysize, 0, 9, gui2d ? 1 : 2, light, alpha);
@@ -962,7 +962,7 @@ struct gui : g3d_gui
             else { p.h += dh; h = p.h; }
             i = p.parent;
         }
-        ysize += max(dh, 0);
+        ysize += std::max(dh, 0);
     }
 
     void adjustverticalcolumn(int col, int i)
@@ -975,7 +975,7 @@ struct gui : g3d_gui
             else { dw = w - p.w; if(dw <= 0) break; p.w = w; }
             i = p.parent;
         }
-        xsize = max(xsize, w);
+        xsize = std::max(xsize, w);
     }
         
     void adjustcolumns()
@@ -983,7 +983,7 @@ struct gui : g3d_gui
         if(lists.inrange(curlist))
         {
             list &l = lists[curlist];
-            if(l.column >= 0) columns[l.column] = max(columns[l.column], ishorizontal() ? ysize : xsize);
+            if(l.column >= 0) columns[l.column] = std::max(columns[l.column], ishorizontal() ? ysize : xsize);
         }
         int parent = -1, depth = 0;
         for(int i = firstlist; i < lists.length(); i++)
@@ -1004,10 +1004,10 @@ struct gui : g3d_gui
         if(layoutpass)
         {	
             adjustcolumns();
-            xsize = max(tx, xsize);
-            ysize = max(ty, ysize);
-            ysize = max(ysize, (skiny[7]-skiny[6])*SKIN_SCALE);
-            if(tcurrent) *tcurrent = max(1, min(*tcurrent, tpos));
+            xsize = std::max(tx, xsize);
+            ysize = std::max(ty, ysize);
+            ysize = std::max(ysize, (skiny[7]-skiny[6])*SKIN_SCALE);
+            if(tcurrent) *tcurrent = std::max(1, std::min(*tcurrent, tpos));
             if(gui2d) adjustscale();
             if(!windowhit && !passthrough)
             {
@@ -1223,8 +1223,8 @@ bool g3d_movecursor(int dx, int dy)
 {
     if(!guis2d.length() || !hascursor) return false;
     const float CURSORSCALE = 500.0f;
-    cursorx = max(0.0f, min(1.0f, cursorx+guisens*dx*(screen->h/(screen->w*CURSORSCALE))));
-    cursory = max(0.0f, min(1.0f, cursory+guisens*dy/CURSORSCALE));
+    cursorx = std::max(0.0f, std::min(1.0f, cursorx+guisens*dx*(screen->h/(screen->w*CURSORSCALE))));
+    cursory = std::max(0.0f, std::min(1.0f, cursory+guisens*dy/CURSORSCALE));
     return true;
 }
 

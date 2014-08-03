@@ -332,7 +332,7 @@ struct Shader
     void setvariant_(int col, int row, Shader *fallbackshader)
     {
         Shader *s = fallbackshader;
-        for(col = min(col, detailshader->variants[row].length()-1); col >= 0; col--) 
+        for(col = std::min(col, detailshader->variants[row].length()-1); col >= 0; col--) 
             if(!(detailshader->variants[row][col]->type&SHADER_INVALID)) 
             { 
                 s = detailshader->variants[row][col]; 
@@ -444,7 +444,7 @@ struct ImageData
         if(!ndata) { owner = this; freefunc = NULL; }
     }
   
-    int calclevelsize(int level) const { return ((max(w>>level, 1)+align-1)/align)*((max(h>>level, 1)+align-1)/align)*bpp; }
+    int calclevelsize(int level) const { return ((std::max(w>>level, 1)+align-1)/align)*((std::max(h>>level, 1)+align-1)/align)*bpp; }
  
     int calcsize() const
     {

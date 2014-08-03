@@ -398,7 +398,7 @@ static int addsound(const char *name, int vol, int maxuses, vector<soundconfig> 
 void registersound(char *name, int *vol) { intret(addsound(name, *vol, 0, gamesounds, gameslots)); }
 COMMAND(registersound, "si");
 
-void mapsound(char *name, int *vol, int *maxuses) { intret(addsound(name, *vol, *maxuses < 0 ? 0 : max(1, *maxuses), mapsounds, mapslots)); }
+void mapsound(char *name, int *vol, int *maxuses) { intret(addsound(name, *vol, *maxuses < 0 ? 0 : std::max(1, *maxuses), mapsounds, mapslots)); }
 COMMAND(mapsound, "sii");
 
 void altsound(char *name, int *vol)
@@ -504,7 +504,7 @@ bool updatechannel(soundchannel &chan)
                 dist -= chan.ent->attr3;
             }
         }
-        else if(chan.radius > 0) rad = maxsoundradius ? min(maxsoundradius, chan.radius) : chan.radius;
+        else if(chan.radius > 0) rad = maxsoundradius ? std::min(maxsoundradius, chan.radius) : chan.radius;
         if(rad > 0) vol -= int(clamp(dist/rad, 0.0f, 1.0f)*soundvol); // simple mono distance attenuation
         if(stereo && (v.x != 0 || v.y != 0) && dist>0)
         {
@@ -513,7 +513,7 @@ bool updatechannel(soundchannel &chan)
         }
     }
     vol = (vol*MAXVOL*chan.slot->volume)/255/255;
-    vol = min(vol, MAXVOL);
+    vol = std::min(vol, MAXVOL);
     if(vol == chan.volume && pan == chan.pan) return false;
     chan.volume = vol;
     chan.pan = pan;
@@ -632,7 +632,7 @@ int playsound(int n, const vec *loc, extentity *ent, int flags, int loops, int f
     if(loc && (maxsoundradius || radius > 0))
     {
         // cull sounds that are unlikely to be heard
-        int rad = radius > 0 ? (maxsoundradius ? min(maxsoundradius, radius) : radius) : maxsoundradius;
+        int rad = radius > 0 ? (maxsoundradius ? std::min(maxsoundradius, radius) : radius) : maxsoundradius;
         if(camera1->o.dist(*loc) > 1.5f*rad)
         {
             if(channels.inrange(chanid) && channels[chanid].inuse && config.hasslot(channels[chanid].slot, slots))

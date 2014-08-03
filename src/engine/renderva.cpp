@@ -94,7 +94,7 @@ void addvisibleva(vtxarray *va)
     float dist = vadist(va, camera1->o);
     va->distance = int(dist); /*cv.dist(camera1->o) - va->size*SQRT3/2*/
 
-    int hash = min(int(dist*VASORTSIZE/worldsize), VASORTSIZE-1);
+    int hash = std::min(int(dist*VASORTSIZE/worldsize), VASORTSIZE-1);
     vtxarray **prev = &vasort[hash], *cur = vasort[hash];
 
     while(cur && va->distance >= cur->distance)
@@ -1256,8 +1256,8 @@ static void changeenv(renderstate &cur, int pass, Slot &slot, VSlot &vslot, geom
                     if(cur.envscale.x != cur.envscale.y || cur.envscale.y != cur.envscale.z)
                         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
                     // fake it, take the average and do a constant blend
-                    float envscale = (min(vslot.envscale.x, min(vslot.envscale.y, vslot.envscale.z)) + 
-                                      max(vslot.envscale.x, max(vslot.envscale.y, vslot.envscale.z)))/2;
+                    float envscale = (std::min(vslot.envscale.x, std::min(vslot.envscale.y, vslot.envscale.z)) + 
+                                      std::max(vslot.envscale.x, std::max(vslot.envscale.y, vslot.envscale.z)))/2;
                     glColor4f(1, 1, 1, envscale);
                     cur.envscale = vec(envscale, envscale, envscale);
                 }
@@ -1662,7 +1662,7 @@ static void renderbatch(renderstate &cur, int pass, geombatch &b)
                 gbatches++;
             }
             ushort minvert = curbatch->es.minvert[0], maxvert = curbatch->es.maxvert[0];
-            if(!curbatch->va->shadowed) { minvert = min(minvert, curbatch->es.minvert[1]); maxvert = max(maxvert, curbatch->es.maxvert[1]); } 
+            if(!curbatch->va->shadowed) { minvert = std::min(minvert, curbatch->es.minvert[1]); maxvert = std::max(maxvert, curbatch->es.maxvert[1]); } 
             drawtris(len, curbatch->edata, minvert, maxvert); 
             vtris += len/3;
         }
@@ -1936,7 +1936,7 @@ static GLuint createattenxytex(int size)
     loop(y, size) loop(x, size)
     {
         float dx = 2*float(x)/(size-1) - 1, dy = 2*float(y)/(size-1) - 1;
-        float atten = max(0.0f, 1.0f - dx*dx - dy*dy);
+        float atten = std::max(0.0f, 1.0f - dx*dx - dy*dy);
         *dst++ = uchar(atten*255);
     }
     GLuint tex = 0;
@@ -2306,7 +2306,7 @@ void rendergeom(float causticspass, bool fogpass)
                 va->occluded = OCCLUDE_PARENT;
                 continue;
             }
-            va->occluded = va->query && va->query->owner == va && checkquery(va->query) ? min(va->occluded+1, int(OCCLUDE_BB)) : OCCLUDE_NOTHING;
+            va->occluded = va->query && va->query->owner == va && checkquery(va->query) ? std::min(va->occluded+1, int(OCCLUDE_BB)) : OCCLUDE_NOTHING;
             va->query = newquery(va);
             if((!va->query && zpass) || !va->occluded)
                 va->occluded = pvsoccluded(va->geommin, va->geommax) ? OCCLUDE_GEOM : OCCLUDE_NOTHING;
@@ -2760,7 +2760,7 @@ static inline void updateskystats(vtxarray *va)
     renderedsky += va->sky;
     renderedexplicitsky += va->explicitsky;
     renderedskyfaces |= va->skyfaces&0x3F;
-    if(!(va->skyfaces&0x1F) || camera1->o.z < va->skyclip) renderedskyclip = min(renderedskyclip, va->skyclip);
+    if(!(va->skyfaces&0x1F) || camera1->o.z < va->skyclip) renderedskyclip = std::min(renderedskyclip, va->skyclip);
     else renderedskyclip = 0;
 }
 

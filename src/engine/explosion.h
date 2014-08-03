@@ -70,10 +70,10 @@ static GLuint createexpmodtex(int size, float minval)
     loop(y, size) loop(x, size)
     {
         float dx = 2*float(x)/(size-1) - 1, dy = 2*float(y)/(size-1) - 1;
-        float z = max(0.0f, 1.0f - dx*dx - dy*dy);
+        float z = std::max(0.0f, 1.0f - dx*dx - dy*dy);
         if(minval) z = sqrtf(z);
         else loopk(2) z *= z;
-        *dst++ = uchar(max(z, minval)*255);
+        *dst++ = uchar(std::max(z, minval)*255);
     }
     GLuint tex = 0;
     glGenTextures(1, &tex);
@@ -442,8 +442,8 @@ struct fireballrenderer : listrenderer
 
             loopk(3)
             {
-                bbmin[k] = min(bbmin[k], p->o[k] - psize);
-                bbmax[k] = max(bbmax[k], p->o[k] + psize);
+                bbmin[k] = std::min(bbmin[k], p->o[k] - psize);
+                bbmax[k] = std::max(bbmax[k], p->o[k] + psize);
             }
 
             int pos = numranges;
@@ -452,7 +452,7 @@ struct fireballrenderer : listrenderer
 
             if(numranges > pos)
             {
-                int moved = min(numranges-pos, maxranges-(pos+1));
+                int moved = std::min(numranges-pos, maxranges-(pos+1));
                 memmove(&ranges[pos+1], &ranges[pos], moved*sizeof(float));
                 memmove(&owners[pos+1], &owners[pos], moved*sizeof(void *));
             }
@@ -467,7 +467,7 @@ struct fireballrenderer : listrenderer
 
     void seedemitter(particleemitter &pe, const vec &o, const vec &d, int fade, float size, int gravity)
     {
-        pe.maxfade = max(pe.maxfade, fade);
+        pe.maxfade = std::max(pe.maxfade, fade);
         pe.extendbb(o, (size+1+pe.ent->attr2)*WOBBLE); 
     }
 

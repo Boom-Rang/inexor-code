@@ -199,7 +199,7 @@ namespace game
                                 case GUN_RIFLE: longrange = true; break;
                             }
                             // the closer the monster is the more likely he wants to shoot, 
-                            if((!melee || dist<20) && !rnd(longrange ? (int)dist/12+1 : min((int)dist/12+1,6)) && enemy->state==CS_ALIVE)      // get ready to fire
+                            if((!melee || dist<20) && !rnd(longrange ? (int)dist/12+1 : std::min((int)dist/12+1,6)) && enemy->state==CS_ALIVE)      // get ready to fire
                             { 
                                 attacktarget = target;
                                 transition(M_AIMING, 0, monstertypes[mtype].lag, 10);
@@ -254,7 +254,7 @@ namespace game
                 lastpain = lastmillis;
                 playsound(monstertypes[mtype].diesound, &o);
                 monsterkilled();
-                gibeffect(max(-health, 0), vel, this);
+                gibeffect(std::max(-health, 0), vel, this);
 
                 defformatstring(id)("monster_dead_%d", tag);
                 if(identexists(id)) execute(id);

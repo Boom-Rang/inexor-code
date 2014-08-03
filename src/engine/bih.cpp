@@ -52,7 +52,7 @@ inline bool BIH::traverse(const vec &o, const vec &ray, const vec &invray, float
                 if(!curnode->isleaf(faridx))
                 {
                     curnode = &nodes[curnode->childindex(faridx)];
-                    tmin = max(tmin, farsplit);
+                    tmin = std::max(tmin, farsplit);
                     continue;
                 }
                 else if(triintersect(tris[curnode->childindex(faridx)], o, ray, maxdist, dist, mode, noclip)) return true;
@@ -66,7 +66,7 @@ inline bool BIH::traverse(const vec &o, const vec &ray, const vec &invray, float
                 if(!curnode->isleaf(faridx))
                 {
                     curnode = &nodes[curnode->childindex(faridx)];
-                    tmin = max(tmin, farsplit);
+                    tmin = std::max(tmin, farsplit);
                     continue;
                 }
                 else if(triintersect(tris[curnode->childindex(faridx)], o, ray, maxdist, dist, mode, noclip)) return true;
@@ -82,21 +82,21 @@ inline bool BIH::traverse(const vec &o, const vec &ray, const vec &invray, float
                     {
                         BIHStack &save = stack[stacksize++];
                         save.node = &nodes[curnode->childindex(faridx)];
-                        save.tmin = max(tmin, farsplit);
+                        save.tmin = std::max(tmin, farsplit);
                         save.tmax = tmax;
                     }
                     else 
                     {
-                        if(traverse(o, ray, invray, maxdist, dist, mode, &nodes[curnode->childindex(nearidx)], tmin, min(tmax, nearsplit))) return true;
+                        if(traverse(o, ray, invray, maxdist, dist, mode, &nodes[curnode->childindex(nearidx)], tmin, std::min(tmax, nearsplit))) return true;
                         curnode = &nodes[curnode->childindex(faridx)];
-                        tmin = max(tmin, farsplit);
+                        tmin = std::max(tmin, farsplit);
                         continue;
                     }
                 }
                 else if(triintersect(tris[curnode->childindex(faridx)], o, ray, maxdist, dist, mode, noclip)) return true;
             }
             curnode = &nodes[curnode->childindex(nearidx)];
-            tmax = min(tmax, nearsplit);
+            tmax = std::min(tmax, nearsplit);
             continue;
         }
         if(stacksize <= 0) return false;
@@ -118,19 +118,19 @@ inline bool BIH::traverse(const vec &o, const vec &ray, float maxdist, float &di
     if(invray.x > 0) { tmin = t1; tmax = t2; } else { tmin = t2; tmax = t1; }
     t1 = (bbmin.y - o.y)*invray.y;
     t2 = (bbmax.y - o.y)*invray.y;
-    if(invray.y > 0) { tmin = max(tmin, t1); tmax = min(tmax, t2); } else { tmin = max(tmin, t2); tmax = min(tmax, t1); }
+    if(invray.y > 0) { tmin = std::max(tmin, t1); tmax = std::min(tmax, t2); } else { tmin = std::max(tmin, t2); tmax = std::min(tmax, t1); }
     t1 = (bbmin.z - o.z)*invray.z;
     t2 = (bbmax.z - o.z)*invray.z;
-    if(invray.z > 0) { tmin = max(tmin, t1); tmax = min(tmax, t2); } else { tmin = max(tmin, t2); tmax = min(tmax, t1); }
+    if(invray.z > 0) { tmin = std::max(tmin, t1); tmax = std::min(tmax, t2); } else { tmin = std::max(tmin, t2); tmax = std::min(tmax, t1); }
     if(tmin >= maxdist || tmin>=tmax) return false;
-    tmax = min(tmax, maxdist);
+    tmax = std::min(tmax, maxdist);
 
     return BIH::traverse(o, ray, invray, maxdist, dist, mode, &nodes[0], tmin, tmax); 
 }
 
 void BIH::build(vector<BIHNode> &buildnodes, ushort *indices, int numindices, const vec &vmin, const vec &vmax, int depth)
 {
-    maxdepth = max(maxdepth, depth);
+    maxdepth = std::max(maxdepth, depth);
    
     int axis = 2;
     loopk(2) if(vmax[k] - vmin[k] > vmax[axis] - vmin[axis]) axis = k;
@@ -146,12 +146,12 @@ void BIH::build(vector<BIHNode> &buildnodes, ushort *indices, int numindices, co
         for(left = 0, right = numindices, splitleft = SHRT_MIN, splitright = SHRT_MAX; left < right;)
         {
             tri &tri = tris[indices[left]];
-            float amin = min(tri.a[axis], min(tri.b[axis], tri.c[axis])),
-                  amax = max(tri.a[axis], max(tri.b[axis], tri.c[axis]));
-            if(max(split - amin, 0.0f) > max(amax - split, 0.0f)) 
+            float amin = std::min(tri.a[axis], std::min(tri.b[axis], tri.c[axis])),
+                  amax = std::max(tri.a[axis], std::max(tri.b[axis], tri.c[axis]));
+            if(std::max(split - amin, 0.0f) > std::max(amax - split, 0.0f)) 
             {
                 ++left;
-                splitleft = max(splitleft, amax);
+                splitleft = std::max(splitleft, amax);
                 leftmin.min(tri.a).min(tri.b).min(tri.c);
                 leftmax.max(tri.a).max(tri.b).max(tri.c);
             }
@@ -159,7 +159,7 @@ void BIH::build(vector<BIHNode> &buildnodes, ushort *indices, int numindices, co
             {    
                 --right; 
                 std::swap(indices[left], indices[right]);
-                splitright = min(splitright, amin);
+                splitright = std::min(splitright, amin);
                 rightmin.min(tri.a).min(tri.b).min(tri.c);
                 rightmax.max(tri.a).max(tri.b).max(tri.c);
             }
@@ -180,13 +180,13 @@ void BIH::build(vector<BIHNode> &buildnodes, ushort *indices, int numindices, co
             tri &tri = tris[indices[i]];
             if(i < left) 
             {
-                splitleft = max(splitleft, max(tri.a[axis], max(tri.b[axis], tri.c[axis])));
+                splitleft = std::max(splitleft, std::max(tri.a[axis], std::max(tri.b[axis], tri.c[axis])));
                 leftmin.min(tri.a).min(tri.b).min(tri.c);
                 leftmax.max(tri.a).max(tri.b).max(tri.c);
             }
             else 
             {
-                splitright = min(splitright, min(tri.a[axis], min(tri.b[axis], tri.c[axis])));
+                splitright = std::min(splitright, std::min(tri.a[axis], std::min(tri.b[axis], tri.c[axis])));
                 rightmin.min(tri.a).min(tri.b).min(tri.c);
                 rightmax.max(tri.a).max(tri.b).max(tri.c);
             }
@@ -231,8 +231,8 @@ BIH::BIH(vector<tri> *t)
         bbmax.max(tri.a).max(tri.b).max(tri.c);
     }
     
-    radius = max(max(max(fabs(bbmin.x), fabs(bbmin.y)), fabs(bbmin.z)),
-                 max(max(fabs(bbmax.x), fabs(bbmax.y)), fabs(bbmax.z)));
+    radius = std::max(std::max(std::max(fabs(bbmin.x), fabs(bbmin.y)), fabs(bbmin.z)),
+                 std::max(std::max(fabs(bbmax.x), fabs(bbmax.y)), fabs(bbmax.z)));
     radius *= radius;
 
     vector<BIHNode> buildnodes;

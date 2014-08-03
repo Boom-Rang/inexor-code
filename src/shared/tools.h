@@ -17,26 +17,9 @@ typedef unsigned long long int ullong;
 #define RESTRICT
 #endif
 
-#ifdef max
-#undef max
-#endif
-#ifdef min
-#undef min
-#endif
-template<class T>
-static inline T max(T a, T b)
-{
-    return a > b ? a : b;
-}
-template<class T>
-static inline T min(T a, T b)
-{
-    return a < b ? a : b;
-}
 template<class T, class U>
-static inline T clamp(T a, U b, U c)
-{
-    return max(T(b), min(a, T(c)));
+static inline T clamp(T a, U b, U c) {
+  return std::max(T(b), std::min(a, T(c)));
 }
 
 #define rnd(x) ((int)(randomMT()&0x7FFFFFFF)%(x))
@@ -164,13 +147,13 @@ struct databuf
     void put(const T *vals, int numvals)
     {
         if(maxlen-len<numvals) flags |= OVERWROTE;
-        memcpy(&buf[len], (const void *)vals, min(maxlen-len, numvals)*sizeof(T));
-        len += min(maxlen-len, numvals);
+        memcpy(&buf[len], (const void *)vals, std::min(maxlen-len, numvals)*sizeof(T));
+        len += std::min(maxlen-len, numvals);
     }
 
     int get(T *vals, int numvals)
     {
-        int read = min(maxlen-len, numvals);
+        int read = std::min(maxlen-len, numvals);
         if(read<numvals) flags |= OVERREAD;
         memcpy(vals, (void *)&buf[len], read*sizeof(T));
         len += read;
@@ -179,10 +162,10 @@ struct databuf
 
     void offset(int n)
     {
-        n = min(n, maxlen);
+        n = std::min(n, maxlen);
         buf += n;
         maxlen -= n;
-        len = max(len-n, 0);
+        len = std::max(len-n, 0);
     }
 
     bool empty() const { return len==0; }
@@ -226,7 +209,7 @@ struct packetbuf : ucharbuf
 
     void checkspace(int n)
     {
-        if(len + n > maxlen && packet && growth > 0) resize(max(len + n, maxlen + growth));
+        if(len + n > maxlen && packet && growth > 0) resize(std::max(len + n, maxlen + growth));
     }
 
     ucharbuf subbuf(int sz)
@@ -500,7 +483,9 @@ template <class T> struct vector
     void growbuf(int sz)
     {
         int olen = alen;
-        if(!alen) alen = max(MINSIZE, sz);
+        // For some reason this will throw errors without
+        // the caset
+        if(!alen) alen = std::max((int)MINSIZE, sz);
         else while(alen < sz) alen *= 2;
         if(alen <= olen) return;
         uchar *newbuf = new uchar[alen*sizeof(T)];
@@ -900,7 +885,7 @@ struct unionfind
 
     void unite (int x, int y)
     {
-        while(ufvals.length() <= max(x, y)) ufvals.add();
+        while(ufvals.length() <= std::max(x, y)) ufvals.add();
         x = compressfind(x);
         y = compressfind(y);
         if(x==y) return;

@@ -307,7 +307,7 @@ namespace server
             
         void setpushed()
         {
-            pushed = max(pushed, gamemillis);
+            pushed = std::max(pushed, gamemillis);
             if(exceeded && checkpushed(exceeded, calcpushrange())) exceeded = 0;
         }
         
@@ -502,14 +502,14 @@ namespace server
 
     int findmaprotation(int mode, const char *map)
     {
-        for(int i = max(curmaprotation, 0); i < maprotations.length(); i++)
+        for(int i = std::max(curmaprotation, 0); i < maprotations.length(); i++)
         {
             maprotation &rot = maprotations[i];
             if(!rot.modes) break;
             if(rot.match(mode, map)) return i;
         }
         int start;
-        for(start = max(curmaprotation, 0) - 1; start >= 0; start--) if(!maprotations[start].modes) break;
+        for(start = std::max(curmaprotation, 0) - 1; start >= 0; start--) if(!maprotations[start].modes) break;
         start++;
         for(int i = start; i < curmaprotation; i++)
         {
@@ -988,7 +988,7 @@ namespace server
         {
             clientinfo *ci = clients[i];
             if(ci->state.timeplayed<0) continue;
-            float rank = ci->state.state!=CS_SPECTATOR ? ci->state.effectiveness/max(ci->state.timeplayed, 1) : -1;
+            float rank = ci->state.state!=CS_SPECTATOR ? ci->state.effectiveness/std::max(ci->state.timeplayed, 1) : -1;
             if(!best || rank > bestrank) { best = ci; bestrank = rank; }
         }
         return best;
@@ -1054,7 +1054,7 @@ namespace server
             loopj(numteams) if(!strcmp(ci->team, teamranks[j].name))
             {
                 teamrank &ts = teamranks[j];
-                ts.rank += ci->state.effectiveness/max(ci->state.timeplayed, 1);
+                ts.rank += ci->state.effectiveness/std::max(ci->state.timeplayed, 1);
                 ts.clients++;
                 break;
             }
@@ -1083,7 +1083,7 @@ namespace server
     void adddemo()
     {
         if(!demotmp) return;
-        int len = (int)min(demotmp->size(), stream::offset((maxdemosize<<20) + 0x10000));
+        int len = (int)std::min(demotmp->size(), stream::offset((maxdemosize<<20) + 0x10000));
         demofile &d = demos.add();
         time_t t = time(NULL);
         char *timestr = ctime(&t), *trim = timestr + strlen(timestr);
@@ -1850,7 +1850,7 @@ namespace server
         if(!ci || (m_timed && smapname[0]))
         {
             putint(p, N_TIMEUP);
-            putint(p, gamemillis < gamelimit && !interm ? max((gamelimit - gamemillis)/1000, 1) : 0);
+            putint(p, gamemillis < gamelimit && !interm ? std::max((gamelimit - gamemillis)/1000, 1) : 0);
         }
         if(!notgotitems)
         {
@@ -2041,7 +2041,7 @@ namespace server
         else if(m_hideandseek) smode = &hideandseekmode;
         else smode = NULL;
 
-        if(m_timed && smapname[0]) sendf(-1, 1, "ri2", N_TIMEUP, gamemillis < gamelimit && !interm ? max((gamelimit - gamemillis)/1000, 1) : 0);
+        if(m_timed && smapname[0]) sendf(-1, 1, "ri2", N_TIMEUP, gamemillis < gamelimit && !interm ? std::max((gamelimit - gamemillis)/1000, 1) : 0);
         loopv(clients)
         {
             clientinfo *ci = clients[i];
@@ -2094,7 +2094,7 @@ namespace server
         {
             curmaprotation = findmaprotation(gamemode, smapname);
             if(curmaprotation >= 0) nextmaprotation();
-            else curmaprotation = smapname[0] ? max(findmaprotation(gamemode, ""), 0) : 0;
+            else curmaprotation = smapname[0] ? std::max(findmaprotation(gamemode, ""), 0) : 0;
         }
         maprotation &rot = maprotations[curmaprotation];
         changemap(rot.map, rot.findmode(gamemode));
@@ -2202,7 +2202,7 @@ namespace server
 
     void startintermission()
     {
-        gamelimit = min(gamelimit, gamemillis);
+        gamelimit = std::min(gamelimit, gamemillis);
         checkintermission();
     }
 
@@ -2291,7 +2291,7 @@ namespace server
                 int friends = 0, enemies = 0; // note: friends also includes the fragger
                 if(m_teammode) loopv(clients) if(strcmp(clients[i]->team, actor->team)) enemies++; else friends++;
                 else { friends = 1; enemies = clients.length()-1; }
-                actor->state.effectiveness += fragvalue*friends/float(max(enemies, 1));
+                actor->state.effectiveness += fragvalue*friends/float(std::max(enemies, 1));
             }
             teaminfo *t = m_teammode ? teaminfos.access(actor->team) : NULL;
             if(t) t->frags += fragvalue; 
@@ -2479,7 +2479,7 @@ namespace server
         loopv(clients)
         {
             clientinfo *ci = clients[i];
-            if(curtime>0 && ci->state.quadmillis) ci->state.quadmillis = max(ci->state.quadmillis-curtime, 0);
+            if(curtime>0 && ci->state.quadmillis) ci->state.quadmillis = std::max(ci->state.quadmillis-curtime, 0);
             flushevents(ci, gamemillis);
         }
     }
@@ -2604,7 +2604,7 @@ namespace server
                 else match->matches++;
             }
         }
-        if(!mcrc && total - unsent < min(total, 4)) return;
+        if(!mcrc && total - unsent < std::min(total, 4)) return;
         crcs.sort(crcinfo::compare);
         string msg;
         loopv(clients)
@@ -3069,7 +3069,7 @@ namespace server
                 {
                     if((!ci->local || demorecord || hasnonlocalclients()) && (cp->state.state==CS_ALIVE || cp->state.state==CS_EDITING))
                     {
-                        if(!ci->local && !m_edit && max(vel.magnitude2(), (float)fabs(vel.z)) >= 180)
+                        if(!ci->local && !m_edit && std::max(vel.magnitude2(), (float)fabs(vel.z)) >= 180)
                             cp->setexceeded();
                         cp->position.setsize(0);
                         while(curmsg<p.length()) cp->position.add(p.buf[curmsg++]);
@@ -3771,7 +3771,7 @@ namespace server
         putint(p, gamepaused || gamespeed != 100 ? 7 : 5);                   // number of attrs following
         putint(p, PROTOCOL_VERSION);    // generic attributes, passed back below
         putint(p, gamemode);
-        putint(p, m_timed ? max((gamelimit - gamemillis)/1000, 0) : 0);
+        putint(p, m_timed ? std::max((gamelimit - gamemillis)/1000, 0) : 0);
         putint(p, maxclients);
         putint(p, serverpass[0] ? MM_PASSWORD : (!m_mp(gamemode) ? MM_PRIVATE : (mastermode || mastermask&MM_AUTOAPPROVE ? mastermode : MM_AUTH)));
         if(gamepaused || gamespeed != 100)

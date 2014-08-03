@@ -589,7 +589,7 @@ void setlocalparamfv(const char *name, int type, int index, const float *v)
 void invalidateenvparams(int type, int start, int count)
 {
     GlobalShaderParamState *paramstate = type==SHPARAM_VERTEX ? vertexparamstate : pixelparamstate;
-    int end = min(start + count, RESERVEDSHADERPARAMS + MAXSHADERPARAMS);
+    int end = std::min(start + count, RESERVEDSHADERPARAMS + MAXSHADERPARAMS);
     while(start < end)
     {
         paramstate[start].dirty = ShaderParamState::INVALID;
@@ -1238,7 +1238,7 @@ static void gendynlightvariant(Shader &s, const char *sname, const char *vs, con
                 defformatstring(color)("%sdynlight%dcolor%s", !k ? "uniform vec4 " : " ", k, k==i ? ";\n" : ",");
                 psdl.put(color, strlen(color));
             }
-            loopk(min(i+1, numlights))
+            loopk(std::min(i+1, numlights))
             {
                 defformatstring(dir)("%sdynlight%ddir%s", !k ? "varying vec3 " : " ", k, k==i || k+1==numlights ? ";\n" : ",");
                 vsdl.put(dir, strlen(dir));
@@ -1801,7 +1801,7 @@ void fastshader(char *nice, char *fast, int *detail)
 {
     Shader *ns = shaders.access(nice), *fs = shaders.access(fast);
     if(!ns || !fs) return;
-    loopi(min(*detail+1, MAXSHADERDETAIL)) ns->fastshader[i] = fs;
+    loopi(std::min(*detail+1, MAXSHADERDETAIL)) ns->fastshader[i] = fs;
     ns->fixdetailshader(false);
 }
 
@@ -1906,7 +1906,7 @@ static int allocatepostfxtex(int scale)
     postfxtex &t = postfxtexs.add();
     t.scale = scale;
     glGenTextures(1, &t.id);
-    createtexture(t.id, max(screen->w>>scale, 1), max(screen->h>>scale, 1), NULL, 3, 1, GL_RGB, GL_TEXTURE_RECTANGLE_ARB);
+    createtexture(t.id, std::max(screen->w>>scale, 1), std::max(screen->h>>scale, 1), NULL, 3, 1, GL_RGB, GL_TEXTURE_RECTANGLE_ARB);
     return postfxtexs.length()-1;
 }
 
@@ -1968,8 +1968,8 @@ void renderpostfx()
             if(hasFBO) glFramebufferTexture2D_(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_RECTANGLE_ARB, postfxtexs[tex].id, 0);
         }
 
-        int w = tex >= 0 ? max(screen->w>>postfxtexs[tex].scale, 1) : screen->w, 
-            h = tex >= 0 ? max(screen->h>>postfxtexs[tex].scale, 1) : screen->h;
+        int w = tex >= 0 ? std::max(screen->w>>postfxtexs[tex].scale, 1) : screen->w, 
+            h = tex >= 0 ? std::max(screen->h>>postfxtexs[tex].scale, 1) : screen->h;
         glViewport(0, 0, w, h);
         p.shader->set();
         setlocalparamfv("params", SHPARAM_VERTEX, 0, p.params.v);
@@ -1979,8 +1979,8 @@ void renderpostfx()
         {
             if(!tmu)
             {
-                tw = max(screen->w>>postfxtexs[binds[j]].scale, 1);
-                th = max(screen->h>>postfxtexs[binds[j]].scale, 1);
+                tw = std::max(screen->w>>postfxtexs[binds[j]].scale, 1);
+                th = std::max(screen->h>>postfxtexs[binds[j]].scale, 1);
             }
             else glActiveTexture_(GL_TEXTURE0_ARB + tmu);
             glBindTexture(GL_TEXTURE_RECTANGLE_ARB, postfxtexs[binds[j]].id);
@@ -2054,7 +2054,7 @@ ICOMMAND(addpostfx, "siisffff", (char *name, int *bind, int *scale, char *inputs
     else if(*inputs=='-') freeinputs = true;
     inputmask &= (1<<NUMPOSTFXBINDS)-1;
     freemask &= (1<<NUMPOSTFXBINDS)-1;
-    addpostfx(name, clamp(*bind, 0, NUMPOSTFXBINDS-1), max(*scale, 0), inputmask, freemask, vec4(*x, *y, *z, *w));
+    addpostfx(name, clamp(*bind, 0, NUMPOSTFXBINDS-1), std::max(*scale, 0), inputmask, freemask, vec4(*x, *y, *z, *w));
 });
 
 ICOMMAND(setpostfx, "sffff", (char *name, float *x, float *y, float *z, float *w),
@@ -2222,7 +2222,7 @@ void inittmus()
     {
         GLint val;
         glGetIntegerv(GL_MAX_TEXTURE_UNITS_ARB, &val);
-        maxtmus = max(1, min(MAXTMUS, int(val)));
+        maxtmus = std::max(1, std::min(MAXTMUS, int(val)));
         loopi(maxtmus)
         {
             glActiveTexture_(GL_TEXTURE0_ARB+i);

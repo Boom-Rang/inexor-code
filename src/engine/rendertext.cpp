@@ -67,7 +67,7 @@ void fontchar(int *x, int *y, int *w, int *h, int *offsetx, int *offsety, int *a
 void fontskip(int *n)
 {
     if(!fontdef) return;
-    loopi(max(*n, 1))
+    loopi(std::max(*n, 1))
     {
         font::charinfo &c = fontdef->chars.add();
         c.x = c.y = c.w = c.h = c.offsetx = c.offsety = c.advance = c.tex = 0;
@@ -151,7 +151,7 @@ float text_widthf(const char *str)
 
 void tabify(const char *str, int *numtabs)
 {
-    int tw = max(*numtabs, 0)*FONTTAB-1, tabs = 0;
+    int tw = std::max(*numtabs, 0)*FONTTAB-1, tabs = 0;
     for(float w = text_widthf(str); w <= tw; w = TEXTTAB(w)) ++tabs;
     int len = strlen(str);
     char *tstr = newstring(len + tabs);

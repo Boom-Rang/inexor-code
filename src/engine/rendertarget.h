@@ -159,16 +159,16 @@ struct rendertarget
     {
         if(x1 >= 1 || y1 >= 1 || x2 <= -1 || y2 <= -1) return false;
 
-        scissorx1 = min(scissorx1, max(x1, -1.0f));
-        scissory1 = min(scissory1, max(y1, -1.0f));
-        scissorx2 = max(scissorx2, min(x2, 1.0f));
-        scissory2 = max(scissory2, min(y2, 1.0f));
+        scissorx1 = std::min(scissorx1, std::max(x1, -1.0f));
+        scissory1 = std::min(scissory1, std::max(y1, -1.0f));
+        scissorx2 = std::max(scissorx2, std::min(x2, 1.0f));
+        scissory2 = std::max(scissory2, std::min(y2, 1.0f));
 
         float blurerror = 2.0f*float(2*blursize + blurmargin);
-        int tx1 = max(0, min(BLURTILES - 1, int((x1-blurerror/vieww + 1)/2 * BLURTILES))),
-            ty1 = max(0, min(BLURTILES - 1, int((y1-blurerror/viewh + 1)/2 * BLURTILES))),
-            tx2 = max(0, min(BLURTILES - 1, int((x2+blurerror/vieww + 1)/2 * BLURTILES))),
-            ty2 = max(0, min(BLURTILES - 1, int((y2+blurerror/viewh + 1)/2 * BLURTILES)));
+        int tx1 = std::max(0, std::min(BLURTILES - 1, int((x1-blurerror/vieww + 1)/2 * BLURTILES))),
+            ty1 = std::max(0, std::min(BLURTILES - 1, int((y1-blurerror/viewh + 1)/2 * BLURTILES))),
+            tx2 = std::max(0, std::min(BLURTILES - 1, int((x2+blurerror/vieww + 1)/2 * BLURTILES))),
+            ty2 = std::max(0, std::min(BLURTILES - 1, int((y2+blurerror/viewh + 1)/2 * BLURTILES)));
 
         uint mask = (BLURTILEMASK>>(BLURTILES - (tx2+1))) & (BLURTILEMASK<<tx1);
         for(int y = ty1; y <= ty2; y++) blurtiles[y] |= mask;
@@ -184,10 +184,10 @@ struct rendertarget
 
         if(!blurtile) return true;
 
-        int tx1 = max(0, min(BLURTILES - 1, int((x1 + 1)/2 * BLURTILES))),
-            ty1 = max(0, min(BLURTILES - 1, int((y1 + 1)/2 * BLURTILES))),
-            tx2 = max(0, min(BLURTILES - 1, int((x2 + 1)/2 * BLURTILES))),
-            ty2 = max(0, min(BLURTILES - 1, int((y2 + 1)/2 * BLURTILES)));
+        int tx1 = std::max(0, std::min(BLURTILES - 1, int((x1 + 1)/2 * BLURTILES))),
+            ty1 = std::max(0, std::min(BLURTILES - 1, int((y1 + 1)/2 * BLURTILES))),
+            tx2 = std::max(0, std::min(BLURTILES - 1, int((x2 + 1)/2 * BLURTILES))),
+            ty2 = std::max(0, std::min(BLURTILES - 1, int((y2 + 1)/2 * BLURTILES)));
 
         uint mask = (BLURTILEMASK>>(BLURTILES - (tx2+1))) & (BLURTILEMASK<<tx1);
         for(int y = ty1; y <= ty2; y++) if(blurtiles[y] & mask) return true;
@@ -322,10 +322,10 @@ struct rendertarget
             }
             return false;
         }
-        x = max(int(floor((scissorx1+1)/2*vieww)) - 2*blursize, 0);
-        y = max(int(floor((scissory1+1)/2*viewh)) - 2*blursize, 0);
-        w = min(int(ceil((scissorx2+1)/2*vieww)) + 2*blursize, vieww) - x;
-        h = min(int(ceil((scissory2+1)/2*viewh)) + 2*blursize, viewh) - y;
+        x = std::max(int(floor((scissorx1+1)/2*vieww)) - 2*blursize, 0);
+        y = std::max(int(floor((scissory1+1)/2*viewh)) - 2*blursize, 0);
+        w = std::min(int(ceil((scissorx2+1)/2*vieww)) + 2*blursize, vieww) - x;
+        h = std::min(int(ceil((scissory2+1)/2*viewh)) + 2*blursize, viewh) - y;
         return true;
     }
 
@@ -342,10 +342,10 @@ struct rendertarget
             }
             return false;
         }
-        x = max(int(floor((scissorx1+1)/2*vieww)), 0);
-        y = max(int(floor((scissory1+1)/2*viewh)), 0);
-        w = min(int(ceil((scissorx2+1)/2*vieww)), vieww) - x;
-        h = min(int(ceil((scissory2+1)/2*viewh)), viewh) - y;
+        x = std::max(int(floor((scissorx1+1)/2*vieww)), 0);
+        y = std::max(int(floor((scissory1+1)/2*viewh)), 0);
+        w = std::min(int(ceil((scissorx2+1)/2*vieww)), vieww) - x;
+        h = std::min(int(ceil((scissory2+1)/2*viewh)), viewh) - y;
         return true;
     }
 
@@ -357,8 +357,8 @@ struct rendertarget
 
     void render(int w, int h, int blursize = 0, float blursigma = 0)
     {
-        w = min(w, hwtexsize);
-        h = min(h, hwtexsize);
+        w = std::min(w, hwtexsize);
+        h = std::min(h, hwtexsize);
         if(texrect())
         {
             if(w > screen->w) w = screen->w;
@@ -370,8 +370,8 @@ struct rendertarget
         {
             while(screen->w < (w*3)/4) w /= 2;
             while(screen->h < (h*3)/4) h /= 2;
-            vieww = min(w, screen->w);
-            viewh = min(h, screen->h);
+            vieww = std::min(w, screen->w);
+            viewh = std::min(h, screen->h);
         }
         else 
         {
@@ -531,7 +531,7 @@ struct rendertarget
     void debug()
     {
         if(!rendertex) return;
-        int w = min(screen->w, screen->h)/2, h = (w*screen->h)/screen->w;
+        int w = std::min(screen->w, screen->h)/2, h = (w*screen->h)/screen->w;
         (target==GL_TEXTURE_RECTANGLE_ARB ? rectshader : defaultshader)->set();
         glColor3f(1, 1, 1);
         glEnable(target);

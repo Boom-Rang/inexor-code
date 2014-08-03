@@ -16,7 +16,7 @@ int guessnumcpus()
 #elif defined(_SC_NPROCESSORS_ONLN)
     numcpus = (int)sysconf(_SC_NPROCESSORS_ONLN);
 #endif
-    return max(numcpus, 1);
+    return std::max(numcpus, 1);
 }
     
 ////////////////////////// rnd numbers ////////////////////////////////////////

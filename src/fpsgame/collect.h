@@ -391,7 +391,7 @@ struct collectclientmode : clientmode
         {
             int team = getint(p);
             vec o;
-            loopk(3) o[k] = max(getint(p)/DMF, 0.0f);
+            loopk(3) o[k] = std::max(getint(p)/DMF, 0.0f);
             if(p.overread()) break;
             if(commit && notgotbases)
             {
@@ -754,7 +754,7 @@ struct collectclientmode : clientmode
 
     int respawnwait(fpsent *d)
     {
-        return max(0, RESPAWNSECS-(lastmillis-d->lastpain)/1000);
+        return std::max(0, RESPAWNSECS-(lastmillis-d->lastpain)/1000);
     }
 
     void pickspawn(fpsent *d)

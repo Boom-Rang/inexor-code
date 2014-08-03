@@ -498,10 +498,10 @@ struct fpsstate
     {
         if(gun==GUN_BOMB) {
             itemstat &is = itemstats[P_AMMO_BO];
-            ammo[gun] = min(ammo[gun] + (is.add*k)/scale, is.max);
+            ammo[gun] = std::min(ammo[gun] + (is.add*k)/scale, is.max);
         } else {
             itemstat &is = itemstats[gun-GUN_SG];
-            ammo[gun] = min(ammo[gun] + (is.add*k)/scale, is.max);
+            ammo[gun] = std::min(ammo[gun] + (is.add*k)/scale, is.max);
         }
     }
 
@@ -557,13 +557,13 @@ struct fpsstate
             switch(type)
             {
                 case I_BOMBRADIUS:
-                    bombradius = min(bombradius+is.add, is.max);
+                    bombradius = std::min(bombradius+is.add, is.max);
                     break;
                 case I_BOMBDELAY:
-                    bombdelay = min(bombdelay+is.add, is.max);
+                    bombdelay = std::min(bombdelay+is.add, is.max);
                     break;
                 default:
-                    ammo[is.info] = min(ammo[is.info]+is.add, is.max);
+                    ammo[is.info] = std::min(ammo[is.info]+is.add, is.max);
                     break;
             }
         } else if(type>=I_SHELLS && type<=I_QUAD) {
@@ -571,20 +571,20 @@ struct fpsstate
             switch(type)
             {
                 case I_BOOST:
-                    maxhealth = min(maxhealth+is.add, is.max);
+                    maxhealth = std::min(maxhealth+is.add, is.max);
                 case I_HEALTH: // boost also adds to health
-                    health = min(health+is.add, maxhealth);
+                    health = std::min(health+is.add, maxhealth);
                     break;
                 case I_GREENARMOUR:
                 case I_YELLOWARMOUR:
-                    armour = min(armour+is.add, is.max);
+                    armour = std::min(armour+is.add, is.max);
                     armourtype = is.info;
                     break;
                 case I_QUAD:
-                    quadmillis = min(quadmillis+is.add, is.max);
+                    quadmillis = std::min(quadmillis+is.add, is.max);
                     break;
                 default:
-                    ammo[is.info] = min(ammo[is.info]+is.add, is.max);
+                    ammo[is.info] = std::min(ammo[is.info]+is.add, is.max);
                     break;
             }
         }

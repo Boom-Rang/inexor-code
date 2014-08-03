@@ -36,7 +36,7 @@ static struct depthfxtexture : rendertarget
 
     float eyedepth(const vec &p) const
     {
-        return max(-mvmatrix.transformz(p), 0.0f);
+        return std::max(-mvmatrix.transformz(p), 0.0f);
     }
 
     void addscissorvert(const vec &v, float &sx1, float &sy1, float &sx2, float &sy2)
@@ -44,10 +44,10 @@ static struct depthfxtexture : rendertarget
         float w = mvpmatrix.transformw(v),
               x = mvpmatrix.transformx(v) / w,
               y = mvpmatrix.transformy(v) / w;
-        sx1 = min(sx1, x);
-        sy1 = min(sy1, y);
-        sx2 = max(sx2, x);
-        sy2 = max(sy2, y);
+        sx1 = std::min(sx1, x);
+        sy1 = std::min(sy1, y);
+        sx2 = std::max(sx2, x);
+        sy2 = std::max(sy2, y);
     }
 
     bool addscissorbox(const vec &center, float size)

@@ -62,7 +62,7 @@ struct skelmodel : animmodel
             if(weight <= 1e-3f) return sorted;
             loopk(sorted) if(weight > weights[k])
             {
-                for(int l = min(sorted-1, 2); l >= k; l--)
+                for(int l = std::min(sorted-1, 2); l >= k; l--)
                 {
                     weights[l+1] = weights[l];
                     bones[l+1] = bones[l];
@@ -130,7 +130,7 @@ struct skelmodel : animmodel
         bool operator==(const animcacheentry &c) const
         {
             loopi(MAXANIMPARTS) if(as[i]!=c.as[i]) return false;
-            return pitch==c.pitch && partmask==c.partmask && ragdoll==c.ragdoll && (!ragdoll || min(millis, c.millis) >= ragdoll->lastmove);
+            return pitch==c.pitch && partmask==c.partmask && ragdoll==c.ragdoll && (!ragdoll || std::min(millis, c.millis) >= ragdoll->lastmove);
         }
     };
 
@@ -191,7 +191,7 @@ struct skelmodel : animmodel
 
         int addblendcombo(const blendcombo &c)
         {
-            maxweights = max(maxweights, c.size());
+            maxweights = std::max(maxweights, c.size());
             return ((skelmeshgroup *)group)->addblendcombo(c);
         }
 
@@ -219,8 +219,8 @@ struct skelmodel : animmodel
                 vec v = m.transform(verts[j].pos);
                 loopi(3)
                 {
-                    bbmin[i] = min(bbmin[i], v[i]);
-                    bbmax[i] = max(bbmax[i], v[i]);
+                    bbmin[i] = std::min(bbmin[i], v[i]);
+                    bbmax[i] = std::max(bbmax[i], v[i]);
                 }
             }
         }
@@ -357,13 +357,13 @@ struct skelmodel : animmodel
                     {
                         int &vidx = htdata[(htidx+k)&(htlen-1)];
                         if(vidx < 0) { vidx = idxs.add(ushort(vverts.length())); assignvert(vverts.add(), index, v, ((skelmeshgroup *)group)->blendcombos[v.blend]); break; }
-                        else if(comparevert(vverts[vidx], index, v)) { minvert = min(minvert, idxs.add(ushort(vidx))); break; }
+                        else if(comparevert(vverts[vidx], index, v)) { minvert = std::min(minvert, idxs.add(ushort(vidx))); break; }
                     }
                 }
             }
             elen = idxs.length()-eoffset;
-            minvert = min(minvert, ushort(voffset));
-            maxvert = max(minvert, ushort(vverts.length()-1));
+            minvert = std::min(minvert, ushort(voffset));
+            maxvert = std::max(minvert, ushort(vverts.length()-1));
             return vverts.length()-voffset;
         }
 
@@ -452,12 +452,12 @@ struct skelmodel : animmodel
             if(glaring)
             {
                 if(!g->skel->usegpuskel) s->setvariant(0, 2);
-                else if(g->skel->usematskel) s->setvariant(min(maxweights, g->vweights), 2);
-                else s->setvariant(min(maxweights, g->vweights)-1, 3);
+                else if(g->skel->usematskel) s->setvariant(std::min(maxweights, g->vweights), 2);
+                else s->setvariant(std::min(maxweights, g->vweights)-1, 3);
             }
             else if(!g->skel->usegpuskel) s->set();
-            else if(g->skel->usematskel) s->setvariant(min(maxweights, g->vweights)-1, 0);
-            else s->setvariant(min(maxweights, g->vweights)-1, 1);
+            else if(g->skel->usematskel) s->setvariant(std::min(maxweights, g->vweights)-1, 0);
+            else s->setvariant(std::min(maxweights, g->vweights)-1, 1);
         }
 
         void render(const animstate *as, skin &s, vbocacheentry &vc)
@@ -727,7 +727,7 @@ struct skelmodel : animmodel
                 if(i + 1 == schedule.length())
                 {
                     int conflict = INT_MAX;
-                    loopj(numbones) if(bones[j].group < numbones && bones[j].scheduled < 0) conflict = min(conflict, abs(bones[j].group));
+                    loopj(numbones) if(bones[j].group < numbones && bones[j].scheduled < 0) conflict = std::min(conflict, abs(bones[j].group));
                     if(conflict < numbones)
                     {
                         bones[conflict].scheduled = schedule.length();
@@ -960,7 +960,7 @@ struct skelmodel : animmodel
                 default: return 0;
             }
         }
-        int availgpubones() const { return min(maxgpuparams() - reservevpparams - 10, maxskelanimdata) / (matskel ? 3 : 2); }
+        int availgpubones() const { return std::min(maxgpuparams() - reservevpparams - 10, maxskelanimdata) / (matskel ? 3 : 2); }
         bool gpuaccelerate() const { return renderpath!=R_FIXEDFUNCTION && numframes && gpuskel && numgpubones<=availgpubones(); }
 
         float calcdeviation(const vec &axis, const vec &forward, const dualquat &pose1, const dualquat &pose2)
@@ -1447,7 +1447,7 @@ struct skelmodel : animmodel
         }
 
         void *animkey() { return skel; }
-        int totalframes() const { return max(skel->numframes, 1); }
+        int totalframes() const { return std::max(skel->numframes, 1); }
 
         virtual skelanimspec *loadanim(const char *filename) { return NULL; }
 
@@ -2148,11 +2148,11 @@ template<class MDL> struct skelcommands : modelcommands<MDL, struct MDL::skelmes
             else loopv(anims)
             {
                 int start = sa->frame, end = sa->range;
-                if(*startoffset > 0) start += min(*startoffset, end-1);
-                else if(*startoffset < 0) start += max(end + *startoffset, 0);
+                if(*startoffset > 0) start += std::min(*startoffset, end-1);
+                else if(*startoffset < 0) start += std::max(end + *startoffset, 0);
                 end -= start - sa->frame;
-                if(*endoffset > 0) end = min(end, *endoffset);
-                else if(*endoffset < 0) end = max(end + *endoffset, 1); 
+                if(*endoffset > 0) end = std::min(end, *endoffset);
+                else if(*endoffset < 0) end = std::max(end + *endoffset, 1); 
                 MDL::loading->parts.last()->setanim(p->numanimparts-1, anims[i], start, end, *speed, *priority);
             }
         }

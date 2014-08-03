@@ -301,7 +301,7 @@ struct vacollect : verthash
         {
             int offset = 2*j;
             if(firstlmid[offset]==LMID_AMBIENT && firstlmid[offset+1]==LMID_AMBIENT) continue;
-            loopi(max(firstlit[offset], firstlit[offset+1]))
+            loopi(std::max(firstlit[offset], firstlit[offset+1]))
             {
                 sortkey &k = texs[i];
                 if((j ? k.layer!=LAYER_BLEND : k.layer==LAYER_BLEND) || k.alpha) continue;
@@ -316,7 +316,7 @@ struct vacollect : verthash
         {
             int offset = 4 + 2*j;
             if(firstlmid[offset]==LMID_AMBIENT && firstlmid[offset+1]==LMID_AMBIENT) continue;
-            loopi(max(firstlit[offset], firstlit[offset+1]))
+            loopi(std::max(firstlit[offset], firstlit[offset+1]))
             {
                 sortkey &k = texs[i];
                 if(k.alpha != j+1) continue;
@@ -519,8 +519,8 @@ struct vacollect : verthash
                         loopvj(t.tris[l])
                         {
                             curbuf[j] += va->voffset;
-                            e.minvert[l] = min(e.minvert[l], curbuf[j]);
-                            e.maxvert[l] = max(e.maxvert[l], curbuf[j]);
+                            e.minvert[l] = std::min(e.minvert[l], curbuf[j]);
+                            e.maxvert[l] = std::max(e.maxvert[l], curbuf[j]);
                         }
 
                         curbuf += t.tris[l].length();
@@ -671,7 +671,7 @@ void addtris(const sortkey &key, int orient, vertex *verts, int *index, int numv
             int axis = abs(d.x) > abs(d.y) ? (abs(d.x) > abs(d.z) ? 0 : 2) : (abs(d.y) > abs(d.z) ? 1 : 2);
             if(d[axis] < 0) d.neg();
             reduceslope(d);
-            int origin = int(min(v1.pos[axis], v2.pos[axis])*8)&~0x7FFF,
+            int origin = int(std::min(v1.pos[axis], v2.pos[axis])*8)&~0x7FFF,
                 offset1 = (int(v1.pos[axis]*8) - origin) / d[axis], 
                 offset2 = (int(v2.pos[axis]*8) - origin) / d[axis];
             vec o = vec(v1.pos).sub(d.tovec().mul(offset1/8.0f));
@@ -732,14 +732,14 @@ void addgrasstri(int face, vertex *verts, int numv, ushort texture, ushort lmid)
     g.surface.toplane(g.v[0], g.v[1], g.v[2]);
     if(g.surface.z <= 0) { vc.grasstris.pop(); return; }
 
-    g.minz = min(min(g.v[0].z, g.v[1].z), min(g.v[2].z, g.v[3].z));
-    g.maxz = max(max(g.v[0].z, g.v[1].z), max(g.v[2].z, g.v[3].z));
+    g.minz = std::min(std::min(g.v[0].z, g.v[1].z), std::min(g.v[2].z, g.v[3].z));
+    g.maxz = std::max(std::max(g.v[0].z, g.v[1].z), std::max(g.v[2].z, g.v[3].z));
 
     g.center = vec(0, 0, 0);
     loopk(numv) g.center.add(g.v[k]);
     g.center.div(numv);
     g.radius = 0;
-    loopk(numv) g.radius = max(g.radius, g.v[k].dist(g.center));
+    loopk(numv) g.radius = std::max(g.radius, g.v[k].dist(g.center));
 
     vec area, bx, by;
     area.cross(vec(g.v[1]).sub(g.v[0]), vec(g.v[2]).sub(g.v[0]));
@@ -875,7 +875,7 @@ void addcubeverts(VSlot &vslot, int orient, int size, vec *pos, int convex, usho
 
     if(texture == DEFAULT_SKY)
     {
-        loopk(numverts) vc.skyclip = min(vc.skyclip, int(pos[k].z*8)>>3);
+        loopk(numverts) vc.skyclip = std::min(vc.skyclip, int(pos[k].z*8)>>3);
         vc.skymask |= 0x3F&~(1<<orient);
     }
 
@@ -1143,10 +1143,10 @@ void minskyface(cube &cu, int orient, const ivec &co, int size, facebounds &orig
     mincf.v1 = orig.v2;
     mincf.v2 = orig.v1;
     mincubeface(cu, orient, co, size, orig, mincf, MAT_ALPHA, MAT_ALPHA);
-    orig.u1 = max(mincf.u1, orig.u1);
-    orig.u2 = min(mincf.u2, orig.u2);
-    orig.v1 = max(mincf.v1, orig.v1);
-    orig.v2 = min(mincf.v2, orig.v2);
+    orig.u1 = std::max(mincf.u1, orig.u1);
+    orig.u2 = std::min(mincf.u2, orig.u2);
+    orig.v1 = std::max(mincf.v1, orig.v1);
+    orig.v2 = std::min(mincf.v2, orig.v2);
 }  
 
 void genskyfaces(cube &c, const ivec &o, int size)
@@ -1192,7 +1192,7 @@ void addskyverts(const ivec &o, int size)
                 v[r] = (o[r]&~0xFFF) + (coords[r] ? m.v2 : m.v1)/8.0f;
                 index[k] = vc.addvert(v);
                 if(index[k] < 0) goto nextskyface;
-                vc.skyclip = min(vc.skyclip, int(v.z*8)>>3);
+                vc.skyclip = std::min(vc.skyclip, int(v.z*8)>>3);
             }
             if(vc.skytris + 6 > USHRT_MAX) break;
             vc.skytris += 6;
@@ -1364,7 +1364,7 @@ int genmergedfaces(cube &c, const ivec &co, int size, int minlevel = -1)
         int level = calcmergedsize(i, co, size, mf.verts, mf.numverts&MAXFACEVERTS);
         if(level > minlevel)
         {
-            maxlevel = max(maxlevel, level);
+            maxlevel = std::max(maxlevel, level);
 
             while(tj >= 0 && tjoints[tj].edge < i*(MAXFACEVERTS+1)) tj = tjoints[tj].next;
             if(tj >= 0 && tjoints[tj].edge < (i+1)*(MAXFACEVERTS+1)) mf.tjoints = tj;
@@ -1389,7 +1389,7 @@ int genmergedfaces(cube &c, const ivec &co, int size, int minlevel = -1)
             } 
     if(maxlevel >= 0)
     {
-        vamergemax = max(vamergemax, maxlevel);
+        vamergemax = std::max(vamergemax, maxlevel);
             vahasmerges |= MERGE_ORIGIN;
         }
     return maxlevel;
@@ -1405,7 +1405,7 @@ int findmergedfaces(cube &c, const ivec &co, int size, int csi, int minlevel)
         {
             ivec o(i, co.x, co.y, co.z, size/2); 
             int level = findmergedfaces(c.children[i], o, size/2, csi-1, minlevel);
-            maxlevel = max(maxlevel, level);
+            maxlevel = std::max(maxlevel, level);
         }
         return maxlevel;
     }
@@ -1441,7 +1441,7 @@ void rendercube(cube &c, int cx, int cy, int cz, int size, int csi, int &maxleve
     //if(size<=16) return;
     if(c.ext && c.ext->va) 
     {
-        maxlevel = max(maxlevel, c.ext->va->mergelevel);
+        maxlevel = std::max(maxlevel, c.ext->va->mergelevel);
         return;                            // don't re-render
     }
 
@@ -1456,7 +1456,7 @@ void rendercube(cube &c, int cx, int cy, int cz, int size, int csi, int &maxleve
             rendercube(c.children[i], o.x, o.y, o.z, size/2, csi-1, level);
             if(level >= csi) 
                 c.escaped |= 1<<i;
-            maxlevel = max(maxlevel, level);   
+            maxlevel = std::max(maxlevel, level);   
         }
         --neighbourdepth;
 
@@ -1474,7 +1474,7 @@ void rendercube(cube &c, int cx, int cy, int cz, int size, int csi, int &maxleve
     if(!isempty(c)) 
     {
         gencubeverts(c, cx, cy, cz, size, csi);
-        if(c.merged) maxlevel = max(maxlevel, genmergedfaces(c, ivec(cx, cy, cz), size));
+        if(c.merged) maxlevel = std::max(maxlevel, genmergedfaces(c, ivec(cx, cy, cz), size));
     }
     if(c.material != MAT_AIR) genmatsurfs(c, cx, cy, cz, size, vc.matsurfs);
 
@@ -1523,14 +1523,14 @@ void calcmatbb(int cx, int cy, int cz, int size, ivec &bbmin, ivec &bbmax)
         int dim = dimension(m.orient),
             r = R[dim],
             c = C[dim];
-        bbmin[dim] = min(bbmin[dim], m.o[dim]);
-        bbmax[dim] = max(bbmax[dim], m.o[dim]);
+        bbmin[dim] = std::min(bbmin[dim], m.o[dim]);
+        bbmax[dim] = std::max(bbmax[dim], m.o[dim]);
 
-        bbmin[r] = min(bbmin[r], m.o[r]);
-        bbmax[r] = max(bbmax[r], m.o[r] + m.rsize);
+        bbmin[r] = std::min(bbmin[r], m.o[r]);
+        bbmax[r] = std::max(bbmax[r], m.o[r] + m.rsize);
 
-        bbmin[c] = min(bbmin[c], m.o[c]);
-        bbmax[c] = max(bbmax[c], m.o[c] + m.csize);
+        bbmin[c] = std::min(bbmin[c], m.o[c]);
+        bbmax[c] = std::max(bbmax[c], m.o[c] + m.csize);
     }
 }
 
@@ -1556,7 +1556,7 @@ void setva(cube &c, int cx, int cy, int cz, int size, int csi)
 
     addskyverts(ivec(cx, cy, cz), size);
 
-    if(size == min(0x1000, worldsize/2) || !vc.emptyva())
+    if(size == std::min(0x1000, worldsize/2) || !vc.emptyva())
     {
         vtxarray *va = newva(cx, cy, cz, size);
         ext(c).va = va;
@@ -1630,7 +1630,7 @@ int updateva(cube *c, int cx, int cy, int cz, int size, int csi)
                 count += hasskyfaces(c[i], o.x, o.y, o.z, size);
             }
             int tcount = count + (csi <= MAXMERGELEVEL ? vamerges[csi].length() : 0);
-            if(tcount > vafacemax || (tcount >= vafacemin && size >= vacubesize) || size == min(0x1000, worldsize/2)) 
+            if(tcount > vafacemax || (tcount >= vafacemin && size >= vacubesize) || size == std::min(0x1000, worldsize/2)) 
             {
                 loadprogress = clamp(recalcprogress/float(allocnodes), 0.0f, 1.0f);
                 setva(c[i], o.x, o.y, o.z, size, csi);
@@ -1645,7 +1645,7 @@ int updateva(cube *c, int cx, int cy, int cz, int size, int csi)
                     varoot.add(c[i].ext->va);
                     if(vamergemax > size)
                     {
-                        cmergemax = max(cmergemax, vamergemax);
+                        cmergemax = std::max(cmergemax, vamergemax);
                         chasmerges |= vahasmerges&~MERGE_USE;
                     }
                     continue;
@@ -1654,7 +1654,7 @@ int updateva(cube *c, int cx, int cy, int cz, int size, int csi)
             }
         }
         if(csi+1 <= MAXMERGELEVEL && vamerges[csi].length()) vamerges[csi+1].move(vamerges[csi]);
-        cmergemax = max(cmergemax, vamergemax);
+        cmergemax = std::max(cmergemax, vamergemax);
         chasmerges |= vahasmerges;
         ccount += count;
     }

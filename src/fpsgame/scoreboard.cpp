@@ -73,7 +73,7 @@ namespace game
         else 
         {
             int bestfrags = INT_MIN;
-            enumerates(teaminfos, teaminfo, t, bestfrags = max(bestfrags, t.frags));
+            enumerates(teaminfos, teaminfo, t, bestfrags = std::max(bestfrags, t.frags));
             if(bestfrags <= 0) loopv(players)
             {
                 fpsent *o = players[i];
@@ -161,14 +161,14 @@ namespace game
             if(intermission) {
                 g.text("intermission", 0xFFFF80);
             } else if(m_timeforward) {
-                int secs = max(lastmillis-maptime, 0)/1000, mins = secs/60;
+                int secs = std::max(lastmillis-maptime, 0)/1000, mins = secs/60;
                 secs %= 60;
                 g.pushlist();
                 g.strut(mins >= 10 ? 4.5f : 3.5f);
                 g.textf("%d:%02d", 0xFFFF80, NULL, mins, secs);
                 g.poplist();
             } else {
-                int secs = max(maplimit-lastmillis, 0)/1000, mins = secs/60;
+                int secs = std::max(maplimit-lastmillis, 0)/1000, mins = secs/60;
                 secs %= 60;
                 g.pushlist();
                 g.strut(mins >= 10 ? 4.5f : 3.5f);

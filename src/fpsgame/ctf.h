@@ -437,7 +437,7 @@ struct ctfclientmode : clientmode
         {
             int team = getint(p);
             vec o;
-            loopk(3) o[k] = max(getint(p)/DMF, 0.0f);
+            loopk(3) o[k] = std::max(getint(p)/DMF, 0.0f);
             if(p.overread()) break;
             if(commit && notgotflags)
             {
@@ -506,7 +506,7 @@ struct ctfclientmode : clientmode
                 {
                     glPushMatrix();
                     glScalef(2, 2, 1);
-                    draw_textf("%d", (x + HICON_SIZE + HICON_SPACE)/2, HICON_TEXTY/2, max(HOLDSECS - (lastmillis - flags[i].owntime)/1000, 0));
+                    draw_textf("%d", (x + HICON_SIZE + HICON_SPACE)/2, HICON_TEXTY/2, std::max(HOLDSECS - (lastmillis - flags[i].owntime)/1000, 0));
                     glPopMatrix();
                 }
                 break;
@@ -589,7 +589,7 @@ struct ctfclientmode : clientmode
         if(pos.x < 0) return pos;
         if(f.interptime && f.interploc.x >= 0)
         {
-            float t = min((lastmillis - f.interptime)/500.0f, 1.0f);
+            float t = std::min((lastmillis - f.interptime)/500.0f, 1.0f);
             pos.lerp(f.interploc, pos, t);
             angle += (1-t)*(f.interpangle - angle);
         }
@@ -616,7 +616,7 @@ struct ctfclientmode : clientmode
             rendermodel(!f.droptime && !f.owner ? &f.light : NULL, flagname, ANIM_MAPMODEL|ANIM_LOOP,
                         pos, angle, 0,
                         MDL_DYNSHADOW | MDL_CULL_VFC | MDL_CULL_OCCLUDED | (f.droptime || f.owner ? MDL_LIGHT : 0),
-                        NULL, NULL, 0, 0, 0.3f + (f.vistime ? 0.7f*min((lastmillis - f.vistime)/1000.0f, 1.0f) : 0.0f));
+                        NULL, NULL, 0, 0, 0.3f + (f.vistime ? 0.7f*std::min((lastmillis - f.vistime)/1000.0f, 1.0f) : 0.0f));
 
             if(m_protect && canaddparticles() && f.owner && insidebase(f, f.owner->feetpos()))
             {
@@ -927,7 +927,7 @@ struct ctfclientmode : clientmode
 
     int respawnwait(fpsent *d)
     {
-        return m_efficiency || !m_protect ? max(0, RESPAWNSECS-(lastmillis-d->lastpain)/1000) : 0;
+        return m_efficiency || !m_protect ? std::max(0, RESPAWNSECS-(lastmillis-d->lastpain)/1000) : 0;
     }
 
     bool pickholdspawn(fpsent *d)

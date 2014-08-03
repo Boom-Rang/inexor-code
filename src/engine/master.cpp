@@ -453,7 +453,7 @@ void checkgameservers()
 
 void messagebuf::purge()
 {
-    refs = max(refs - 1, 0);
+    refs = std::max(refs - 1, 0);
     if(refs<=0 && owner.last()!=this)
     {
         owner.removeobj(this);
@@ -601,7 +601,7 @@ ENetSocketSet readset, writeset;
 void checkclients()
 {
     ENetSocketSet readset, writeset;
-    ENetSocket maxsock = max(serversocket, pingsocket);
+    ENetSocket maxsock = std::max(serversocket, pingsocket);
     ENET_SOCKETSET_EMPTY(readset);
     ENET_SOCKETSET_EMPTY(writeset);
     ENET_SOCKETSET_ADD(readset, serversocket);
@@ -612,7 +612,7 @@ void checkclients()
         if(c.authreqs.length()) purgeauths(c);
         if(c.message || c.output.length()) ENET_SOCKETSET_ADD(writeset, c.socket);
         else ENET_SOCKETSET_ADD(readset, c.socket);
-        maxsock = max(maxsock, c.socket);
+        maxsock = std::max(maxsock, c.socket);
     }
     if(enet_socketset_select(maxsock, &readset, &writeset, 1000)<=0) return;
 
@@ -682,7 +682,7 @@ void checkclients()
             if(res>0)
             {
                 c.inputpos += res;
-                c.input[min(c.inputpos, (int)sizeof(c.input)-1)] = '\0';
+                c.input[std::min(c.inputpos, (int)sizeof(c.input)-1)] = '\0';
                 if(!checkclientinput(c)) { purgeclient(i--); continue; }
             }
             else { purgeclient(i--); continue; }

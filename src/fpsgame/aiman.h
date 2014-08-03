@@ -82,7 +82,7 @@ namespace aiman
 
 	bool addai(int skill, int limit)
 	{
-		int numai = 0, cn = -1, maxai = limit >= 0 ? min(limit, MAXBOTS) : MAXBOTS;
+		int numai = 0, cn = -1, maxai = limit >= 0 ? std::min(limit, MAXBOTS) : MAXBOTS;
 		loopv(bots)
         {
       clientinfo *ci = bots[i];

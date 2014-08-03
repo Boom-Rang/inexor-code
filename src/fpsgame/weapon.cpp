@@ -82,7 +82,7 @@ namespace game
     }
     ICOMMAND(cycleweapon, "V", (tagval *args, int numargs),
     {
-         int numguns = min(numargs, 8);
+         int numguns = std::min(numargs, 8);
          int guns[8];
          loopi(numguns) guns[i] = getweapon(args[i].getstr());
          cycleweapon(numguns, guns);
@@ -268,7 +268,7 @@ namespace game
                 // cheaper variable rate physics for debris, gibs, etc.
                 for(int rtime = time; rtime > 0;)
                 {
-                    int qtime = min(30, rtime);
+                    int qtime = std::min(30, rtime);
                     rtime -= qtime;
                     if((bnc.lifetime -= qtime)<0 || bounce(&bnc, qtime/1000.0f, 0.6f, 0.5f, 1)) { stopped = true; break; }
                 }
@@ -309,7 +309,7 @@ namespace game
             else
             {
                 bnc.roll += old.sub(bnc.o).magnitude()/(4*RAD);
-                bnc.offsetmillis = max(bnc.offsetmillis-time, 0);
+                bnc.offsetmillis = std::max(bnc.offsetmillis-time, 0);
             }
         }
     }
@@ -375,7 +375,7 @@ namespace game
     {
         if(!blood || damage <= 0) return;
         vec from = d->abovehead();
-        loopi(min(damage/25, 40)+1) spawnbouncer(from, vel, d, BNC_GIBS);
+        loopi(std::min(damage/25, 40)+1) spawnbouncer(from, vel, d, BNC_GIBS);
     }
 
     void hit(int damage, dynent *d, fpsent *at, const vec &vel, int gun, float info1, int info2 = 1)
@@ -467,7 +467,7 @@ namespace game
         int size = 4.0f;
         float exprad = guns[gun].exprad;
         int numdebris = gun==GUN_BARREL
-              ? rnd(max(maxbarreldebris-5, 1))+5
+              ? rnd(std::max(maxbarreldebris-5, 1))+5
               : rnd(maxdebris-5)+5;
         vec debrisvel = owner->o==v
               ? vec(0, 0, 0)
@@ -636,19 +636,19 @@ namespace game
         loopv(projs)
         {
             projectile &p = projs[i];
-            p.offsetmillis = max(p.offsetmillis-time, 0);
+            p.offsetmillis = std::max(p.offsetmillis-time, 0);
             int qdam = guns[p.gun].damage*(p.owner->quadmillis ? 4 : 1);
             if(p.owner->type==ENT_AI) qdam /= MONSTERDAMAGEFACTOR;
             vec dv;
             float dist = p.to.dist(p.o, dv); 
-            dv.mul(time/max(dist*1000/p.speed, float(time)));
+            dv.mul(time/std::max(dist*1000/p.speed, float(time)));
             vec v = vec(p.o).add(dv);
             bool exploded = false;
             hits.setsize(0);
             if(p.local)
             {
                 vec halfdv = vec(dv).mul(0.5f), bo = vec(p.o).add(halfdv);
-                float br = max(fabs(halfdv.x), fabs(halfdv.y)) + 1;
+                float br = std::max(fabs(halfdv.x), fabs(halfdv.y)) + 1;
                 loopj(numdynents())
                 {
                     dynent *o = iterdynents(j);
@@ -813,7 +813,7 @@ namespace game
         {
             vecfromyawpitch(owner->yaw, owner->pitch, 1, 0, d);
             float newdist = raycube(owner->o, d, dist, RAY_CLIPMAT|RAY_ALPHAPOLY);
-            d.mul(min(newdist, dist)).add(owner->o);
+            d.mul(std::min(newdist, dist)).add(owner->o);
         }
     }
 
@@ -857,7 +857,7 @@ namespace game
 
     void shorten(vec &from, vec &target, float dist)
     {
-        target.sub(from).mul(min(1.0f, dist)).add(from);
+        target.sub(from).mul(std::min(1.0f, dist)).add(from);
     }
 
     void raydamage(vec &from, vec &to, fpsent *d)

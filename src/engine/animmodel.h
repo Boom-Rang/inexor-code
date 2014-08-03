@@ -40,8 +40,8 @@ struct animmodel : model
             }
             else
             {
-                fr1 = min(fr1, info.range-1)+info.frame;
-                fr2 = min(fr1+1, info.frame+info.range-1);
+                fr1 = std::min(fr1, info.range-1)+info.frame;
+                fr2 = std::min(fr1+1, info.frame+info.range-1);
             }
             if(info.anim&ANIM_REVERSE)
             {
@@ -138,14 +138,14 @@ struct animmodel : model
             else glColor4f(matcolor.x*color.x, matcolor.y*color.y, matcolor.z*color.z, transparent);
             if(lightmodels && !fullbright)
             {
-                float ambientk = min(max(ambient, mincolor)*0.75f, 1.0f),
+                float ambientk = std::min(std::max(ambient, mincolor)*0.75f, 1.0f),
                       diffusek = 1-ambientk;
                 GLfloat ambientcol[4] = { color.x*ambientk, color.y*ambientk, color.z*ambientk, 1 },
                         diffusecol[4] = { color.x*diffusek, color.y*diffusek, color.z*diffusek, 1 };
-                float ambientmax = max(ambientcol[0], max(ambientcol[1], ambientcol[2])),
-                      diffusemax = max(diffusecol[0], max(diffusecol[1], diffusecol[2]));
-                if(ambientmax>1e-3f) loopk(3) ambientcol[k] *= min(1.5f, 1.0f/min(ambientmax, 1.0f));
-                if(diffusemax>1e-3f) loopk(3) diffusecol[k] *= min(1.5f, 1.0f/min(diffusemax, 1.0f));
+                float ambientmax = std::max(ambientcol[0], std::max(ambientcol[1], ambientcol[2])),
+                      diffusemax = std::max(diffusecol[0], std::max(diffusecol[1], diffusecol[2]));
+                if(ambientmax>1e-3f) loopk(3) ambientcol[k] *= std::min(1.5f, 1.0f/std::min(ambientmax, 1.0f));
+                if(diffusemax>1e-3f) loopk(3) diffusecol[k] *= std::min(1.5f, 1.0f/std::min(diffusemax, 1.0f));
                 glLightfv(GL_LIGHT0, GL_AMBIENT, ambientcol);
                 glLightfv(GL_LIGHT0, GL_DIFFUSE, diffusecol);
             }
@@ -162,8 +162,8 @@ struct animmodel : model
             else
             {
                 float mincolor = as->cur.anim&ANIM_FULLBRIGHT ? fullbrightmodels/100.0f : 0.0f, 
-                      bias = max(mincolor-1.0f, 0.2f), scale = 0.5f*max(0.8f-bias, 0.0f), 
-                      minshade = scale*max(ambient, mincolor);
+                      bias = std::max(mincolor-1.0f, 0.2f), scale = 0.5f*std::max(0.8f-bias, 0.0f), 
+                      minshade = scale*std::max(ambient, mincolor);
                 vec color = vec(lightcolor).max(mincolor);
                 glColor4f(color.x, color.y, color.z, transparent);
                 setenvparamf("lightscale", SHPARAM_VERTEX, 2, scale - minshade, scale, minshade + bias);
@@ -523,7 +523,7 @@ struct animmodel : model
         virtual int totalframes() const { return 1; }
         bool hasframe(int i) const { return i>=0 && i<totalframes(); }
         bool hasframes(int i, int n) const { return i>=0 && i+n<=totalframes(); }
-        int clipframes(int i, int n) const { return min(n, totalframes() - i); }
+        int clipframes(int i, int n) const { return std::min(n, totalframes() - i); }
 
         virtual void cleanup() {}
         virtual void preload(part *p) {}
@@ -752,7 +752,7 @@ struct animmodel : model
             if(d && interp>=0)
             {
                 animinterpinfo &ai = d->animinterp[interp];
-                if((info.anim&ANIM_CLAMP)==ANIM_CLAMP) aitime = min(aitime, int(info.range*info.speed*0.5e-3f));
+                if((info.anim&ANIM_CLAMP)==ANIM_CLAMP) aitime = std::min(aitime, int(info.range*info.speed*0.5e-3f));
                 void *ak = meshes->animkey();
                 if(d->ragdoll && !(anim&ANIM_RAGDOLL)) 
                 {
@@ -1501,7 +1501,7 @@ template<class MDL, class MESH> struct modelcommands
     
     static void setalphatest(char *meshname, float *cutoff)
     {
-        loopskins(meshname, s, s.alphatest = max(0.0f, min(1.0f, *cutoff)));
+        loopskins(meshname, s, s.alphatest = std::max(0.0f, std::min(1.0f, *cutoff)));
     }
     
     static void setalphablend(char *meshname, int *blend)

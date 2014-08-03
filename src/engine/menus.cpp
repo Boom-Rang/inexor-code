@@ -186,7 +186,7 @@ int cleargui(int n)
         clear--;
         if(!clear) return 1;
     }
-    if(n>0) clear = min(clear, n);
+    if(n>0) clear = std::min(clear, n);
     loopi(clear) popgui(); 
     if(!guistack.empty()) restoregui(guistack.length()-1);
     return clear;
@@ -329,7 +329,7 @@ void guistrut(float *strut, int *alt)
 
 void guispring(int *weight)
 {
-    if(cgui) cgui->spring(max(*weight, 1));
+    if(cgui) cgui->spring(std::max(*weight, 1));
 }
 
 void guicolumn(int *col)
@@ -701,7 +701,7 @@ void addchange(const char *desc, int type)
     loopv(needsapply) if(!strcmp(needsapply[i].desc, desc)) return;
     needsapply.add(change(type, desc));
     if(needsapply.length() && guistack.find(&applymenu) < 0)
-        pushgui(&applymenu, processingmenu ? max(guistack.length()-1, 0) : -1);
+        pushgui(&applymenu, processingmenu ? std::max(guistack.length()-1, 0) : -1);
 }
 
 void clearchanges(int type)

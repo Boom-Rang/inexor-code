@@ -226,7 +226,7 @@ uint renderwaterlod(int x, int y, int z, uint size, int mat)
     if(size <= (uint)(32 << waterlod))
     {
         uint subdiv = calcwatersubdiv(x, y, z, size);
-        if(subdiv < size * 2) rendervertwater(min(subdiv, size), x, y, z, size, mat);
+        if(subdiv < size * 2) rendervertwater(std::min(subdiv, size), x, y, z, size, mat);
         return subdiv;
     }
     else
@@ -243,9 +243,9 @@ uint renderwaterlod(int x, int y, int z, uint size, int mat)
              subdiv3 = renderwaterlod(x + childsize, y + childsize, z, childsize, mat),
              subdiv4 = renderwaterlod(x, y + childsize, z, childsize, mat),
              minsubdiv = subdiv1;
-        minsubdiv = min(minsubdiv, subdiv2);
-        minsubdiv = min(minsubdiv, subdiv3);
-        minsubdiv = min(minsubdiv, subdiv4);
+        minsubdiv = std::min(minsubdiv, subdiv2);
+        minsubdiv = std::min(minsubdiv, subdiv3);
+        minsubdiv = std::min(minsubdiv, subdiv4);
         if(minsubdiv < size * 2)
         {
             if(minsubdiv >= size) rendervertwater(size, x, y, z, size, mat);
@@ -538,8 +538,8 @@ void renderwaterff()
     
             if(m.depth!=lastdepth)
             {
-                float depth = !wfog ? 1.0f : min(0.75f*m.depth/wfog, 0.95f);
-                if(nowater || !waterrefract) depth = max(depth, nowater || (!waterreflect && (!waterenvmap || !hasCM)) || below ? 0.6f : 0.3f);
+                float depth = !wfog ? 1.0f : std::min(0.75f*m.depth/wfog, 0.95f);
+                if(nowater || !waterrefract) depth = std::max(depth, nowater || (!waterreflect && (!waterenvmap || !hasCM)) || below ? 0.6f : 0.3f);
                 wcol[3] = int(depth*255);
                 if(!nowater && !waterrefract && ((waterreflect || (waterenvmap && hasCM)) && !below))
                 {
@@ -685,7 +685,7 @@ void renderwater()
 
     varray::enable();
 
-    vec ambient(max(skylightcolor[0], ambientcolor[0]), max(skylightcolor[1], ambientcolor[1]), max(skylightcolor[2], ambientcolor[2]));
+    vec ambient(std::max(skylightcolor[0], ambientcolor[0]), std::max(skylightcolor[1], ambientcolor[1]), std::max(skylightcolor[2], ambientcolor[2]));
     float offset = -WATER_OFFSET;
     loopi(MAXREFLECTIONS)
     {
@@ -763,8 +763,8 @@ void renderwater()
             if(!glaring && !waterrefract && m.depth!=lastdepth)
             {
                 if(varray::data.length()) varray::end();
-                float depth = !wfog ? 1.0f : min(0.75f*m.depth/wfog, 0.95f);
-                depth = max(depth, !below && (waterreflect || (waterenvmap && hasCM)) ? 0.3f : 0.6f);
+                float depth = !wfog ? 1.0f : std::min(0.75f*m.depth/wfog, 0.95f);
+                depth = std::max(depth, !below && (waterreflect || (waterenvmap && hasCM)) ? 0.3f : 0.6f);
                 setlocalparamf("depth", SHPARAM_PIXEL, 5, depth, 1.0f-depth);
                 lastdepth = m.depth;
             }
@@ -963,7 +963,7 @@ void addreflection(materialsurface &m)
         else if(r.height==height && r.material==mat) 
         {
             r.matsurfs.add(&m);
-            r.depth = max(r.depth, int(m.depth));
+            r.depth = std::max(r.depth, int(m.depth));
             if(r.lastused==totalmillis) return;
             ref = &r;
             break;
@@ -1203,12 +1203,12 @@ static bool calcscissorbox(Reflection &ref, int size, vec &clipmin, vec &clipmax
     loopvj(ref.matsurfs)
     {
         materialsurface &m = *ref.matsurfs[j];
-        bbmin[r] = min(bbmin[r], m.o[r]);
-        bbmin[c] = min(bbmin[c], m.o[c]);
-        bbmax[r] = max(bbmax[r], m.o[r] + m.rsize);
-        bbmax[c] = max(bbmax[c], m.o[c] + m.csize);
-        bbmin[dim] = min(bbmin[dim], m.o[dim]);
-        bbmax[dim] = max(bbmax[dim], m.o[dim]);
+        bbmin[r] = std::min(bbmin[r], m.o[r]);
+        bbmin[c] = std::min(bbmin[c], m.o[c]);
+        bbmax[r] = std::max(bbmax[r], m.o[r] + m.rsize);
+        bbmax[c] = std::max(bbmax[c], m.o[c] + m.csize);
+        bbmin[dim] = std::min(bbmin[dim], m.o[dim]);
+        bbmax[dim] = std::max(bbmax[dim], m.o[dim]);
     }
 
     vec4 v[8];
@@ -1220,10 +1220,10 @@ static bool calcscissorbox(Reflection &ref, int size, vec &clipmin, vec &clipmax
         if(p.z >= -p.w)
         {
             float x = p.x / p.w, y = p.y / p.w;
-            sx1 = min(sx1, x);
-            sy1 = min(sy1, y);
-            sx2 = max(sx2, x);
-            sy2 = max(sy2, y);
+            sx1 = std::min(sx1, x);
+            sy1 = std::min(sy1, y);
+            sx2 = std::max(sx2, x);
+            sy2 = std::max(sy2, y);
         }
     }
     if(sx1 >= sx2 || sy1 >= sy2) return false;
@@ -1239,17 +1239,17 @@ static bool calcscissorbox(Reflection &ref, int size, vec &clipmin, vec &clipmax
                   w = p.w + t*(o.w - p.w),
                   x = (p.x + t*(o.x - p.x))/w,
                   y = (p.y + t*(o.y - p.y))/w;
-            sx1 = min(sx1, x);
-            sy1 = min(sy1, y);
-            sx2 = max(sx2, x);
-            sy2 = max(sy2, y);
+            sx1 = std::min(sx1, x);
+            sy1 = std::min(sy1, y);
+            sx2 = std::max(sx2, x);
+            sy2 = std::max(sy2, y);
         }
     }
     if(sx1 <= -1 && sy1 <= -1 && sx2 >= 1 && sy2 >= 1) return false;
-    sx1 = max(sx1, -1.0f);
-    sy1 = max(sy1, -1.0f);
-    sx2 = min(sx2, 1.0f);
-    sy2 = min(sy2, 1.0f);
+    sx1 = std::max(sx1, -1.0f);
+    sy1 = std::max(sy1, -1.0f);
+    sx2 = std::min(sx2, 1.0f);
+    sy2 = std::min(sy2, 1.0f);
     if(reflectvfc)
     {
         clipmin.x = clamp(clipmin.x, sx1, sx2);
@@ -1259,8 +1259,8 @@ static bool calcscissorbox(Reflection &ref, int size, vec &clipmin, vec &clipmax
     }
     sx = int(floor((hasFBO ? 0 : screen->w-size) + (sx1+1)*0.5f*size));
     sy = int(floor((hasFBO ? 0 : screen->h-size) + (sy1+1)*0.5f*size));
-    sw = max(int(ceil((hasFBO ? 0 : screen->w-size) + (sx2+1)*0.5f*size)) - sx, 0);
-    sh = max(int(ceil((hasFBO ? 0 : screen->h-size) + (sy2+1)*0.5f*size)) - sy, 0);
+    sw = std::max(int(ceil((hasFBO ? 0 : screen->w-size) + (sx2+1)*0.5f*size)) - sx, 0);
+    sh = std::max(int(ceil((hasFBO ? 0 : screen->h-size) + (sy2+1)*0.5f*size)) - sy, 0);
     return true;
 }
 

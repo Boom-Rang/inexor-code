@@ -129,7 +129,7 @@ bool loadents(const char *fname, vector<entity> &ents, uint *crc)
         f->seek(nummru*sizeof(ushort), SEEK_CUR);
     }
 
-    loopi(min(hdr.numents, MAXENTS))
+    loopi(std::min(hdr.numents, MAXENTS))
     {
         entity &e = ents.add();
         f->read(&e, sizeof(entity));
@@ -807,8 +807,8 @@ void loadvslot(stream *f, VSlot &vs, int changed)
         {
             ShaderParam &p = vs.params.add();
             int nlen = f->getlil<ushort>();
-            f->read(name, min(nlen, MAXSTRLEN-1));
-            name[min(nlen, MAXSTRLEN-1)] = '\0';
+            f->read(name, std::min(nlen, MAXSTRLEN-1));
+            name[std::min(nlen, MAXSTRLEN-1)] = '\0';
             if(nlen >= MAXSTRLEN) f->seek(nlen - (MAXSTRLEN-1), SEEK_CUR);
             p.name = getshaderparamname(name);
             p.type = SHPARAM_LOOKUP;
@@ -1066,8 +1066,8 @@ bool load_world(const char *mname, const char *cname)        // still supports a
     {
         int type = f->getchar(), ilen = f->getlil<ushort>();
         string name;
-        f->read(name, min(ilen, MAXSTRLEN-1));
-        name[min(ilen, MAXSTRLEN-1)] = '\0';
+        f->read(name, std::min(ilen, MAXSTRLEN-1));
+        name[std::min(ilen, MAXSTRLEN-1)] = '\0';
         if(ilen >= MAXSTRLEN) f->seek(ilen - (MAXSTRLEN-1), SEEK_CUR);
         ident *id = getident(name);
         bool exists = id && id->type == type && id->flags&IDF_OVERRIDE;
@@ -1093,8 +1093,8 @@ bool load_world(const char *mname, const char *cname)        // still supports a
             {
                 int slen = f->getlil<ushort>();
                 string val;
-                f->read(val, min(slen, MAXSTRLEN-1));
-                val[min(slen, MAXSTRLEN-1)] = '\0';
+                f->read(val, std::min(slen, MAXSTRLEN-1));
+                val[std::min(slen, MAXSTRLEN-1)] = '\0';
                 if(slen >= MAXSTRLEN) f->seek(slen - (MAXSTRLEN-1), SEEK_CUR);
                 if(exists) setsvar(name, val);
                 if(dbgvars) conoutf(CON_DEBUG, "read svar %s: %s", name, val);
@@ -1145,7 +1145,7 @@ bool load_world(const char *mname, const char *cname)        // still supports a
     vector<extentity *> &ents = entities::getents();
     int einfosize = entities::extraentinfosize();
     char *ebuf = einfosize > 0 ? new char[einfosize] : NULL;
-    loopi(min(hdr.numents, MAXENTS))
+    loopi(std::min(hdr.numents, MAXENTS))
     {
         extentity &e = *entities::newentity();
         ents.add(&e);
@@ -1315,8 +1315,8 @@ void writeobj(char *name)
                     verts.add(pos);
                     loopl(3)
                     {
-                        bbmin[l] = min(bbmin[l], pos[l]);
-                        bbmax[l] = max(bbmax[l], pos[l]);
+                        bbmin[l] = std::min(bbmin[l], pos[l]);
+                        bbmax[l] = std::max(bbmax[l], pos[l]);
                     }
                 }
                 key.y = sharetc.access(tc, texcoords.length());

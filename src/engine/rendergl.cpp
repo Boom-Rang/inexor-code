@@ -275,7 +275,7 @@ void gl_checkextensions()
 #ifdef __APPLE__
     /* VBOs over 256KB seem to destroy performance on 10.5, but not in 10.6 */
     extern int maxvbosize;
-    if(osversion < 0x0A0600) maxvbosize = min(maxvbosize, 8192);  
+    if(osversion < 0x0A0600) maxvbosize = std::min(maxvbosize, 8192);  
 #endif
 
     if(hasext(exts, "GL_ARB_pixel_buffer_object"))
@@ -674,7 +674,7 @@ void gl_checkextensions()
         if(hasext(exts, "GL_3DFX_texture_compression_FXT1"))
         {
             hasFXT1 = true;
-            if(mesa) usetexcompress = max(usetexcompress, 1);
+            if(mesa) usetexcompress = std::max(usetexcompress, 1);
             if(dbgexts) conoutf(CON_INIT, "Using GL_3DFX_texture_compression_FXT1.");
         }
     }
@@ -883,10 +883,10 @@ void disablezoom()
 void computezoom()
 {
     if(!zoom) { zoomprogress = 0; curfov = fov; curavatarfov = avatarfov; return; }
-    if(zoom > 0) zoomprogress = zoominvel ? min(zoomprogress + float(elapsedtime) / zoominvel, 1.0f) : 1;
+    if(zoom > 0) zoomprogress = zoominvel ? std::min(zoomprogress + float(elapsedtime) / zoominvel, 1.0f) : 1;
     else
     {
-        zoomprogress = zoomoutvel ? max(zoomprogress - float(elapsedtime) / zoomoutvel, 0.0f) : 0;
+        zoomprogress = zoomoutvel ? std::max(zoomprogress - float(elapsedtime) / zoomoutvel, 0.0f) : 0;
         if(zoomprogress <= 0) zoom = 0;
     }
     curfov = zoomfov*zoomprogress + fov*(1 - zoomprogress);
@@ -1193,10 +1193,10 @@ int pushscissor(float sx1, float sy1, float sx2, float sy2)
 
     if(sx1 <= -1 && sy1 <= -1 && sx2 >= 1 && sy2 >= 1) return 0;
 
-    sx1 = max(sx1, -1.0f);
-    sy1 = max(sy1, -1.0f);
-    sx2 = min(sx2, 1.0f);
-    sy2 = min(sy2, 1.0f);
+    sx1 = std::max(sx1, -1.0f);
+    sy1 = std::max(sy1, -1.0f);
+    sx2 = std::min(sx2, 1.0f);
+    sy2 = std::min(sy2, 1.0f);
 
     GLint viewport[4];
     glGetIntegerv(GL_VIEWPORT, viewport);
@@ -1211,10 +1211,10 @@ int pushscissor(float sx1, float sy1, float sx2, float sy2)
         glGetIntegerv(GL_SCISSOR_BOX, oldscissor);
         sw += sx;
         sh += sy;
-        sx = max(sx, int(oldscissor[0]));
-        sy = max(sy, int(oldscissor[1]));
-        sw = min(sw, int(oldscissor[0] + oldscissor[2])) - sx;
-        sh = min(sh, int(oldscissor[1] + oldscissor[3])) - sy;
+        sx = std::max(sx, int(oldscissor[0]));
+        sy = std::max(sy, int(oldscissor[1]));
+        sw = std::min(sw, int(oldscissor[0] + oldscissor[2])) - sx;
+        sh = std::min(sh, int(oldscissor[1] + oldscissor[3])) - sy;
         if(sw <= 0 || sh <= 0) return 0;
         scissoring = 2;
     }
@@ -1279,7 +1279,7 @@ static void blendfog(int fogmat, float blend, float logblend, float &start, floa
             const bvec &wcol = getwatercolor(fogmat);
             int wfog = getwaterfog(fogmat);
             loopk(3) fogc[k] += blend*wcol[k]/255.0f;
-            end += logblend*min(fog, max(wfog*4, 32));
+            end += logblend*std::min(fog, std::max(wfog*4, 32));
             break;
         }
 
@@ -1288,7 +1288,7 @@ static void blendfog(int fogmat, float blend, float logblend, float &start, floa
             const bvec &lcol = getlavacolor(fogmat);
             int lfog = getlavafog(fogmat);
             loopk(3) fogc[k] += blend*lcol[k]/255.0f;
-            end += logblend*min(fog, max(lfog*4, 32));
+            end += logblend*std::min(fog, std::max(lfog*4, 32));
             break;
         }
 
@@ -1323,16 +1323,16 @@ static void blendfogoverlay(int fogmat, float blend, float *overlay)
         case MAT_WATER:
         {
             const bvec &wcol = getwatercolor(fogmat);
-            maxc = max(wcol[0], max(wcol[1], wcol[2]));
-            loopk(3) overlay[k] += blend*max(0.4f, wcol[k]/min(32.0f + maxc*7.0f/8.0f, 255.0f));
+            maxc = std::max(wcol[0], std::max(wcol[1], wcol[2]));
+            loopk(3) overlay[k] += blend*std::max(0.4f, wcol[k]/std::min(32.0f + maxc*7.0f/8.0f, 255.0f));
             break;
         }
 
         case MAT_LAVA:
         {
             const bvec &lcol = getlavacolor(fogmat);
-            maxc = max(lcol[0], max(lcol[1], lcol[2]));
-            loopk(3) overlay[k] += blend*max(0.4f, lcol[k]/min(32.0f + maxc*7.0f/8.0f, 255.0f));
+            maxc = std::max(lcol[0], std::max(lcol[1], lcol[2]));
+            loopk(3) overlay[k] += blend*std::max(0.4f, lcol[k]/std::min(32.0f + maxc*7.0f/8.0f, 255.0f));
             break;
         }
 
@@ -1456,7 +1456,7 @@ void drawreflection(float z, bool refract, int fogdepth, const bvec &col)
     if(fogging)
     {
         glFogf(GL_FOG_START, camera1->o.z - z);
-        glFogf(GL_FOG_END, camera1->o.z - (z-max(refractfog, 1)));
+        glFogf(GL_FOG_END, camera1->o.z - (z-std::max(refractfog, 1)));
         GLfloat m[16] =
         {
              1,   0,  0, 0,
@@ -1770,8 +1770,8 @@ void clipminimap(ivec &bbmin, ivec &bbmax, cube *c = worldroot, int x = 0, int y
         if(c[i].children) clipminimap(bbmin, bbmax, c[i].children, o.x, o.y, o.z, size>>1);
         else if(!isentirelysolid(c[i]) && (c[i].material&MATF_CLIP)!=MAT_CLIP)
         {
-            loopk(3) bbmin[k] = min(bbmin[k], o[k]);
-            loopk(3) bbmax[k] = max(bbmax[k], o[k] + size);
+            loopk(3) bbmin[k] = std::min(bbmin[k], o[k]);
+            loopk(3) bbmax[k] = std::max(bbmax[k], o[k] + size);
         }
     }
 }
@@ -1782,7 +1782,7 @@ void drawminimap()
 
     renderprogress(0, "generating mini-map...", 0, !renderedframe);
 
-    int size = 1<<minimapsize, sizelimit = min(hwtexsize, min(screen->w, screen->h));
+    int size = 1<<minimapsize, sizelimit = std::min(hwtexsize, std::min(screen->w, screen->h));
     while(size > sizelimit) size /= 2;
     if(!minimaptex) glGenTextures(1, &minimaptex);
 
@@ -1794,21 +1794,21 @@ void drawminimap()
         loopk(3)
         {
             if(va->geommin[k]>va->geommax[k]) continue;
-            bbmin[k] = min(bbmin[k], va->geommin[k]);
-            bbmax[k] = max(bbmax[k], va->geommax[k]);
+            bbmin[k] = std::min(bbmin[k], va->geommin[k]);
+            bbmax[k] = std::max(bbmax[k], va->geommax[k]);
         }
     }
     if(minimapclip)
     {
         ivec clipmin(worldsize, worldsize, worldsize), clipmax(0, 0, 0);
         clipminimap(clipmin, clipmax);
-        loopk(2) bbmin[k] = max(bbmin[k], clipmin[k]);
-        loopk(2) bbmax[k] = min(bbmax[k], clipmax[k]); 
+        loopk(2) bbmin[k] = std::max(bbmin[k], clipmin[k]);
+        loopk(2) bbmax[k] = std::min(bbmax[k], clipmax[k]); 
     }
  
     minimapradius = bbmax.tovec().sub(bbmin.tovec()).mul(0.5f); 
     minimapcenter = bbmin.tovec().add(minimapradius);
-    minimapradius.x = minimapradius.y = max(minimapradius.x, minimapradius.y);
+    minimapradius.x = minimapradius.y = std::max(minimapradius.x, minimapradius.y);
     minimapscale = vec((0.5f - 1.0f/size)/minimapradius.x, (0.5f - 1.0f/size)/minimapradius.y, 1.0f);
 
     envmapping = minimapping = true;
@@ -1818,7 +1818,7 @@ void drawminimap()
     cmcamera = *player;
     cmcamera.reset();
     cmcamera.type = ENT_CAMERA;
-    cmcamera.o = vec(minimapcenter.x, minimapcenter.y, max(minimapcenter.z + minimapradius.z + 1, float(minimapheight)));
+    cmcamera.o = vec(minimapcenter.x, minimapcenter.y, std::max(minimapcenter.z + minimapradius.z + 1, float(minimapheight)));
     cmcamera.yaw = 0;
     cmcamera.pitch = -90;
     cmcamera.roll = 0;
@@ -1921,7 +1921,7 @@ FVARP(motionblurscale, 0, 0.5f, 1);
 
 void addmotionblur()
 {
-    if(!motionblur || !hasTR || max(screen->w, screen->h) > hwtexsize) return;
+    if(!motionblur || !hasTR || std::max(screen->w, screen->h) > hwtexsize) return;
 
     if(game::ispaused()) { lastmotion = 0; return; }
 
@@ -1952,7 +1952,7 @@ void addmotionblur()
 
     rectshader->set();
 
-    glColor4f(1, 1, 1, lastmotion ? pow(motionblurscale, max(float(lastmillis - lastmotion)/motionblurmillis, 1.0f)) : 0);
+    glColor4f(1, 1, 1, lastmotion ? pow(motionblurscale, std::max(float(lastmillis - lastmotion)/motionblurmillis, 1.0f)) : 0);
     glBegin(GL_TRIANGLE_STRIP);
     glTexCoord2f(      0,       0); glVertex2f(-1, -1);
     glTexCoord2f(motionw,       0); glVertex2f( 1, -1);
@@ -2006,10 +2006,10 @@ void gl_drawframe(int w, int h)
     if(isliquid(fogmat&MATF_VOLUME))
     {
         float z = findsurface(fogmat, camera1->o, abovemat) - WATER_OFFSET;
-        if(camera1->o.z < z + 1) fogblend = min(z + 1 - camera1->o.z, 1.0f);
+        if(camera1->o.z < z + 1) fogblend = std::min(z + 1 - camera1->o.z, 1.0f);
         else fogmat = abovemat;
         if(caustics && (fogmat&MATF_VOLUME)==MAT_WATER && camera1->o.z < z)
-            causticspass = renderpath==R_FIXEDFUNCTION ? 1.0f : min(z - camera1->o.z, 1.0f);
+            causticspass = renderpath==R_FIXEDFUNCTION ? 1.0f : std::min(z - camera1->o.z, 1.0f);
     }
     else fogmat = MAT_AIR;    
     setfog(fogmat, fogblend, abovemat);
@@ -2161,14 +2161,14 @@ void damagecompass(int n, const vec &loc)
     if(yaw >= 360) yaw = fmod(yaw, 360);
     else if(yaw < 0) yaw = 360 - fmod(-yaw, 360);
     int dir = (int(yaw+22.5f)%360)/45;
-    dcompass[dir] += max(n, damagecompassmin)/float(damagecompassmax);
+    dcompass[dir] += std::max(n, damagecompassmin)/float(damagecompassmax);
     if(dcompass[dir]>1) dcompass[dir] = 1;
 
 }
 void drawdamagecompass(int w, int h)
 {
     int dirs = 0;
-    float size = damagecompasssize/100.0f*min(h, w)/2.0f;
+    float size = damagecompasssize/100.0f*std::min(h, w)/2.0f;
     loopi(8) if(dcompass[i]>0)
     {
         if(!dirs)
@@ -2181,7 +2181,7 @@ void drawdamagecompass(int w, int h)
         glPushMatrix();
         glTranslatef(w/2, h/2, 0);
         glRotatef(i*45, 0, 0, 1);
-        glTranslatef(0, -size/2.0f-min(h, w)/4.0f, 0);
+        glTranslatef(0, -size/2.0f-std::min(h, w)/4.0f, 0);
         float logscale = 32,
               scale = log(1 + (logscale - 1)*dcompass[i]) / log(logscale);
         glScalef(size*scale, size*scale, 0);
@@ -2460,8 +2460,8 @@ void gl_drawhud(int w, int h)
                 }
                 int nextstats[8] =
                 {
-                    vtris*100/max(wtris, 1),
-                    vverts*100/max(wverts, 1),
+                    vtris*100/std::max(wtris, 1),
+                    vverts*100/std::max(wverts, 1),
                     xtraverts/1024,
                     xtravertsva/1024,
                     glde,
@@ -2490,7 +2490,7 @@ void gl_drawhud(int w, int h)
                         int tw, th;
                         text_bounds(editinfo, tw, th);
                         th += FONTH-1; th -= th%FONTH;
-                        abovehud -= max(th, FONTH);
+                        abovehud -= std::max(th, FONTH);
                         draw_text(editinfo, FONTH/2, abovehud);
                     }
                     DELETEA(editinfo);
@@ -2506,8 +2506,8 @@ void gl_drawhud(int w, int h)
                         int tw, th;
                         text_bounds(gameinfo, tw, th);
                         th += FONTH-1; th -= th%FONTH;
-                        roffset += max(th, FONTH);    
-                        draw_text(gameinfo, conw-max(5*FONTH, 2*FONTH+tw), conh-FONTH/2-roffset);
+                        roffset += std::max(th, FONTH);    
+                        draw_text(gameinfo, conw-std::max(5*FONTH, 2*FONTH+tw), conh-FONTH/2-roffset);
                     }
                     DELETEA(gameinfo);
                 }
@@ -2520,7 +2520,7 @@ void gl_drawhud(int w, int h)
         {
             glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
             game::gameplayhud(w, h);
-            limitgui = abovehud = min(abovehud, int(conh*game::abovegameplayhud(w, h)));
+            limitgui = abovehud = std::min(abovehud, int(conh*game::abovegameplayhud(w, h)));
         }
 
         rendertexturepanel(w, h);

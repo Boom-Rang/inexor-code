@@ -223,7 +223,7 @@ namespace game
     {
         static int lastslowmohealth = 0;
         server::forcegamespeed(intermission ? 100 : clamp(player1->health, 25, 200));
-        if(player1->health<player1->maxhealth && lastmillis-max(maptime, lastslowmohealth)>player1->health*player1->health/2)
+        if(player1->health<player1->maxhealth && lastmillis-std::max(maptime, lastslowmohealth)>player1->health*player1->health/2)
         {
             lastslowmohealth = lastmillis;
             player1->health++;
@@ -307,7 +307,7 @@ namespace game
             if(m_classicsp)
             {
                 conoutf(CON_GAMEINFO, "\f2You wasted another life! The monsters stole your armour and some ammo...");
-                loopi(NUMGUNS) if(i!=GUN_PISTOL && (player1->ammo[i] = savedammo[i]) > 5) player1->ammo[i] = max(player1->ammo[i]/3, 5);
+                loopi(NUMGUNS) if(i!=GUN_PISTOL && (player1->ammo[i] = savedammo[i]) > 5) player1->ammo[i] = std::max(player1->ammo[i]/3, 5);
             }
         }
     }
@@ -369,7 +369,7 @@ namespace game
     {
         d->state = CS_DEAD;
         d->lastpain = lastmillis;
-        if(!restore) gibeffect(max(-d->health, 0), d->vel, d);
+        if(!restore) gibeffect(std::max(-d->health, 0), d->vel, d);
         if(d==player1)
         {
             if(deathscore) showscores(true);
@@ -454,7 +454,7 @@ namespace game
             if(m_ctf) conoutf(CON_GAMEINFO, "\f2player frags: %d, flags: %d, deaths: %d", player1->frags, player1->flags, player1->deaths);
             else if(m_collect) conoutf(CON_GAMEINFO, "\f2player frags: %d, skulls: %d, deaths: %d", player1->frags, player1->flags, player1->deaths);
             else conoutf(CON_GAMEINFO, "\f2player frags: %d, deaths: %d", player1->frags, player1->deaths);
-            int accuracy = (player1->totaldamage*100)/max(player1->totalshots, 1);
+            int accuracy = (player1->totaldamage*100)/std::max(player1->totalshots, 1);
             conoutf(CON_GAMEINFO, "\f2player total damage dealt: %d, damage wasted: %d, accuracy(%%): %d", player1->totaldamage, player1->totalshots-player1->totaldamage, accuracy);
             if(m_sp) spsummary(accuracy);
 
@@ -468,7 +468,7 @@ namespace game
     ICOMMAND(getfrags, "", (), intret(player1->frags));
     ICOMMAND(getflags, "", (), intret(player1->flags));
     ICOMMAND(getdeaths, "", (), intret(player1->deaths));
-    ICOMMAND(getaccuracy, "", (), intret((player1->totaldamage*100)/max(player1->totalshots, 1)));
+    ICOMMAND(getaccuracy, "", (), intret((player1->totaldamage*100)/std::max(player1->totalshots, 1)));
     ICOMMAND(gettotaldamage, "", (), intret(player1->totaldamage));
     ICOMMAND(gettotalshots, "", (), intret(player1->totalshots));
 
@@ -476,7 +476,7 @@ namespace game
 
     fpsent *newclient(int cn)   // ensure valid entity
     {
-        if(cn < 0 || cn > max(0xFF, MAXCLIENTS + MAXBOTS))
+        if(cn < 0 || cn > std::max(0xFF, MAXCLIENTS + MAXBOTS))
         {
             neterr("clientnum", false);
             return NULL;
@@ -889,10 +889,10 @@ namespace game
             int pw, ph, tw, th, fw, fh;
             text_bounds("  ", pw, ph);
             text_bounds("SPECTATOR", tw, th);
-            th = max(th, ph);
+            th = std::max(th, ph);
             fpsent *f = followingplayer();
             text_bounds(f ? colorname(f) : " ", fw, fh);
-            fh = max(fh, ph);
+            fh = std::max(fh, ph);
             draw_text("SPECTATOR", w*1800/h - tw - pw, 1650 - th - fh);
             if(f) 
             {

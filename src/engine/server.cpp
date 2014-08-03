@@ -273,7 +273,7 @@ ENetPacket *sendfile(int cn, int chan, stream *file, const char *format, ...)
     }
     else if(!clients.inrange(cn)) return NULL;
 
-    int len = (int)min(file->size(), stream::offset(INT_MAX));
+    int len = (int)std::min(file->size(), stream::offset(INT_MAX));
     if(len <= 0 || len > 16<<20) return NULL;
 
     packetbuf p(MAXTRANS+len, ENET_PACKET_FLAG_RELIABLE);
@@ -538,13 +538,13 @@ void checkserversockets()        // reply all server info requests
     ENET_SOCKETSET_ADD(readset, pongsock);
     if(mastersock != ENET_SOCKET_NULL)
     {
-        maxsock = max(maxsock, mastersock);
+        maxsock = std::max(maxsock, mastersock);
         ENET_SOCKETSET_ADD(readset, mastersock);
         if(!masterconnected) ENET_SOCKETSET_ADD(writeset, mastersock);
     }
     if(lansock != ENET_SOCKET_NULL)
     {
-        maxsock = max(maxsock, lansock);
+        maxsock = std::max(maxsock, lansock);
         ENET_SOCKETSET_ADD(readset, lansock);
     }
     if(enet_socketset_select(maxsock, &readset, &writeset, 0) <= 0) return;
@@ -986,7 +986,7 @@ void logoutfv(const char *fmt, va_list args)
         logline &line = loglines.add();
         vformatstring(line.buf, fmt, args, sizeof(line.buf));
         if(logfile) writelog(logfile, line.buf);
-        line.len = min(strlen(line.buf), sizeof(line.buf)-2);
+        line.len = std::min(strlen(line.buf), sizeof(line.buf)-2);
         line.buf[line.len++] = '\n';
         line.buf[line.len] = '\0';
         if(outhandle) writeline(line);
@@ -1053,7 +1053,7 @@ bool setuplistenserver(bool dedicated)
         if(enet_address_set_host(&address, serverip)<0) conoutf(CON_WARN, "WARNING: server ip not resolved");
         else serveraddress.host = address.host;
     }
-    serverhost = enet_host_create(&address, min(maxclients + server::reserveclients(), MAXCLIENTS), server::numchannels(), 0, serveruprate);
+    serverhost = enet_host_create(&address, std::min(maxclients + server::reserveclients(), MAXCLIENTS), server::numchannels(), 0, serveruprate);
     if(!serverhost) return servererror(dedicated, "could not create server host");
     serverhost->duplicatePeers = maxdupclients ? maxdupclients : MAXCLIENTS;
     loopi(maxclients) serverhost->peers[i].data = NULL;
