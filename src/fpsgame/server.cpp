@@ -1262,7 +1262,7 @@ namespace server
 			sendstring(f->name, p); 
 			putint(p, f->filesize);
 			putint(p, f->crc);
-			conoutf("sent: %s (%d KB) : %X", f->name, f->filesize, f->crc);
+			//conoutf("sent: %s (%d KB) : %X", f->name, f->filesize, f->crc);
 		}
 		
         sendpacket(cn, 1, p.finalize());
