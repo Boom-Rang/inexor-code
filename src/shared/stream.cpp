@@ -578,7 +578,6 @@ int stream::printf(const char *fmt, ...)
 struct filestream : stream
 {
     FILE *file;
-
     filestream() : file(NULL) {}
     ~filestream() { close(); }
 
@@ -618,6 +617,14 @@ struct filestream : stream
         return ftello(file); 
 #endif
     }
+	/**
+	*seek for a position in the stream:
+	*whence is the point of start; 
+	*   the current position ( SEEK_CUR )
+    *   the beginning of the stream ( SEEK_SET )
+	*   or the end of the stream ( SEEK_END )
+	*pos is the offset (in bytes) where you want to go, depending on whence
+	**/
     bool seek(offset pos, int whence) 
     { 
 #ifdef WIN32
@@ -631,7 +638,7 @@ struct filestream : stream
 #endif
     }
 
-    int read(void *buf, int len) { return (int)fread(buf, 1, len, file); }
+	int read(void *buf, int len) { return (int)fread(buf, 1, len, file); }
     int write(const void *buf, int len) { return (int)fwrite(buf, 1, len, file); }
     int getchar() { return fgetc(file); }
     bool putchar(int c) { return fputc(c, file)!=EOF; }
@@ -646,12 +653,30 @@ struct filestream : stream
         va_end(v);
         return result;
     }
+	// Cycle Redundant Checksum: a lightweight checksum ideal for files, plus its easily extendable: 
+	//after a chunk with new data appeared, you can easily compute the newcrc = crc32(oldcrc, newdata, lenght_of_newdata);
+	uint getcrc() 
+	{
+		uint crc = crc32(0, NULL, 0);
+		char buf[BUFSIZ];
+		int siz;
+		do {
+			siz = read(buf, BUFSIZ);
+			crc = crc32(crc, (Bytef *)buf, siz);
+		}
+		while (siz);
+		return crc; 
+	}
 };
 
 #ifndef STANDALONE
 VAR(dbggz, 0, 0, 1);
 #endif
 
+/**
+* GZstream: 
+* A zip-compressed filestream used e.g. for maps
+**/
 struct gzstream : stream
 {
     enum
