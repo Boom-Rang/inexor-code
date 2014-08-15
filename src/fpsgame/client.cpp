@@ -882,11 +882,11 @@ namespace game
 
 	SVARP(allowedfileext, ".cfg .jpg .ogz .png");
 
-	bool allowedfile(const char *name)
+	bool hasextension(const char *name, const char *extensions)
 	{
 		if(!name) return false; //todo ?
 		vector<char *> exts;
-		char *pos = strtok(newstring(allowedfileext), "\n\t ");;
+		char *pos = strtok(newstring(extensions), "\n\t ");;
 		while(pos)
 		{
 			exts.add(newstring(pos));
@@ -901,6 +901,20 @@ namespace game
 		}
 		return false;
 	}
+	uint getfilecrc(const char *name)
+	{
+		stream *f = openfile(name, "rb");
+		if(!f) return 0;
+		uint crc = f->getcrc();
+		delete f;
+		return crc;
+	}
+	VARP(allowfilereplacement, 0, 1, 1); //whether a downloadable modified file will be downloaded or skipped
+
+	bool firewall(const char *name)
+	{
+		return hasextension(name, allowedfileext);
+	}
 
 	bool sendfilerequest(int pack, int file)
 	{
@@ -910,8 +924,11 @@ namespace game
 		
 		string msg;
         msg[0] = '\0';
-		if(!allowedfile(fname)) formatstring(msg) ("skipped .. %s \f3not allowed filetype", fname);
-		if(fileexists(fname, "r")) formatstring(msg) ("skipped .. %s already exists", fname);
+		if(!hasextension(fname, allowedfileext)) formatstring(msg) ("skipped .. %s \f3not allowed filetype", fname);
+		if(fileexists(fname, "r"))  {
+			if(getfilecrc(fname) == fi->crc)	formatstring(msg) ("skipped .. %s already exists", fname);
+			else if(!allowfilereplacement) formatstring(msg) ("skipped .. %s already exists in another version", fname); 
+		}
 		if(msg[0]) {
 			conoutf(msg);
 			sendfilerequest(pack, file +1);
@@ -2046,10 +2063,13 @@ namespace game
 				getstring(filename, p); 
 				int finished = getint(p); //in %
 
-				if(finished < 0 || !allowedfile(filename)) break;
+				if(finished < 0 || !firewall(filename)) break;
 				
 				stream *f = openrawfile(filename, "wb");
-				if(!f) { conoutf("could not save file (%s)", filename); break; }
+				if(!f) { conoutf(CON_ERROR, "could not save file (%s)", filename); break; }
+				ucharbuf b = p.subbuf(p.remaining());
+				f->write(b.buf, b.maxlen);
+				delete f;
 				
 				if(finished <= 100) 
 				{ 
@@ -2057,10 +2077,6 @@ namespace game
 					sendfilerequest(pack, file+1); //request next file
 				}
 				else conoutf("\f0Received package (%d files)", file+1);
-
-				ucharbuf b = p.subbuf(p.remaining());
-				f->write(b.buf, b.maxlen);
-				delete f;
 
 				break;
 			}
