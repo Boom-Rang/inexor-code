@@ -2,19 +2,19 @@
 #include "engine/particles/particles.h"
 
 /**
- * Singleton implementation of a box emitter.
+ * Singleton implementation of a sphere emitter.
  */
-struct box_emitter : public particle_emitter_implementation
+struct sphere_emitter : public particle_emitter_implementation
 {
 
 public:
 
-	static box_emitter& instance()
+	static sphere_emitter& instance()
 	{
-		static box_emitter _instance;
+		static sphere_emitter _instance;
 		return _instance;
 	}
-	virtual ~box_emitter() { }
+	virtual ~sphere_emitter() { }
 
 	/**
 	 * Emits particles from a single sphere (x,y,z).
@@ -37,16 +37,14 @@ public:
 				// get the particle type, mass and density from the emitter type
 				p_inst->p_type = pe_inst->p_type;
 				// conoutf("x:%3.1f y:%3.1f z:%3.1f", pe_inst->o.x, pe_inst->o.y, pe_inst->o.z);
+				p_inst->o = vec(pe_inst->o);
 
 				float rx = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
 				float ry = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
 				float rz = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-
-				p_inst->o.x = pe_inst->o.x + rx * pe_inst->density;
-				p_inst->o.y = pe_inst->o.y + ry * pe_inst->density;
-				p_inst->o.z = pe_inst->o.z + rz * pe_inst->density;
-
-				p_inst->vel = vec(pe_inst->vel);
+				p_inst->vel.x += (rx * 2 * pe_inst->vel.x) - pe_inst->vel.x;
+				p_inst->vel.y += (ry * 2 * pe_inst->vel.y) - pe_inst->vel.y;
+				p_inst->vel.z += (rz * 2 * pe_inst->vel.z) - pe_inst->vel.z;
 				p_inst->roll = 0;
 
 				p_inst->mass = pe_inst->mass;
@@ -76,14 +74,14 @@ private:
 
 	particle_instance* last;
 
-	box_emitter() : particle_emitter_implementation("box_emitter")
+	sphere_emitter() : particle_emitter_implementation("sphere_emitter")
 	{
 		ps.add_emitter_implementation(this);
 		last = NULL;
 	}
-	box_emitter( const box_emitter& );
-	box_emitter & operator = (const box_emitter &);
+	sphere_emitter( const sphere_emitter& );
+	sphere_emitter & operator = (const sphere_emitter &);
 
 };
 
-box_emitter& ps_emitter_box = box_emitter::instance();
+sphere_emitter& ps_emitter_sphere = sphere_emitter::instance();

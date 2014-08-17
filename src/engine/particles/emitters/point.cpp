@@ -2,22 +2,22 @@
 #include "engine/particles/particles.h"
 
 /**
- * Singleton implementation of a box emitter.
+ * Singleton implementation of a point emitter.
  */
-struct box_emitter : public particle_emitter_implementation
+struct point_emitter : public particle_emitter_implementation
 {
 
 public:
 
-	static box_emitter& instance()
+	static point_emitter& instance()
 	{
-		static box_emitter _instance;
+		static point_emitter _instance;
 		return _instance;
 	}
-	virtual ~box_emitter() { }
+	virtual ~point_emitter() { }
 
 	/**
-	 * Emits particles from a single sphere (x,y,z).
+	 * Emits particles from a single point (x,y,z).
 	 */
 	inline void emit(particle_emitter_instance *pe_inst, int elapsedtime)
 	{
@@ -37,18 +37,9 @@ public:
 				// get the particle type, mass and density from the emitter type
 				p_inst->p_type = pe_inst->p_type;
 				// conoutf("x:%3.1f y:%3.1f z:%3.1f", pe_inst->o.x, pe_inst->o.y, pe_inst->o.z);
-
-				float rx = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-				float ry = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-				float rz = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-
-				p_inst->o.x = pe_inst->o.x + rx * pe_inst->density;
-				p_inst->o.y = pe_inst->o.y + ry * pe_inst->density;
-				p_inst->o.z = pe_inst->o.z + rz * pe_inst->density;
-
-				p_inst->vel = vec(pe_inst->vel);
+				p_inst->o = vec(pe_inst->o);
+				p_inst->vel = pe_inst->vel;
 				p_inst->roll = 0;
-
 				p_inst->mass = pe_inst->mass;
 				p_inst->density = pe_inst->density;
 				// set the remaining iterations from the emitter type's lifetime
@@ -65,8 +56,6 @@ public:
 					(*pm_it)->pm_type->pm_impl->init(p_inst);
 				}
 				*/
-				last = p_inst;
-
 			}
 		}
 
@@ -74,16 +63,13 @@ public:
 
 private:
 
-	particle_instance* last;
-
-	box_emitter() : particle_emitter_implementation("box_emitter")
+	point_emitter() : particle_emitter_implementation("point_emitter")
 	{
 		ps.add_emitter_implementation(this);
-		last = NULL;
 	}
-	box_emitter( const box_emitter& );
-	box_emitter & operator = (const box_emitter &);
+	point_emitter( const point_emitter& );
+	point_emitter & operator = (const point_emitter &);
 
 };
 
-box_emitter& ps_emitter_box = box_emitter::instance();
+point_emitter& ps_emitter_point = point_emitter::instance();
