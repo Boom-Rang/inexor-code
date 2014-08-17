@@ -2,10 +2,10 @@
 
 #define FPSGAME_HUD_H
 
-extern string hud_radar;
+extern string radar_frame;
 extern string hud_compass;
-extern string hud_items;
-extern string hud_bomb_items;
+extern string interface_items;
+extern string interface_bomb_items;
 extern string blip_blue;
 extern string blip_red;
 extern string blip_grey;

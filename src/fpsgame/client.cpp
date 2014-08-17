@@ -74,7 +74,7 @@ namespace game
             {
                 if(!alive++) 
                 {
-                	defformatstring(blip_alive)("%s/%s", huddir, isteam(d->team, player1->team) ? blip_blue_alive : blip_red_alive);
+                	defformatstring(blip_alive)("%s/%s", radardir, isteam(d->team, player1->team) ? blip_blue_alive : blip_red_alive);
                     settexture(blip_alive);
                     glBegin(GL_QUADS);
                 }
@@ -89,7 +89,7 @@ namespace game
             {
                 if(!dead++) 
                 {
-                	defformatstring(blip_dead)("%s/%s", huddir, isteam(d->team, player1->team) ? blip_blue_dead : blip_red_dead);
+                	defformatstring(blip_dead)("%s/%s", radardir, isteam(d->team, player1->team) ? blip_blue_dead : blip_red_dead);
                     settexture(blip_dead);
                     glBegin(GL_QUADS);
                 }
@@ -1914,7 +1914,7 @@ namespace game
                 string oldname;
                 copystring(oldname, getclientmap());
                 defformatstring(mname)("getmap_%d", lastmillis);
-                defformatstring(fname)("%s/%s.ogz", basedir, mname);
+                defformatstring(fname)("%s/%s.ogz", mapdir, mname);
                 stream *map = openrawfile(path(fname), "wb");
                 if(!map) return;
                 conoutf("received map");
@@ -2002,7 +2002,7 @@ namespace game
         conoutf("sending map...");
         defformatstring(mname)("sendmap_%d", lastmillis);
         save_world(mname, true);
-        defformatstring(fname)("%s/%s.ogz", basedir, mname);
+        defformatstring(fname)("%s/%s.ogz", mapdir, mname);
         stream *map = openrawfile(path(fname), "rb");
         if(map)
         {

@@ -2224,7 +2224,7 @@ void drawdamagescreen(int w, int h)
 
     static Texture *damagetex = NULL;
     if(!damagetex) {
-        defformatstring(damagetex_filename)("%s/damage.png", huddir);
+        defformatstring(damagetex_filename)("%s/damage.png", interfacedir);
     	damagetex = textureload(damagetex_filename, 3);
     }
 

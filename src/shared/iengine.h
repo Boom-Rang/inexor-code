@@ -7,7 +7,7 @@ extern int totalmillis;                 // total elapsed time
 extern uint totalsecs;
 extern int gamespeed, paused;
 
-extern string packagesdir;
+extern string mediadir;
 
 enum
 {

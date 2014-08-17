@@ -1132,13 +1132,13 @@ static bool texturedata(ImageData &d, const char *tname, Slot::Tex *tex = NULL, 
         {
             cmds = tex->name;
             file = strrchr(tex->name, '>');
-            if(!file) { if(msg) conoutf(CON_ERROR, "could not load texture %s/%s", packagesdir, tex->name); return false; }
+            if(!file) { if(msg) conoutf(CON_ERROR, "could not load texture %s/%s", mediadir, tex->name); return false; }
             file++;
         }
         else file = tex->name;
         
         static string pname;
-        formatstring(pname)("%s/%s", packagesdir, file);
+        formatstring(pname)("%s/%s", mediadir, file);
         file = path(pname);
     }
     else if(tname[0]=='<') 
@@ -1733,7 +1733,7 @@ void autograss(char *name)
     if(slots.empty()) return;
     Slot &s = *slots.last();
     DELETEA(s.autograss);
-    s.autograss = name[0] ? newstring(makerelpath("packages", name, NULL, "<ffskip><premul>")) : NULL;
+    s.autograss = name[0] ? newstring(makerelpath(texturedir, name, NULL, "<ffskip><premul>")) : NULL;
 }
 COMMAND(autograss, "s");
 
@@ -1780,7 +1780,7 @@ void texlayer(int *layer, char *name, int *mode, float *scale)
     if(slots.empty()) return;
     Slot &s = *slots.last();
     s.variants->layer = *layer < 0 ? max(slots.length()-1+*layer, 0) : *layer;
-    s.layermaskname = name[0] ? newstring(path(makerelpath("packages", name))) : NULL; 
+	s.layermaskname = name[0] ? newstring(path(makerelpath(texturedir, name))) : NULL; 
     s.layermaskmode = *mode;
     s.layermaskscale = *scale <= 0 ? 1 : *scale;
     propagatevslot(s.variants, 1<<VSLOT_LAYER);
@@ -1922,7 +1922,7 @@ static void addname(vector<char> &key, Slot &slot, Slot::Tex &t, bool combined =
 {
     if(combined) key.add('&');
     if(prefix) { while(*prefix) key.add(*prefix++); }
-    defformatstring(tname)("%s/%s", packagesdir, t.name);
+    defformatstring(tname)("%s/%s", mediadir, t.name);
     for(const char *s = path(tname); *s; key.add(*s++));
 }
 
@@ -2331,7 +2331,7 @@ Texture *cubemapload(const char *name, bool mipit, bool msg, bool transient)
 {
     if(!hasCM) return NULL;
     string pname;
-    copystring(pname, makerelpath("packages", name));
+    copystring(pname, makerelpath(skyboxdir, name));
     path(pname);
     Texture *t = NULL;
     if(!strchr(pname, '*'))

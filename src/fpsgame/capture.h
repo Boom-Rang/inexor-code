@@ -475,18 +475,9 @@ struct captureclientmode : clientmode
         if(minimapalpha >= 1) glEnable(GL_BLEND);
         glColor3f(1, 1, 1);
         float margin = 0.04f, roffset = s*margin, rsize = s + 2*roffset;
-        defformatstring(capture_blip_radar_filename)("%s/%s", huddir, hud_radar);
+        defformatstring(capture_blip_radar_filename)("%s/%s", radardir, radar_frame);
         settexture(capture_blip_radar_filename, 3);
         drawradar(x - roffset, y - roffset, rsize);
-        #if 0
-        defformatstring(capture_compass_filename)("%s/%s", huddir, hud_compass);
-        settexture(capture_compass_filename, 3);
-        glPushMatrix();
-        glTranslatef(x - roffset + 0.5f*rsize, y - roffset + 0.5f*rsize, 0);
-        glRotatef(camera1->yaw + 180, 0, 0, -1);
-        drawradar(-0.5f*rsize, -0.5f*rsize, rsize);
-        glPopMatrix();
-        #endif
         bool showenemies = lastmillis%1000 >= 500;
         int fw = 1, fh = 1;
         if(basenumbers) {
@@ -494,7 +485,7 @@ struct captureclientmode : clientmode
             setfont("digit_blue");
             text_bounds(" ", fw, fh);
         } else {
-            defformatstring(capture_blip_blue_filename)("%s/%s", huddir, blip_blue);
+            defformatstring(capture_blip_blue_filename)("%s/%s", radardir, blip_blue);
         	settexture(capture_blip_blue_filename, 3);
         }
         glPushMatrix();
@@ -505,14 +496,14 @@ struct captureclientmode : clientmode
         if(basenumbers) {
         	setfont("digit_grey");
         } else {
-            defformatstring(capture_blip_grey_filename)("%s/%s", huddir, blip_grey);
+            defformatstring(capture_blip_grey_filename)("%s/%s", radardir, blip_grey);
         	settexture(capture_blip_grey_filename, 3);
         }
         drawblips(d, blipsize, fw, fh, 0, showenemies);
         if(basenumbers) {
         	setfont("digit_red");
         } else {
-            defformatstring(capture_blip_red_filename)("%s/%s", huddir, blip_red);
+            defformatstring(capture_blip_red_filename)("%s/%s", radardir, blip_red);
         	settexture(capture_blip_red_filename, 3);
         }
         drawblips(d, blipsize, fw, fh, -1, showenemies);

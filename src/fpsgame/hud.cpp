@@ -1,9 +1,9 @@
 #include "cube.h"
 
-string hud_radar = "radar.png";
+string radar_frame = "radar.png";
 string hud_compass = "compass.png";
-string hud_items = "items.png";
-string hud_bomb_items = "bomb_items.png";
+string radar_frame = "items.png";
+string interface_bomb_items = "bomb_items.png";
 string blip_blue = "blip_blue.png";
 string blip_red = "blip_red.png";
 string blip_grey = "blip_grey.png";

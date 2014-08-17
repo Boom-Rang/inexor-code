@@ -727,7 +727,7 @@ namespace game
 
     void drawicon(int icon, float x, float y, float sz)
     {
-        defformatstring(fps_items_filename)("%s/%s", huddir, hud_items);
+        defformatstring(fps_items_filename)("%s/%s", interfacedir, interface_items);
         settexture(fps_items_filename);
         glBegin(GL_TRIANGLE_STRIP);
         float tsz = 0.25f, tx = tsz*(icon%4), ty = tsz*(icon/4);
@@ -934,9 +934,9 @@ namespace game
     	string crosshair;
         switch(index)
         {
-            case 2: formatstring(crosshair)("%s/%s", datadir, crosshair_hit);
-            case 1: formatstring(crosshair)("%s/%s", datadir, crosshair_teammate);
-            default: formatstring(crosshair)("%s/%s", datadir, crosshair_default);
+            case 2: formatstring(crosshair)("%s/hit.png", crosshairdir);
+            case 1: formatstring(crosshair)("%s/teammate.png", crosshairdir);
+            default: formatstring(crosshair)("%s/crosshair.png", crosshairdir);
         }
     	return crosshair;
     }

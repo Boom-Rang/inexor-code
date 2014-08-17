@@ -52,7 +52,7 @@ bool loadents(const char *fname, vector<entity> &ents, uint *crc)
 {
     string pakname, mapname, mcfgname, ogzname;
     getmapfilenames(fname, NULL, pakname, mapname, mcfgname);
-    formatstring(ogzname)("packages/%s.ogz", mapname);
+    formatstring(ogzname)("%s/%s.ogz", mapdir, mapname);
     path(ogzname);
     stream *f = opengzfile(ogzname, "rb");
     if(!f) return false;
@@ -170,11 +170,11 @@ void setmapfilenames(const char *fname, const char *cname = 0)
     string pakname, mapname, mcfgname;
     getmapfilenames(fname, cname, pakname, mapname, mcfgname);
 
-    formatstring(ogzname)("%s/%s.ogz", packagesdir, mapname);
-    if(savebak==1) formatstring(bakname)("%s/%s.BAK", packagesdir, mapname);
-    else formatstring(bakname)("%s/%s_%d.BAK", packagesdir, mapname, totalmillis);
-    formatstring(cfgname)("%s/%s/%s.cfg", packagesdir, pakname, mcfgname);
-    formatstring(picname)("%s/%s.jpg", packagesdir, mapname);
+    formatstring(ogzname)("%s/%s.ogz", mediadir, mapname);
+    if(savebak==1) formatstring(bakname)("%s/%s.BAK", mediadir, mapname);
+    else formatstring(bakname)("%s/%s_%d.BAK", mediadir, mapname, totalmillis);
+    formatstring(cfgname)("%s/%s/%s.cfg", mediadir, pakname, mcfgname);
+    formatstring(picname)("%s/%s.jpg", mediadir, mapname);
 
     path(ogzname);
     path(bakname);
@@ -189,7 +189,7 @@ void mapcfgname()
 
     string pakname, mapname, mcfgname;
     getmapfilenames(mname, NULL, pakname, mapname, mcfgname);
-    defformatstring(cfgname)("%s/%s/%s.cfg", packagesdir, pakname, mcfgname);
+    defformatstring(cfgname)("%s/%s/%s.cfg", mediadir, pakname, mcfgname);
     path(cfgname);
     result(cfgname);
 }
@@ -1237,7 +1237,8 @@ bool load_world(const char *mname, const char *cname)        // still supports a
     clearmainmenu();
 
     identflags |= IDF_OVERRIDDEN;
-    execfile("data/default_map_settings.cfg", false);
+	defformatstring(default_map_settings) ("%s/default_map_settings.cfg", configdir);
+    execfile(default_map_settings, false);
     execfile(cfgname, false);
     identflags &= ~IDF_OVERRIDDEN;
    
@@ -1369,7 +1370,7 @@ void writeobj(char *name)
     {
         VSlot &vslot = lookupvslot(usedmtl[i], false);
         f->printf("newmtl slot%d\n", usedmtl[i]);
-        f->printf("map_Kd %s\n", vslot.slot->sts.empty() ? notexture->name : path(makerelpath("packages", vslot.slot->sts[0].name)));
+		f->printf("map_Kd %s\n", vslot.slot->sts.empty() ? notexture->name : path(makerelpath(texturedir, vslot.slot->sts[0].name)));
         f->printf("\n");
     } 
     delete f;

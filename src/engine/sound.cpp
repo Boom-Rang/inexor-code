@@ -212,7 +212,7 @@ void startmusic(char *name, char *cmd, char *cmd_success, char *cmd_failed)
     stopmusic();
     if(soundvol && musicvol && *name)
     {
-        defformatstring(file)("%s/%s", packagesdir, name);
+        defformatstring(file)("%s/%s", mediadir, name);
         path(file);
         if(loadmusic(file))
         {
@@ -239,7 +239,7 @@ COMMANDN(music, startmusic, "ssss");
 /*
 void previousalbum(char *cmd, char *cmd_success, char *cmd_failed)
 {
-    defformatstring(albumdir)("%s/%s/%s/%s", packagesdir, musicdir, currentartist, currentalbum);
+    defformatstring(albumdir)("%s/%s/%s/%s", mediadir, musicdir, currentartist, currentalbum);
     vector<char *> files;
     listfiles(albumdir, NULL, files);
     if (files.length() < 2) return;
@@ -258,7 +258,7 @@ COMMAND(previousalbum, "sss");
 
 void nextsong(char *cmd, char *cmd_success, char *cmd_failed)
 {
-    defformatstring(albumdir)("%s/%s/%s/%s", packagesdir, musicdir, currentartist, currentalbum);
+    defformatstring(albumdir)("%s/%s/%s/%s", mediadir, musicdir, currentartist, currentalbum);
     vector<char *> files;
     listfiles(albumdir, "ogg", files);
     removehiddendirs(files);
@@ -280,7 +280,7 @@ COMMAND(nextsong, "sss");
 
 void previoussong(char *cmd, char *cmd_success, char *cmd_failed)
 {
-    defformatstring(albumdir)("%s/%s/%s/%s", packagesdir, musicdir, currentartist, currentalbum);
+    defformatstring(albumdir)("%s/%s/%s/%s", mediadir, musicdir, currentartist, currentalbum);
     vector<char *> files;
     listfiles(albumdir, "ogg", files);
     removehiddendirs(files);
@@ -299,7 +299,7 @@ COMMAND(previoussong, "sss");
 
 void nextalbum(char *cmd, char *cmd_success, char *cmd_failed)
 {
-    defformatstring(artistdir)("%s/%s/%s", packagesdir, musicdir, currentartist);
+    defformatstring(artistdir)("%s/%s/%s", mediadir, musicdir, currentartist);
     vector<char *> files;
     listfiles(artistdir, NULL, files);
     removehiddendirs(files);
@@ -320,7 +320,7 @@ COMMAND(nextalbum, "sss");
 
 void nextartist(char *cmd, char *cmd_success, char *cmd_failed)
 {
-    defformatstring(allartistsdir)("%s/%s", packagesdir, musicdir);
+    defformatstring(allartistsdir)("%s/%s", mediadir, musicdir);
     vector<char *> files;
     listfiles(allartistsdir, NULL, files);
     removehiddendirs(files);
@@ -582,14 +582,14 @@ static bool loadsoundslot(soundslot &slot, bool msg = false)
     string filename;
     loopi(sizeof(exts)/sizeof(exts[0]))
     {
-        formatstring(filename)("%s/%s%s", soundsdir, slot.sample->name, exts[i]);
+        formatstring(filename)("%s/%s%s", sounddir, slot.sample->name, exts[i]);
         if(msg && !i) renderprogress(0, filename);
         path(filename);
         slot.sample->chunk = loadwav(filename);
         if(slot.sample->chunk) return true;
     }
 
-    conoutf(CON_ERROR, "failed to load sample: %s/%s", soundsdir, slot.sample->name);
+    conoutf(CON_ERROR, "failed to load sample: %s/%s", sounddir, slot.sample->name);
     return false;
 }
 

@@ -421,7 +421,7 @@ model *loadmodel(const char *name, int i, bool msg)
         if(!name[0] || loadingmodel || lightmapping > 1) return NULL;
         if(msg)
         {
-            defformatstring(filename)("%s/%s", modelsdir, name);
+            defformatstring(filename)("%s/%s", modeldir, name);
             renderprogress(loadprogress, filename);
         }
         loopi(NUMMODELTYPES)
@@ -1024,8 +1024,8 @@ void loadskin(const char *dir, const char *altdir, Texture *&skin, Texture *&mas
         } \
     }
    
-    defformatstring(mdir)("%s/%s", modelsdir, dir);
-    defformatstring(maltdir)("%s/%s", modelsdir, altdir);
+    defformatstring(mdir)("%s/%s", modeldir, dir);
+    defformatstring(maltdir)("%s/%s", modeldir, altdir);
     masks = notexture;
     tryload(skin, NULL, NULL, "skin");
     tryload(masks, "<stub>", NULL, "masks");
