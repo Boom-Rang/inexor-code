@@ -139,13 +139,13 @@ struct flarerenderer : partrenderer
         if(!tex) tex = textureload(texname);
         glBindTexture(GL_TEXTURE_2D, tex->id);
         glBegin(GL_QUADS);
-        loopi(numflares)
+        for(int i = 0; i < int(numflares); i++)
         {
             flare *f = flares+i;
             vec center = f->center;
             vec axis = vec(f->o).sub(center);
             uchar color[4] = {f->color[0], f->color[1], f->color[2], 255};
-            loopj(f->sparkle?12:9)
+            for(int j = 0; j < int(f->sparkle?12:9); j++)
             {
                 const flaretype &ft = flaretypes[j];
                 vec o = vec(axis).mul(ft.loc).add(center);

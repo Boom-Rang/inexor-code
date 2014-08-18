@@ -68,11 +68,11 @@ static inline void reorienttexture(uchar *src, int sw, int sh, int bpp, int stri
     if(flipx) { dst += (sw-1)*stridex; stridex = -stridex; }
     if(flipy) { dst += (sh-1)*stridey; stridey = -stridey; }
     uchar *srcrow = src;
-    loopi(sh)
+    for(int i = 0; i < int(sh); i++)
     {
         for(uchar *curdst = dst, *src = srcrow, *end = &srcrow[sw*bpp]; src < end;)
         {
-            loopk(bpp) curdst[k] = *src++;
+            for(int k = 0; k < int(bpp); k++) curdst[k] = *src++;
             if(normals)
             {
                 if(flipx) curdst[0] = 255-curdst[0];
@@ -92,7 +92,7 @@ static void reorients3tc(GLenum format, int blocksize, int w, int h, uchar *src,
     if(swapxy) stridex *= bw; else stridey *= bh;
     if(flipx) { dst += (bw-1)*stridex; stridex = -stridex; bx1 += 4-bx2; bx2 = 4; }
     if(flipy) { dst += (bh-1)*stridey; stridey = -stridey; by1 += 4-by2; by2 = 4; }
-    loopi(bh)
+    for(int i = 0; i < int(bh); i++)
     {
         for(uchar *curdst = dst, *end = &src[bw*blocksize]; src < end; src += blocksize, curdst += stridex)
         {
@@ -173,7 +173,7 @@ static void reorients3tc(GLenum format, int blocksize, int w, int h, uchar *src,
 #define writetex(t, body) \
     { \
         uchar *dstrow = t.data; \
-        loop(y, t.h) \
+        for(int y = 0; y < int(t.h); y++)\
         { \
             for(uchar *dst = dstrow, *end = &dstrow[t.w*t.bpp]; dst < end; dst += t.bpp) \
             { \
@@ -186,7 +186,7 @@ static void reorients3tc(GLenum format, int blocksize, int w, int h, uchar *src,
 #define readwritetex(t, s, body) \
     { \
         uchar *dstrow = t.data, *srcrow = s.data; \
-        loop(y, t.h) \
+        for(int y = 0; y < int(t.h); y++)\
         { \
             for(uchar *dst = dstrow, *src = srcrow, *end = &srcrow[s.w*s.bpp]; src < end; dst += t.bpp, src += s.bpp) \
             { \
@@ -200,7 +200,7 @@ static void reorients3tc(GLenum format, int blocksize, int w, int h, uchar *src,
 #define read2writetex(t, s1, src1, s2, src2, body) \
     { \
         uchar *dstrow = t.data, *src1row = s1.data, *src2row = s2.data; \
-        loop(y, t.h) \
+        for(int y = 0; y < int(t.h); y++)\
         { \
             for(uchar *dst = dstrow, *end = &dstrow[t.w*t.bpp], *src1 = src1row, *src2 = src2row; dst < end; dst += t.bpp, src1 += s1.bpp, src2 += s2.bpp) \
             { \
@@ -223,7 +223,7 @@ void texreorient(ImageData &s, bool flipx, bool flipy, bool swapxy, int type = T
     case GL_COMPRESSED_RGBA_S3TC_DXT5_EXT:
         {
             uchar *dst = d.data, *src = s.data;
-            loopi(s.levels)
+            for(int i = 0; i < int(s.levels); i++)
             {
                 reorients3tc(s.compressed, s.bpp, std::max(s.w>>i, 1), std::max(s.h>>i, 1), src, dst, flipx, flipy, swapxy, type==TEX_NORMAL);
                 src += s.calclevelsize(i);
@@ -258,7 +258,7 @@ void texoffset(ImageData &s, int xoffset, int yoffset)
     if(!xoffset && !yoffset) return;
     ImageData d(s.w, s.h, s.bpp);
     uchar *src = s.data;
-    loop(y, s.h)
+    for(int y = 0; y < int(s.h); y++)
     {
         uchar *dst = (uchar *)d.data+((y+yoffset)%d.h)*d.pitch;
         memcpy(dst+xoffset*s.bpp, src, (s.w-xoffset)*s.bpp);
@@ -272,7 +272,7 @@ void texmad(ImageData &s, const vec &mul, const vec &add)
 {
     int maxk = std::min(int(s.bpp), 3);
     writetex(s,
-        loopk(maxk) dst[k] = uchar(clamp(dst[k]*mul[k] + 255*add[k], 0.0f, 255.0f));
+        for(int k = 0; k < int(maxk); k++) dst[k] = uchar(clamp(dst[k]*mul[k] + 255*add[k], 0.0f, 255.0f));
     );
 }
 
@@ -282,7 +282,7 @@ void texcolorify(ImageData &s, const vec &color, vec weights)
     if(weights.iszero()) weights = vec(0.21f, 0.72f, 0.07f);
     writetex(s,
         float lum = dst[0]*weights.x + dst[1]*weights.y + dst[2]*weights.z;
-        loopk(3) dst[k] = uchar(clamp(lum*color[k], 0.0f, 255.0f));
+        for(int k = 0; k < int(3); k++) dst[k] = uchar(clamp(lum*color[k], 0.0f, 255.0f));
     );
 }
 
@@ -293,7 +293,7 @@ void texcolormask(ImageData &s, const vec &color1, const vec &color2)
     readwritetex(d, s,
         vec color;
         color.lerp(color2, color1, src[3]/255.0f);
-        loopk(3) dst[k] = uchar(clamp(color[k]*src[k], 0.0f, 255.0f));
+        for(int k = 0; k < int(3); k++) dst[k] = uchar(clamp(color[k]*src[k], 0.0f, 255.0f));
     );
     s.replace(d);
 }
@@ -528,7 +528,7 @@ void uploadtexture(GLenum target, GLenum internal, int tw, int th, GLenum format
         {
             row = 0;
             buf = new uchar[tw*th*bpp];
-            loopi(th) memcpy(&buf[i*tw*bpp], &((uchar *)pixels)[i*pitch], tw*bpp);
+            for(int i = 0; i < int(th); i++) memcpy(&buf[i*tw*bpp], &((uchar *)pixels)[i*pitch], tw*bpp);
         }
     }
     for(int level = 0, align = 0;; level++)
@@ -556,7 +556,7 @@ void uploadcompressedtexture(GLenum target, GLenum subtarget, GLenum format, int
     int hwlimit = target==GL_TEXTURE_CUBE_MAP_ARB ? hwcubetexsize : hwtexsize,
         sizelimit = levels > 1 && maxtexsize ? std::min(maxtexsize, hwlimit) : hwlimit;
     int level = 0;
-    loopi(levels)
+    for(int i = 0; i < int(levels); i++)
     {
         int size = ((w + align-1)/align) * ((h + align-1)/align) * blocksize;
         if(w <= sizelimit && h <= sizelimit)
@@ -763,7 +763,7 @@ static Texture *newtexture(Texture *t, const char *rname, ImageData &s, int clam
     {
         uchar *data = s.data;
         int levels = s.levels, level = 0;
-        if(canreduce && texreduce) loopi(std::min(texreduce, s.levels-1))
+        if(canreduce && texreduce) for(int i = 0; i < int(std::min(texreduce, s.levels-1)); i++)
         {
             data += s.calclevelsize(level++);
             levels--;
@@ -834,7 +834,7 @@ bool checkgrayscale(SDL_Surface *s)
     {
         if(s->format->palette->ncolors != 256 || s->format->colorkey) return false;
         const SDL_Color *colors = s->format->palette->colors;
-        loopi(256) if(colors[i].r != i || colors[i].g != i || colors[i].b != i) return false;
+        for(int i = 0; i < int(256); i++) if(colors[i].r != i || colors[i].g != i || colors[i].b != i) return false;
     }
     return true;
 }
@@ -869,7 +869,7 @@ void texflip(ImageData &s)
 {
     ImageData d(s.w, s.h, s.bpp);
     uchar *dst = d.data, *src = &s.data[s.pitch*s.h];
-    loopi(s.h)
+    for(int i = 0; i < int(s.h); i++)
     {
         src -= s.pitch;
         memcpy(dst, src, s.bpp*s.w);
@@ -882,7 +882,7 @@ void texnormal(ImageData &s, int emphasis)
 {
     ImageData d(s.w, s.h, 3);
     uchar *src = s.data, *dst = d.data;
-    loop(y, s.h) loop(x, s.w)
+    for(int y = 0; y < int(s.h); y++) for(int x = 0; x < int(s.w); x++)
     {
         vec normal(0.0f, 0.0f, 255.0f/emphasis);
         normal.x += src[y*s.pitch + ((x+s.w-1)%s.w)*s.bpp];
@@ -996,7 +996,7 @@ void blurnormals(int n, int w, int h, bvec *dst, const bvec *src, int margin)
 void texblur(ImageData &s, int n, int r)
 {
     if(s.bpp < 3) return;
-    loopi(r)
+    for(int i = 0; i < int(r); i++)
     {
         ImageData d(s.w, s.h, s.bpp);
         blurtexture(n, s.bpp, s.w, s.h, d.data, s.data);
@@ -1159,7 +1159,7 @@ static bool texturedata(ImageData &d, const char *tname, Slot::Tex *tex = NULL, 
             if(!end) break; \
             cmds = strchr(cmd, '<'); \
             size_t len = strcspn(cmd, ":,><"); \
-            loopi(4) \
+            for(int i = 0; i < int(4); i++)\
             { \
                 arg[i] = strchr(i ? arg[i-1] : cmd, i ? ',' : ':'); \
                 if(!arg[i] || arg[i] >= end) arg[i] = ""; \
@@ -1265,10 +1265,10 @@ void loadalphamask(Texture *t)
     if(!texturedata(s, t->name, NULL, false) || !s.data || s.compressed) return;
     t->alphamask = new uchar[s.h * ((s.w+7)/8)];
     uchar *srcrow = s.data, *dst = t->alphamask-1;
-    loop(y, s.h)
+    for(int y = 0; y < int(s.h); y++)
     {
         uchar *src = srcrow+s.bpp-1;
-        loop(x, s.w)
+        for(int x = 0; x < int(s.w); x++)
         {
             int offset = x%8;
             if(!offset) *++dst = 0;
@@ -1323,7 +1323,7 @@ COMMAND(texturereset, "i");
 void materialreset()
 {
     if(!(identflags&IDF_OVERRIDDEN) && !game::allowedittoggle()) return;
-    loopi((MATF_VOLUME|MATF_INDEX)+1) materialslots[i].reset();
+    for(int i = 0; i < int((MATF_VOLUME|MATF_INDEX)+1); i++) materialslots[i].reset();
 }
 
 COMMAND(materialreset, "");
@@ -1336,7 +1336,7 @@ void clearslots()
     resetslotshader();
     slots.deletecontents();
     vslots.deletecontents();
-    loopi((MATF_VOLUME|MATF_INDEX)+1) materialslots[i].reset();
+    for(int i = 0; i < int((MATF_VOLUME|MATF_INDEX)+1); i++) materialslots[i].reset();
     clonedvslots = 0;
 }
 
@@ -1370,10 +1370,10 @@ void compactvslot(int &index)
 void compactvslots(cube *c, int n)
 {
     if((compactvslotsprogress++&0xFFF)==0) renderprogress(std::min(float(compactvslotsprogress)/allocnodes, 1.0f), markingvslots ? "marking slots..." : "compacting slots...");
-    loopi(n)
+    for(int i = 0; i < int(n); i++)
     {
         if(c[i].children) compactvslots(c[i].children);
-        else loopj(6) if(vslots.inrange(c[i].texture[j]))
+        else for(int j = 0; j < int(6); j++) if(vslots.inrange(c[i].texture[j]))
         {
             VSlot &vs = *vslots[c[i].texture[j]];
             if(vs.index < 0) assignvslot(vs);
@@ -1439,7 +1439,7 @@ int compactvslots()
         VSlot &vs = *vslots[i];
         if(vs.index >= 0 && vs.layer && vslots.inrange(vs.layer)) vs.layer = vslots[vs.layer]->index;
     }
-    loopv(vslots) 
+    loopv(vslots)
     {
         while(vslots[i]->index >= 0 && vslots[i]->index != i)     
             std::swap(vslots[i], vslots[vslots[i]->index]); 
@@ -1517,7 +1517,7 @@ static void propagatevslot(VSlot *root, int changed)
 
 static void mergevslot(VSlot &dst, const VSlot &src, int diff, Slot *slot = NULL)
 {
-    if(diff & (1<<VSLOT_SHPARAM)) loopv(src.params) 
+    if(diff & (1<<VSLOT_SHPARAM)) loopv(src.params)
     {
         const ShaderParam &sp = src.params[i];
         loopvj(dst.params)
@@ -1593,7 +1593,7 @@ static bool comparevslot(const VSlot &dst, const VSlot &src, int diff)
     if(diff & (1<<VSLOT_SHPARAM)) 
     {
         if(src.params.length() != dst.params.length()) return false;
-        loopv(src.params) 
+        loopv(src.params)
         {
             const ShaderParam &sp = src.params[i], &dp = dst.params[i];
             if(sp.name != dp.name || memcmp(sp.val, dp.val, sizeof(sp.val))) return false;
@@ -1652,11 +1652,11 @@ VSlot *editvslot(const VSlot &src, const VSlot &delta)
 
 static void fixinsidefaces(cube *c, const ivec &o, int size, int tex)
 {
-    loopi(8) 
+    for(int i = 0; i < int(8); i++)
     {
         ivec co(i, o.x, o.y, o.z, size);
         if(c[i].children) fixinsidefaces(c[i].children, co, size>>1, tex);
-        else loopj(6) if(!visibletris(c[i], j, co.x, co.y, co.z, size))
+        else for(int j = 0; j < int(6); j++) if(!visibletris(c[i], j, co.x, co.y, co.z, size))
             c[i].texture[j] = tex;
     }
 }
@@ -1687,7 +1687,7 @@ const struct slottex
 
 int findslottex(const char *name)
 {
-    loopi(sizeof(slottexs)/sizeof(slottex))
+    for(int i = 0; i < int(sizeof(slottexs)/sizeof(slottex)); i++)
     {
         if(!strcmp(slottexs[i].name, name)) return slottexs[i].id;
     }
@@ -1833,7 +1833,7 @@ static void addbump(ImageData &c, ImageData &n, bool envmap, bool specmap)
         {
             readwritergbatex(c, n,
                 int z = std::max(int(src[2])*2-255, 0);
-                loopk(3) dst[k] = int(dst[k])*z/255;
+                for(int k = 0; k < int(3); k++) dst[k] = int(dst[k])*z/255;
                 dst[3] = z;
             );
         }
@@ -1841,7 +1841,7 @@ static void addbump(ImageData &c, ImageData &n, bool envmap, bool specmap)
         {
             readwritergbatex(c, n,
                 int z = std::max(int(src[2])*2-255, 0);
-                loopk(4) dst[k] = int(dst[k])*z/255;
+                for(int k = 0; k < int(4); k++) dst[k] = int(dst[k])*z/255;
             );
         }
     }
@@ -1850,7 +1850,7 @@ static void addbump(ImageData &c, ImageData &n, bool envmap, bool specmap)
     noenvmap:
         readwritergbtex(c, n,
             int z = std::max(int(src[2])*2-255, 0);
-            loopk(3) dst[k] = int(dst[k])*z/255;
+            for(int k = 0; k < int(3); k++) dst[k] = int(dst[k])*z/255;
         );
     }
 }
@@ -1860,13 +1860,13 @@ static void addglow(ImageData &c, ImageData &g, const vec &glowcolor)
     if(g.bpp < 3)
     {
         readwritergbtex(c, g,
-            loopk(3) dst[k] = clamp(int(dst[k]) + int(src[0]*glowcolor[k]), 0, 255);
+            for(int k = 0; k < int(3); k++) dst[k] = clamp(int(dst[k]) + int(src[0]*glowcolor[k]), 0, 255);
         );
     }
     else
     {
         readwritergbtex(c, g,
-            loopk(3) dst[k] = clamp(int(dst[k]) + int(src[k]*glowcolor[k]), 0, 255);
+            for(int k = 0; k < int(3); k++) dst[k] = clamp(int(dst[k]) + int(src[k]*glowcolor[k]), 0, 255);
         );
     }
 }
@@ -1876,7 +1876,7 @@ static void blenddecal(ImageData &c, ImageData &d)
     if(d.bpp < 4) return;
     readwritergbtex(c, d,
         uchar a = src[3];
-        loopk(3) dst[k] = (int(src[k])*int(a) + int(dst[k])*int(255-a))/255;
+        for(int k = 0; k < int(3); k++) dst[k] = (int(src[k])*int(a) + int(dst[k])*int(255-a))/255;
     );
 }
 
@@ -2065,7 +2065,7 @@ void linkslotshaders()
 {
     loopv(slots) if(slots[i]->loaded) linkslotshader(*slots[i]);
     loopv(vslots) if(vslots[i]->linked) linkvslotshader(*vslots[i]);
-    loopi((MATF_VOLUME|MATF_INDEX)+1) if(materialslots[i].loaded) 
+    for(int i = 0; i < int((MATF_VOLUME|MATF_INDEX)+1); i++) if(materialslots[i].loaded)
     {
         linkslotshader(materialslots[i]);
         linkvslotshader(materialslots[i]);
@@ -2093,7 +2093,7 @@ Texture *loadthumbnail(Slot &slot)
     int glow = -1;
     if(slot.texmask&(1<<TEX_GLOW)) 
     { 
-        loopvj(slot.sts) if(slot.sts[j].type==TEX_GLOW) { glow = j; break; } 
+        loopvj(slot.sts) if(slot.sts[j].type==TEX_GLOW) { glow = j; break; }
         if(glow >= 0) 
         {
             defformatstring(prefix)("<glow:%.2f/%.2f/%.2f>", vslot.glowcolor.x, vslot.glowcolor.y, vslot.glowcolor.z); 
@@ -2137,10 +2137,10 @@ Texture *loadthumbnail(Slot &slot)
                 forcergbimage(s);
                 forcergbimage(l); 
                 uchar *dstrow = &s.data[s.pitch*l.h + s.bpp*l.w], *srcrow = l.data;
-                loop(y, l.h) 
+                for(int y = 0; y < int(l.h); y++)
                 {
                     for(uchar *dst = dstrow, *src = srcrow, *end = &srcrow[l.w*l.bpp]; src < end; dst += s.bpp, src += l.bpp)
-                        loopk(3) dst[k] = src[k]; 
+                        for(int k = 0; k < int(3); k++) dst[k] = src[k];
                     dstrow += s.pitch;
                     srcrow += l.pitch;
                 }
@@ -2191,7 +2191,7 @@ void forcecubemapload(GLuint tex)
     if(!blend) glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glBegin(GL_POINTS);
-    loopi(3)
+    for(int i = 0; i < int(3); i++)
     {
         glColor4f(1, 1, 1, 0);
         glTexCoord3f(0, 0, 1);
@@ -2241,7 +2241,7 @@ Texture *cubemaploadwildcard(Texture *t, const char *name, bool mipit, bool msg,
     string sname;
     if(!wildcard) copystring(sname, tname);
     int tsize = 0, compress = 0;
-    loopi(6)
+    for(int i = 0; i < int(6); i++)
     {
         if(wildcard)
         {
@@ -2300,7 +2300,7 @@ Texture *cubemaploadwildcard(Texture *t, const char *name, bool mipit, bool msg,
     }
     }
     glGenTextures(1, &t->id);
-    loopi(6)
+    for(int i = 0; i < int(6); i++)
     {
         ImageData &s = surface[i];
         cubemapside &side = cubemapsides[i];
@@ -2387,7 +2387,7 @@ GLuint genenvmap(const vec &o, int envmapsize, int blur)
     float yaw = 0, pitch = 0;
     uchar *pixels = new uchar[3*rendersize*rendersize*2];
     glPixelStorei(GL_PACK_ALIGNMENT, texalign(pixels, rendersize, 3));
-    loopi(6)
+    for(int i = 0; i < int(6); i++)
     {
         const cubemapside &side = cubemapsides[i];
         switch(side.target)
@@ -2521,7 +2521,7 @@ void cleanuptextures()
     clearenvmaps();
     loopv(slots) slots[i]->cleanup();
     loopv(vslots) vslots[i]->cleanup();
-    loopi((MATF_VOLUME|MATF_INDEX)+1) materialslots[i].cleanup();
+    for(int i = 0; i < int((MATF_VOLUME|MATF_INDEX)+1); i++) materialslots[i].cleanup();
     enumerate(textures, Texture, tex, cleanuptexture(&tex));
 }
 
@@ -2834,10 +2834,10 @@ void savepng(const char *filename, ImageData &image, bool flip)
     z.next_out = (Bytef *)buf;
     z.avail_out = sizeof(buf);
 
-    loopi(image.h)
+    for(int i = 0; i < int(image.h); i++)
     {
         uchar filter = 0;
-        loopj(2)
+        for(int j = 0; j < int(2); j++)
         {
             z.next_in = j ? (Bytef *)image.data + (flip ? image.h-i-1 : i)*image.pitch : (Bytef *)&filter;
             z.avail_in = j ? image.w*image.bpp : 1;
@@ -2926,7 +2926,7 @@ void savetga(const char *filename, ImageData &image, bool flip)
     f->write(&hdr, sizeof(hdr));
 
     uchar buf[128*4];
-    loopi(image.h)
+    for(int i = 0; i < int(image.h); i++)
     {
         uchar *src = image.data + (flip ? i : image.h - i - 1)*image.pitch;
         for(int remaining = image.w; remaining > 0;)
@@ -2958,7 +2958,7 @@ void savetga(const char *filename, ImageData &image, bool flip)
             }
             else raw = std::min(remaining, 128);
             uchar *dst = buf;
-            loopj(raw)
+            for(int j = 0; j < int(raw); j++)
             {
                 dst[0] = src[2];
                 dst[1] = src[1];
@@ -2990,7 +2990,7 @@ const char *imageexts[NUMIMG] = { ".bmp", ".tga", ".png" };
 int guessimageformat(const char *filename, int format = IMG_BMP)
 {
     int len = strlen(filename);
-    loopi(NUMIMG)
+    for(int i = 0; i < int(NUMIMG); i++)
     {
         int extlen = strlen(imageexts[i]);
         if(len >= extlen && !strcasecmp(&filename[len-extlen], imageexts[i])) return i;

@@ -66,7 +66,7 @@ void resolverinit()
     resultcond = SDL_CreateCond();
 
     SDL_LockMutex(resolvermutex);
-    loopi(RESOLVERTHREADS)
+    for(int i = 0; i < int(RESOLVERTHREADS); i++)
     {
         resolverthread &rt = resolverthreads.add();
         rt.query = NULL;
@@ -156,7 +156,7 @@ bool resolverwait(const char *name, ENetAddress *address)
     for(;;) 
     {
         SDL_CondWaitTimeout(resultcond, resolvermutex, 250);
-        loopv(resolverresults) if(resolverresults[i].query == name) 
+        loopv(resolverresults) if(resolverresults[i].query == name)
         {
             address->host = resolverresults[i].address.host;
             resolverresults.remove(i);
@@ -249,7 +249,7 @@ struct serverinfo
     void clearpings()
     {
         ping = WAITING;
-        loopk(MAXPINGS) pings[k] = WAITING;
+        for(int k = 0; k < int(MAXPINGS); k++) pings[k] = WAITING;
         nextping = 0;
         lastping = -1;
     }
@@ -276,7 +276,7 @@ struct serverinfo
     void calcping()
         {
         int numpings = 0, totalpings = 0;
-        loopk(MAXPINGS) if(pings[k] != WAITING) { totalpings += pings[k]; numpings++; }
+        for(int k = 0; k < int(MAXPINGS); k++) if(pings[k] != WAITING) { totalpings += pings[k]; numpings++; }
         ping = numpings ? totalpings/numpings : WAITING;
         }
 
@@ -379,7 +379,7 @@ void pingservers()
 
     static int lastping = 0;
     if(lastping >= servers.length()) lastping = 0;
-    loopi(maxservpings ? std::min(servers.length(), maxservpings) : servers.length())
+    for(int i = 0; i < int(maxservpings ? std::min(servers.length(), maxservpings) : servers.length()); i++)
     {
         serverinfo &si = *servers[lastping];
         if(++lastping >= servers.length()) lastping = 0;
@@ -461,7 +461,7 @@ void checkpings()
         si->numplayers = getint(p);
         int numattr = getint(p);
         si->attr.setsize(0);
-        loopj(numattr) { int attr = getint(p); if(p.overread()) break; si->attr.add(attr); }
+        for(int j = 0; j < int(numattr); j++) { int attr = getint(p); if(p.overread()) break; si->attr.add(attr); }
         getstring(text, p);
         filtertext(si->map, text, false);
         getstring(text, p);
@@ -512,7 +512,7 @@ const char *showservers(g3d_gui *cgui, uint *header, int pagemin, int pagemax)
         if(header) execute(header);
         int end = servers.length();
         cgui->pushlist();
-        loopi(10)
+        for(int i = 0; i < int(10); i++)
         {
             if(!game::serverinfostartcolumn(cgui, i)) break;
             for(int j = start; j < end; j++)
@@ -655,7 +655,7 @@ void writeservercfg()
     }
     if(kept) f->printf("\n");
     f->printf("// servers connected to are added here automatically\n\n");
-    loopv(servers) 
+    loopv(servers)
     {
         serverinfo *s = servers[i];
         if(!s->keep) 

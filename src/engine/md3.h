@@ -73,7 +73,7 @@ struct md3 : vertmodel, vertloader<md3>
             numframes = header.numframes;
 
             int mesh_offset = header.ofs_meshes;
-            loopi(header.nummeshes)
+            for(int i = 0; i < int(header.nummeshes); i++)
             {
                 vertmesh &m = *new vertmesh;
                 m.group = this;
@@ -89,12 +89,12 @@ struct md3 : vertmodel, vertloader<md3>
                 m.numtris = mheader.numtriangles; 
                 m.tris = new tri[m.numtris];
                 f->seek(mesh_offset + mheader.ofs_triangles, SEEK_SET);
-                loopj(m.numtris)
+                for(int j = 0; j < int(m.numtris); j++)
                 {
                     md3triangle tri;
                     f->read(&tri, sizeof(md3triangle)); // read the triangles
                     lilswap(tri.vertexindices, 3);
-                    loopk(3) m.tris[j].vert[k] = (ushort)tri.vertexindices[k];
+                    for(int k = 0; k < int(3); k++) m.tris[j].vert[k] = (ushort)tri.vertexindices[k];
                 }
 
                 m.numverts = mheader.numvertices;
@@ -105,7 +105,7 @@ struct md3 : vertmodel, vertloader<md3>
                 
                 m.verts = new vert[numframes*m.numverts];
                 f->seek(mesh_offset + mheader.ofs_vertices, SEEK_SET); 
-                loopj(numframes*m.numverts)
+                for(int j = 0; j < int(numframes*m.numverts); j++)
                 {
                     md3vertex v;
                     f->read(&v, sizeof(md3vertex)); // read the vertices
@@ -132,7 +132,7 @@ struct md3 : vertmodel, vertloader<md3>
                 f->seek(header.ofs_tags, SEEK_SET);
                 md3tag tag;
 
-                loopi(header.numframes*header.numtags)
+                for(int i = 0; i < int(header.numframes*header.numtags); i++)
                 {
                     f->read(&tag, sizeof(md3tag));
                     lilswap(&tag.pos.x, 12);
@@ -140,13 +140,13 @@ struct md3 : vertmodel, vertloader<md3>
                     matrix3x4 &m = tags[i].transform;
                     tag.pos.y *= -1;
                     // undo the -y
-                    loopj(3) tag.rotation[1][j] *= -1;
+                    for(int j = 0; j < int(3); j++) tag.rotation[1][j] *= -1;
                     // then restore it
-                    loopj(3) tag.rotation[j][1] *= -1;
+                    for(int j = 0; j < int(3); j++) tag.rotation[j][1] *= -1;
                     m.a.w = tag.pos.x;
                     m.b.w = tag.pos.y;
                     m.c.w = tag.pos.z;
-                    loopj(3)
+                    for(int j = 0; j < int(3); j++)
                     {
                         m.a[j] = tag.rotation[j][0];
                         m.b[j] = tag.rotation[j][1];
@@ -156,9 +156,9 @@ struct md3 : vertmodel, vertloader<md3>
                     tags[i].pos = vec(tag.pos.x, -tag.pos.y, tag.pos.z);
                     memcpy(tags[i].transform, tag.rotation, sizeof(tag.rotation));
                     // undo the -y
-                    loopj(3) tags[i].transform[1][j] *= -1;
+                    for(int j = 0; j < int(3); j++) tags[i].transform[1][j] *= -1;
                     // then restore it
-                    loopj(3) tags[i].transform[j][1] *= -1;
+                    for(int j = 0; j < int(3); j++) tags[i].transform[j][1] *= -1;
 #endif
                 }
             }

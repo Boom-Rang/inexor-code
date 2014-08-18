@@ -23,7 +23,7 @@ namespace game
         vecfromyawpitch(camera1->yaw, 0, 1, 0, dir);
         float scale = calcradarscale();
         glBegin(GL_TRIANGLE_FAN);
-        loopi(16)
+        for(int i = 0; i < int(16); i++)
         {
             vec tc = vec(dir).rotate_around_z(i/16.0f*2*M_PI);
             glTexCoord2f(pos.x + tc.x*scale*minimapscale.x, pos.y + tc.y*scale*minimapscale.y);
@@ -66,7 +66,7 @@ namespace game
         if(!radarteammates) return;
         float scale = calcradarscale();
         int alive = 0, dead = 0;
-        loopv(players) 
+        loopv(players)
         {
             fpsent *o = players[i];
             if(o != d && o->state == CS_ALIVE && isteam(o->team, d->team))
@@ -80,7 +80,7 @@ namespace game
             }
         }
         if(alive) glEnd();
-        loopv(players) 
+        loopv(players)
         {
             fpsent *o = players[i];
             if(o != d && o->state == CS_DEAD && isteam(o->team, d->team))
@@ -498,7 +498,7 @@ namespace game
         if(multiplayer(false) && !m_mp(mode))
         {
             conoutf(CON_ERROR, "mode %s (%d) not supported in multiplayer", server::modename(gamemode), gamemode);
-            loopi(NUMGAMEMODES) if(m_mp(STARTGAMEMODE + i)) { mode = STARTGAMEMODE + i; break; }
+            for(int i = 0; i < int(NUMGAMEMODES); i++) if(m_mp(STARTGAMEMODE + i)) { mode = STARTGAMEMODE + i; break; }
         }
 
         gamemode = mode;
@@ -773,7 +773,7 @@ namespace game
                 {
                     int n = va_arg(args, int);
                     int *v = va_arg(args, int *);
-                    loopi(n) putint(p, v[i]);
+                    for(int i = 0; i < int(n); i++) putint(p, v[i]);
                     numi += n;
                     break;
                 }
@@ -781,14 +781,14 @@ namespace game
                 case 'i':
                 {
                     int n = isdigit(*fmt) ? *fmt++-'0' : 1;
-                    loopi(n) putint(p, va_arg(args, int));
+                    for(int i = 0; i < int(n); i++) putint(p, va_arg(args, int));
                     numi += n;
                     break;
                 }
                 case 'f':
                 {
                     int n = isdigit(*fmt) ? *fmt++-'0' : 1;
-                    loopi(n) putfloat(p, (float)va_arg(args, double));
+                    for(int i = 0; i < int(n); i++) putfloat(p, (float)va_arg(args, double));
                     numf += n;
                     break;
                 }
@@ -886,7 +886,7 @@ namespace game
         }
         if((lookupmaterial(d->feetpos())&MATF_CLIP) == MAT_GAMECLIP) flags |= 1<<7;
         putuint(q, flags);
-        loopk(3)
+        for(int k = 0; k < int(3); k++)
         {
             q.put(o[k]&0xFF);
             q.put((o[k]>>8)&0xFF);
@@ -1057,7 +1057,7 @@ namespace game
                 int cn = getuint(p), physstate = p.get(), flags = getuint(p);
                 vec o, vel, falling;
                 float yaw, pitch, roll;
-                loopk(3)
+                for(int k = 0; k < int(3); k++)
                 {
                     int n = p.get(); n |= p.get()<<8; if(flags&(1<<k)) { n |= p.get()<<16; if(n&0x800000) n |= -1<<24; }
                     o[k] = n/DMF;
@@ -1169,13 +1169,13 @@ namespace game
         if(resume && d==player1)
         {
             getint(p);
-            loopi(GUN_PISTOL-GUN_SG+1) getint(p);
+            for(int i = 0; i < int(GUN_PISTOL-GUN_SG+1); i++) getint(p);
         }
         else
         {
             int gun = getint(p);
             d->gunselect = clamp(gun, int(GUN_FIST), int(GUN_BOMB));
-            loopi(GUN_PISTOL-GUN_SG+1) d->ammo[GUN_SG+i] = getint(p);
+            for(int i = 0; i < int(GUN_PISTOL-GUN_SG+1); i++) d->ammo[GUN_SG+i] = getint(p);
         }
     }
 
@@ -1435,8 +1435,8 @@ namespace game
             {
                 int scn = getint(p), gun = getint(p), id = getint(p);
                 vec from, to;
-                loopk(3) from[k] = getint(p)/DMF;
-                loopk(3) to[k] = getint(p)/DMF;
+                for(int k = 0; k < int(3); k++) from[k] = getint(p)/DMF;
+                for(int k = 0; k < int(3); k++) to[k] = getint(p)/DMF;
                 fpsent *s = getclient(scn);
                 if(!s) break;
                 if(gun>GUN_FIST && gun<=GUN_BOMB && s->ammo[gun]) s->ammo[gun]--;
@@ -1479,7 +1479,7 @@ namespace game
                 int tcn = getint(p), gun = getint(p), damage = getint(p);
                 fpsent *target = getclient(tcn);
                 vec dir;
-                loopk(3) dir[k] = getint(p)/DNF;
+                for(int k = 0; k < int(3); k++) dir[k] = getint(p)/DNF;
                 if(target) target->hitpush(damage * (target->health<=0 ? deadpush : 1), dir, NULL, gun);
                 break;
             }
@@ -1562,7 +1562,7 @@ namespace game
             {
                 int id = getint(p), type = getint(p);
                 vec itemloc;
-                loopk(3) itemloc[k] = getint(p)/DMF;
+                for(int k = 0; k < int(3); k++) itemloc[k] = getint(p)/DMF;
                 if(entities::getents().length()<=id) {
                     while(entities::getents().length()<id) entities::getents().add(entities::newentity())->type = ET_EMPTY;
                     int eind;
@@ -1702,7 +1702,7 @@ namespace game
             {
                 int demos = getint(p);
                 if(demos <= 0) conoutf("no demos available");
-                else loopi(demos)
+                else for(int i = 0; i < int(demos); i++)
                 {
                     getstring(text, p);
                     if(p.overread()) break;

@@ -115,7 +115,7 @@ static void showglslinfo(GLenum type, GLuint obj, const char *name, const char *
             if(type) glGetShaderInfoLog_(obj, length, &length, log);
             else glGetProgramInfoLog_(obj, length, &length, log);
             fprintf(l, "%s\n", log);
-            if(source) loopi(1000)
+            if(source) for(int i = 0; i < int(1000); i++)
             {
                 const char *next = strchr(source, '\n');
                 fprintf(l, "%d: ", i+1);
@@ -212,7 +212,7 @@ static void linkglslprogram(Shader &s, bool msg = true)
     if(success)
     {
         glUseProgram_(s.program);
-        loopi(8)
+        for(int i = 0; i < int(8); i++)
         {
             defformatstring(arg)("tex%d", i);
             GLint loc = glGetUniformLocation_(s.program, arg);
@@ -322,7 +322,7 @@ static void allocglsluniformparam(Shader &s, int type, int index, bool local = f
         defformatstring(altname)("%s%d", type==SHPARAM_VERTEX ? "v" : "p", index);
         loc = glGetUniformLocation_(s.program, altname);
     }
-    if(loc >= 0) loopi(s.numextparams)
+    if(loc >= 0) for(int i = 0; i < int(s.numextparams); i++)
     {
         LocalShaderParamState &ext = s.extparams[i];
         if(ext.loc != loc) continue;
@@ -367,7 +367,7 @@ static void setglsluniformformat(Shader &s, const char *name, GLenum format, int
         s.defaultparams[j].format = format;
         return;
     }
-    loopj(s.numextparams) if(s.extparams[j].loc == loc)
+    for(int j = 0; j < int(s.numextparams); j++) if(s.extparams[j].loc == loc)
     {
         s.extparams[j].format = format;
         return;
@@ -381,7 +381,7 @@ static void allocglslactiveuniforms(Shader &s)
     GLint numactive = 0;
     glGetProgramiv_(s.program, GL_ACTIVE_UNIFORMS, &numactive);
     string name;
-    loopi(numactive)
+    for(int i = 0; i < int(numactive); i++)
     {
         GLsizei namelen = 0;
         GLint size = 0;
@@ -396,7 +396,7 @@ static void allocglslactiveuniforms(Shader &s)
 
 static inline bool duplicateenvparam(GlobalShaderParamState &param)
 {
-    loopj(RESERVEDSHADERPARAMS) 
+    for(int j = 0; j < int(RESERVEDSHADERPARAMS); j++)
     {
         GlobalShaderParamState &vp = vertexparamstate[j];
         if(vp.name && !vp.local && vp.version > param.version && !strcmp(vp.name, param.name))
@@ -457,9 +457,9 @@ void Shader::allocenvparams(Slot *slot)
         extpixparams = extvertparams + RESERVEDSHADERPARAMS;
     }
     memset(extvertparams, ALLOCEXTPARAM, 2*RESERVEDSHADERPARAMS);
-    loopi(RESERVEDSHADERPARAMS) if(vertexparamstate[i].name && !vertexparamstate[i].local && !duplicateenvparam(vertexparamstate[i]))
+    for(int i = 0; i < int(RESERVEDSHADERPARAMS); i++) if(vertexparamstate[i].name && !vertexparamstate[i].local && !duplicateenvparam(vertexparamstate[i]))
         allocglsluniformparam(*this, SHPARAM_VERTEX, i);
-    loopi(RESERVEDSHADERPARAMS) if(pixelparamstate[i].name && !pixelparamstate[i].local && !duplicateenvparam(pixelparamstate[i]))
+    for(int i = 0; i < int(RESERVEDSHADERPARAMS); i++) if(pixelparamstate[i].name && !pixelparamstate[i].local && !duplicateenvparam(pixelparamstate[i]))
         allocglsluniformparam(*this, SHPARAM_PIXEL, i);
     allocglslactiveuniforms(*this);
 }
@@ -504,14 +504,14 @@ static inline bool sortparamversions(const GlobalShaderParamState *x, const Glob
 static uint resetparamversions()
 {
     GlobalShaderParamState *params[2*(RESERVEDSHADERPARAMS + MAXSHADERPARAMS)];
-    loopi(RESERVEDSHADERPARAMS + MAXSHADERPARAMS)
+    for(int i = 0; i < int(RESERVEDSHADERPARAMS + MAXSHADERPARAMS); i++)
     {
         params[2*i+0] = &vertexparamstate[i];  
         params[2*i+1] = &pixelparamstate[i];
     }
     quicksort(params, 2*(RESERVEDSHADERPARAMS + MAXSHADERPARAMS), sortparamversions);
     paramversion = 0;
-    loopi(2*(RESERVEDSHADERPARAMS + MAXSHADERPARAMS)) params[i]->version = ++paramversion;
+    for(int i = 0; i < int(2*(RESERVEDSHADERPARAMS + MAXSHADERPARAMS)); i++) params[i]->version = ++paramversion;
     return paramversion;
 }
  
@@ -603,7 +603,7 @@ void Shader::flushenvparams(Slot *slot)
     {
         if(!used) allocenvparams(slot);
             
-        loopi(numextparams)
+        for(int i = 0; i < int(numextparams); i++)
         {
             LocalShaderParamState &ext = extparams[i];
             if(ext.index >= 0)
@@ -612,14 +612,14 @@ void Shader::flushenvparams(Slot *slot)
     }
     else if(dirtyenvparams)
     {
-        loopi(RESERVEDSHADERPARAMS)
+        for(int i = 0; i < int(RESERVEDSHADERPARAMS); i++)
         {
             ShaderParamState &val = vertexparamstate[i];
             if(val.local || val.dirty!=ShaderParamState::DIRTY) continue;
             glProgramEnvParameter4fvARB_(GL_VERTEX_PROGRAM_ARB, i, val.val);
             val.dirty = ShaderParamState::CLEAN;
         }
-        loopi(RESERVEDSHADERPARAMS)
+        for(int i = 0; i < int(RESERVEDSHADERPARAMS); i++)
         {
             ShaderParamState &val = pixelparamstate[i];
             if(val.local || val.dirty!=ShaderParamState::DIRTY) continue;
@@ -771,7 +771,7 @@ void Shader::cleanup(bool invalid)
     if(standard || invalid)
     {
         type = SHADER_INVALID;
-        loopi(MAXVARIANTROWS) variants[i].setsize(0);
+        for(int i = 0; i < int(MAXVARIANTROWS); i++) variants[i].setsize(0);
         DELETEA(vsstr);
         DELETEA(psstr);
         DELETEA(defer);
@@ -779,7 +779,7 @@ void Shader::cleanup(bool invalid)
         attriblocs.setsize(0);
         uniformlocs.setsize(0);
         altshader = NULL;
-        loopi(MAXSHADERDETAIL) fastshader[i] = this;
+        for(int i = 0; i < int(MAXSHADERDETAIL); i++) fastshader[i] = this;
         reusevs = reuseps = NULL;
     }
 }
@@ -1008,9 +1008,9 @@ static bool findunusedtexcoordcomponent(const char *str, int &texcoord, int &com
             }
         }
     }
-    loopi(sizeof(texcoords)) if(texcoords[i]>0 && texcoords[i]<0xF)
+    for(int i = 0; i < int(sizeof(texcoords)); i++) if(texcoords[i]>0 && texcoords[i]<0xF)
     {
-        loopk(4) if(!(texcoords[i]&(1<<k))) { texcoord = i; component = k; return true; }
+        for(int k = 0; k < int(4); k++) if(!(texcoords[i]&(1<<k))) { texcoord = i; component = k; return true; }
     }
     return false;
 }
@@ -1138,7 +1138,7 @@ static bool genwatervariant(Shader &s, const char *sname, vector<char> &vs, vect
         {
             uint usedtc = findusedtexcoords(vs.getbuf());
             int reservetc = row%2 ? reserveshadowmaptc : reservedynlighttc;
-            loopi(maxtexcoords-reservetc) if(!(usedtc&(1<<i))) { fadetc = i; fadecomp = 3; break; }
+            for(int i = 0; i < int(maxtexcoords-reservetc); i++) if(!(usedtc&(1<<i))) { fadetc = i; fadecomp = 3; break; }
         }
         if(fadetc>=0)
         {
@@ -1179,7 +1179,7 @@ static void gendynlightvariant(Shader &s, const char *sname, const char *vs, con
         int reservetc = row%2 ? reserveshadowmaptc : reservedynlighttc;
         if(maxtexcoords-reservetc<0) return;
         int limit = minimizedynlighttcusage ? 1 : MAXDYNLIGHTS;
-        loopi(maxtexcoords-reservetc) if(!(usedtc&(1<<i))) 
+        for(int i = 0; i < int(maxtexcoords-reservetc); i++) if(!(usedtc&(1<<i)))
         {
             lights[numlights++] = i;    
             if(numlights>=limit) break;
@@ -1215,7 +1215,7 @@ static void gendynlightvariant(Shader &s, const char *sname, const char *vs, con
     }
 
     vector<char> vsdl, psdl;
-    loopi(MAXDYNLIGHTS)
+    for(int i = 0; i < int(MAXDYNLIGHTS); i++)
     {
         vsdl.setsize(0);
         psdl.setsize(0);
@@ -1223,7 +1223,7 @@ static void gendynlightvariant(Shader &s, const char *sname, const char *vs, con
         if(psmain >= ps) psdl.put(ps, psmain - ps);
         if(s.type & SHADER_GLSLANG)
         {
-            loopk(i+1)
+            for(int k = 0; k < int(i+1); k++)
             {
                 defformatstring(pos)("%sdynlight%d%s%s", 
                     !k || k==numlights ? "uniform vec4 " : " ", 
@@ -1233,12 +1233,12 @@ static void gendynlightvariant(Shader &s, const char *sname, const char *vs, con
                 if(k<numlights) vsdl.put(pos, strlen(pos));
                 else psdl.put(pos, strlen(pos));
             }
-            loopk(i+1)
+            for(int k = 0; k < int(i+1); k++)
             {
                 defformatstring(color)("%sdynlight%dcolor%s", !k ? "uniform vec4 " : " ", k, k==i ? ";\n" : ",");
                 psdl.put(color, strlen(color));
             }
-            loopk(std::min(i+1, numlights))
+            for(int k = 0; k < int(std::min(i+1, numlights)); k++)
             {
                 defformatstring(dir)("%sdynlight%ddir%s", !k ? "varying vec3 " : " ", k, k==i || k+1==numlights ? ";\n" : ",");
                 vsdl.put(dir, strlen(dir));
@@ -1249,7 +1249,7 @@ static void gendynlightvariant(Shader &s, const char *sname, const char *vs, con
         vsdl.put(vsmain, vspragma-vsmain);
         psdl.put(psmain, pspragma-psmain);
 
-        loopk(i+1)
+        for(int k = 0; k < int(i+1); k++)
         {
             extern int ati_dph_bug;
             string tc, dl;
@@ -1318,7 +1318,7 @@ static void genshadowmapvariant(Shader &s, const char *sname, const char *vs, co
     {
         uint usedtc = findusedtexcoords(vs);
         if(maxtexcoords-reserveshadowmaptc<0) return;
-        loopi(maxtexcoords-reserveshadowmaptc) if(!(usedtc&(1<<i))) { smtc = i; break; }
+        for(int i = 0; i < int(maxtexcoords-reserveshadowmaptc); i++) if(!(usedtc&(1<<i))) { smtc = i; break; }
         extern int emulatefog;
         if(smtc<0 && emulatefog && reserveshadowmaptc>0 && !(usedtc&(1<<(maxtexcoords-reserveshadowmaptc))) && strstr(ps, "OPTION ARB_fog_linear;"))
         {
@@ -1588,7 +1588,7 @@ void Shader::fixdetailshader(bool force, bool recurse)
         alt = alt->altshader;
     } while(alt && alt!=this);
 
-    if(recurse && detailshader) loopi(MAXVARIANTROWS) loopvj(detailshader->variants[i]) detailshader->variants[i][j]->fixdetailshader(force, false);
+    if(recurse && detailshader) for(int i = 0; i < int(MAXVARIANTROWS); i++) loopvj(detailshader->variants[i]) detailshader->variants[i][j]->fixdetailshader(force, false);
 }
 
 Shader *useshaderbyname(const char *name)
@@ -1776,16 +1776,16 @@ void linkvslotshader(VSlot &s, bool load)
     if(s.slot->texmask&(1<<TEX_GLOW))
     {
         ShaderParam *cparam = findshaderparam(s, "glowcolor");
-        if(cparam) loopk(3) s.glowcolor[k] = clamp(cparam->val[k], 0.0f, 1.0f);
+        if(cparam) for(int k = 0; k < int(3); k++) s.glowcolor[k] = clamp(cparam->val[k], 0.0f, 1.0f);
         ShaderParam *pulseparam = findshaderparam(s, "pulseglowcolor"), 
                     *speedparam = findshaderparam(s, "pulseglowspeed");
-        if(pulseparam) loopk(3) s.pulseglowcolor[k] = clamp(pulseparam->val[k], 0.0f, 1.0f);
+        if(pulseparam) for(int k = 0; k < int(3); k++) s.pulseglowcolor[k] = clamp(pulseparam->val[k], 0.0f, 1.0f);
         if(speedparam) s.pulseglowspeed = speedparam->val[0]/1000.0f;
     }
     if(sh->type&SHADER_ENVMAP)
     {
         ShaderParam *envparam = findshaderparam(s, "envscale");
-        if(envparam) loopk(3) s.envscale[k] = clamp(envparam->val[k], 0.0f, 1.0f);
+        if(envparam) for(int k = 0; k < int(3); k++) s.envscale[k] = clamp(envparam->val[k], 0.0f, 1.0f);
     }
 }
 
@@ -1801,7 +1801,7 @@ void fastshader(char *nice, char *fast, int *detail)
 {
     Shader *ns = shaders.access(nice), *fs = shaders.access(fast);
     if(!ns || !fs) return;
-    loopi(std::min(*detail+1, MAXSHADERDETAIL)) ns->fastshader[i] = fs;
+    for(int i = 0; i < int(std::min(*detail+1, MAXSHADERDETAIL)); i++) ns->fastshader[i] = fs;
     ns->fixdetailshader(false);
 }
 
@@ -1937,7 +1937,7 @@ void renderpostfx()
     }
 
     int binds[NUMPOSTFXBINDS];
-    loopi(NUMPOSTFXBINDS) binds[i] = -1;
+    for(int i = 0; i < int(NUMPOSTFXBINDS); i++) binds[i] = -1;
     loopv(postfxtexs) postfxtexs[i].used = -1;
 
     binds[0] = allocatepostfxtex(0);
@@ -1975,7 +1975,7 @@ void renderpostfx()
         setlocalparamfv("params", SHPARAM_VERTEX, 0, p.params.v);
         setlocalparamfv("params", SHPARAM_PIXEL, 0, p.params.v);
         int tw = w, th = h, tmu = 0;
-        loopj(NUMPOSTFXBINDS) if(p.inputs&(1<<j) && binds[j] >= 0)
+        for(int j = 0; j < int(NUMPOSTFXBINDS); j++) if(p.inputs&(1<<j) && binds[j] >= 0)
         {
             if(!tmu)
             {
@@ -1994,7 +1994,7 @@ void renderpostfx()
         glTexCoord2f(tw, th); glVertex2f( 1,  1);
         glEnd();
 
-        loopj(NUMPOSTFXBINDS) if(p.freeinputs&(1<<j) && binds[j] >= 0)
+        for(int j = 0; j < int(NUMPOSTFXBINDS); j++) if(p.freeinputs&(1<<j) && binds[j] >= 0)
         {
             postfxtexs[binds[j]].used = -1;
             binds[j] = -1;
@@ -2179,7 +2179,7 @@ void colortmu(int n, float r, float g, float b, float a)
 void committmufunc(GLenum mode, bool rgb, tmufunc &dst, tmufunc &src)
 {
     if(dst.combine!=src.combine) glTexEnvi(GL_TEXTURE_ENV, rgb ? GL_COMBINE_RGB_ARB : GL_COMBINE_ALPHA_ARB, src.combine);
-    loopi(3)
+    for(int i = 0; i < int(3); i++)
     {
         if(dst.sources[i]!=src.sources[i]) glTexEnvi(GL_TEXTURE_ENV, (rgb ? GL_SOURCE0_RGB_ARB : GL_SOURCE0_ALPHA_ARB)+i, src.sources[i]);
         if(dst.ops[i]!=src.ops[i]) glTexEnvi(GL_TEXTURE_ENV, (rgb ? GL_OPERAND0_RGB_ARB : GL_OPERAND0_ALPHA_ARB)+i, src.ops[i]);
@@ -2223,7 +2223,7 @@ void inittmus()
         GLint val;
         glGetIntegerv(GL_MAX_TEXTURE_UNITS_ARB, &val);
         maxtmus = std::max(1, std::min(MAXTMUS, int(val)));
-        loopi(maxtmus)
+        for(int i = 0; i < int(maxtmus); i++)
         {
             glActiveTexture_(GL_TEXTURE0_ARB+i);
             resettmu(i);
@@ -2258,14 +2258,14 @@ void cleanupshaders()
         glDisable(GL_FRAGMENT_PROGRAM_ARB);
     }
     if(renderpath==R_GLSLANG || renderpath==R_ASMGLSLANG) glUseProgram_(0);
-    loopi(RESERVEDSHADERPARAMS + MAXSHADERPARAMS)
+    for(int i = 0; i < int(RESERVEDSHADERPARAMS + MAXSHADERPARAMS); i++)
     {
         vertexparamstate[i].dirty = ShaderParamState::INVALID;
         pixelparamstate[i].dirty = ShaderParamState::INVALID;
     }
 
     tmu invalidtmu = INVALIDTMU;
-    loopi(MAXTMUS) tmus[i] = invalidtmu;
+    for(int i = 0; i < int(MAXTMUS); i++) tmus[i] = invalidtmu;
 }
 
 void reloadshaders()
@@ -2282,7 +2282,7 @@ void reloadshaders()
             defformatstring(info)("shader %s", s.name);
             renderprogress(0.0, info);
             if(!s.compile()) s.cleanup(true);
-            loopi(MAXVARIANTROWS) loopvj(s.variants[i])
+            for(int i = 0; i < int(MAXVARIANTROWS); i++) loopvj(s.variants[i])
             {
                 Shader *v = s.variants[i][j];
                 if((v->reusevs && v->reusevs->type&SHADER_INVALID) || 
@@ -2304,7 +2304,7 @@ void setupblurkernel(int radius, float sigma, float *weights, float *offsets)
     offsets[0] = 0;
     // rely on bilinear filtering to sample 2 pixels at once
     // transforms a*X + b*Y into (u+v)*[X*u/(u+v) + Y*(1 - u/(u+v))]
-    loopi(radius)
+    for(int i = 0; i < int(radius); i++)
     {
         float weight1 = exp(-((2*i)*(2*i)) / (2*sigma*sigma)) / sigma,
               weight2 = exp(-((2*i+1)*(2*i+1)) / (2*sigma*sigma)) / sigma,
@@ -2314,7 +2314,7 @@ void setupblurkernel(int radius, float sigma, float *weights, float *offsets)
         offsets[i+1] = offset;
         total += 2*scale;
     }
-    loopi(radius+1) weights[i] /= total;
+    for(int i = 0; i < int(radius+1); i++) weights[i] /= total;
     for(int i = radius+1; i <= MAXBLURRADIUS; i++) weights[i] = offsets[i] = 0;
 }
 
@@ -2337,7 +2337,7 @@ void setblurshader(int pass, int size, int radius, float *weights, float *offset
         pass==1 ? offsets[1]/size : offsets[0]/size,
         (offsets[2] - offsets[1])/size,
         (offsets[3] - offsets[2])/size);
-    loopk(4)
+    for(int k = 0; k < int(4); k++)
     {
         static const char * const names[4] = { "offset4", "offset5", "offset6", "offset7" };
         setlocalparamf(names[k], SHPARAM_PIXEL, 3+k,

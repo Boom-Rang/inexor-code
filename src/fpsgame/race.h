@@ -81,7 +81,7 @@ struct raceclientmode : clientmode
       putint(p, v.length());
       loopv(v){
         spawnloc &sploc = v[i];
-        loopk(3) putint(p, int(sploc.o[k]*DMF));
+        for(int k = 0; k < int(3); k++) putint(p, int(sploc.o[k]*DMF));
         putint(p, sploc.team);
         putint(p, sploc.index);
       }
@@ -342,9 +342,9 @@ struct raceclientmode : clientmode
 
     bool parsespawnloc(ucharbuf &p, bool commit) {
         int numsploc = getint(p);
-        loopi(numsploc){
+        for(int i = 0; i < int(numsploc); i++){
             vec o;
-            loopk(3) o[k] = std::max(getint(p)/DMF, 0.0f);
+            for(int k = 0; k < int(3); k++) o[k] = std::max(getint(p)/DMF, 0.0f);
             int team = getint(p), index = getint(p);
             if(p.overread()) break;
             if(m_teammode ? team < 1 || team > 2 : team) return false;
@@ -509,7 +509,7 @@ struct raceclientmode : clientmode
         }
         vector<spawnloc*> pool[3];
         loopv(spawnlocs) pool[spawnlocs[i]->team].add(spawnlocs[i]);
-        loopi(3) pool[i].shuffle();
+        for(int i = 0; i < int(3); i++) pool[i].shuffle();
         for(int i = 0; i < activepl.length(); i++){
             vector<spawnloc*>& tpool = pool[m_teammode ? bombteamname(activepl[i]->team) : 0];
             if(tpool.length()){

@@ -179,7 +179,7 @@ void renderbackground(const char *caption, Texture *mapshot, const char *mapname
         numdecals = sizeof(decals)/sizeof(decals[0]);
         numdecals = numdecals/3 + rnd((numdecals*2)/3 + 1);
         float maxsize = std::min(w, h)/16.0f;
-        loopi(numdecals)
+        for(int i = 0; i < int(numdecals); i++)
         {
             decal d = { rndscale(w), rndscale(h), maxsize/2 + rndscale(maxsize/2), rnd(2) };
             decals[i] = d;
@@ -187,7 +187,7 @@ void renderbackground(const char *caption, Texture *mapshot, const char *mapname
     }
     else if(lastupdate != lastmillis) lastupdate = lastmillis;
 
-    loopi(restore ? 1 : 3)
+    for(int i = 0; i < int(restore ? 1 : 3); i++)
     {
         glColor3f(1, 1, 1);
         settexture("data/background.png", 0);
@@ -210,7 +210,7 @@ void renderbackground(const char *caption, Texture *mapshot, const char *mapname
         glEnd();
         settexture("data/background_decal.png", 3);
         glBegin(GL_QUADS);
-        loopj(numdecals)
+        for(int j = 0; j < int(numdecals); j++)
         {
             float hsz = decals[j].size, hx = clamp(decals[j].x, hsz, w-hsz), hy = clamp(decals[j].y, hsz, h-hsz), side = decals[j].side;
             glTexCoord2f(side,   0); glVertex2f(hx-hsz, hy-hsz);
@@ -609,7 +609,7 @@ void setupscreen(int &usedcolorbits, int &useddepthbits, int &usedfsaa)
         SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 0);
         SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 0);
     }
-    loopi(sizeof(configs)/sizeof(configs[0]))
+    for(int i = 0; i < int(sizeof(configs)/sizeof(configs[0])); i++)
     {
         config = configs[i];
         if(!depthbits && config&1) continue;
@@ -951,7 +951,7 @@ int fpspos = 0, fpshistory[MAXFPSHISTORY];
 
 void resetfpshistory()
 {
-    loopi(MAXFPSHISTORY) fpshistory[i] = 1;
+    for(int i = 0; i < int(MAXFPSHISTORY); i++) fpshistory[i] = 1;
     fpspos = 0;
 }
 
@@ -964,7 +964,7 @@ void updatefpshistory(int millis)
 void getfps(int &fps, int &bestdiff, int &worstdiff)
 {
     int total = fpshistory[MAXFPSHISTORY-1], best = total, worst = total;
-    loopi(MAXFPSHISTORY-1)
+    for(int i = 0; i < int(MAXFPSHISTORY-1); i++)
     {
         int millis = fpshistory[i];
         total += millis;

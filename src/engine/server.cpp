@@ -233,20 +233,20 @@ ENetPacket *sendf(int cn, int chan, const char *format, ...)
         {
             int n = va_arg(args, int);
             int *v = va_arg(args, int *);
-            loopi(n) putint(p, v[i]);
+            for(int i = 0; i < int(n); i++) putint(p, v[i]);
             break;
         }
 
         case 'i': 
         {
             int n = isdigit(*format) ? *format++-'0' : 1;
-            loopi(n) putint(p, va_arg(args, int));
+            for(int i = 0; i < int(n); i++) putint(p, va_arg(args, int));
             break;
         }
         case 'f':
         {
             int n = isdigit(*format) ? *format++-'0' : 1;
-            loopi(n) putfloat(p, (float)va_arg(args, double));
+            for(int i = 0; i < int(n); i++) putfloat(p, (float)va_arg(args, double));
             break;
         }
         case 's': sendstring(va_arg(args, const char *), p); break;
@@ -284,7 +284,7 @@ ENetPacket *sendfile(int cn, int chan, stream *file, const char *format, ...)
         case 'i':
         {
             int n = isdigit(*format) ? *format++-'0' : 1;
-            loopi(n) putint(p, va_arg(args, int));
+            for(int i = 0; i < int(n); i++) putint(p, va_arg(args, int));
             break;
         }
         case 's': sendstring(va_arg(args, const char *), p); break;
@@ -551,7 +551,7 @@ void checkserversockets()        // reply all server info requests
 
     ENetBuffer buf;
     uchar pong[MAXTRANS];
-    loopi(2)
+    for(int i = 0; i < int(2); i++)
     {
         ENetSocket sock = i ? lansock : pongsock;
         if(sock == ENET_SOCKET_NULL || !ENET_SOCKETSET_CHECK(readset, sock)) continue;
@@ -711,7 +711,7 @@ void flushserver(bool force)
 void localdisconnect(bool cleanup)
 {
     bool disconnected = false;
-    loopv(clients) if(clients[i]->type==ST_LOCAL) 
+    loopv(clients) if(clients[i]->type==ST_LOCAL)
     {
         server::localdisconnect(i);
         delclient(clients[i]);
@@ -1056,7 +1056,7 @@ bool setuplistenserver(bool dedicated)
     serverhost = enet_host_create(&address, std::min(maxclients + server::reserveclients(), MAXCLIENTS), server::numchannels(), 0, serveruprate);
     if(!serverhost) return servererror(dedicated, "could not create server host");
     serverhost->duplicatePeers = maxdupclients ? maxdupclients : MAXCLIENTS;
-    loopi(maxclients) serverhost->peers[i].data = NULL;
+    for(int i = 0; i < int(maxclients); i++) serverhost->peers[i].data = NULL;
     address.port = server::serverinfoport(serverport > 0 ? serverport : -1);
     pongsock = enet_socket_create(ENET_SOCKET_TYPE_DATAGRAM);
     if(pongsock != ENET_SOCKET_NULL && enet_socket_bind(pongsock, &address) < 0)

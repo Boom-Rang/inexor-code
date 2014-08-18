@@ -20,7 +20,7 @@ namespace aiman
         teams.sort(teamscore::compare);
         if(teams.length() < int(sizeof(defaults)/sizeof(defaults[0])))
         {
-            loopi(sizeof(defaults)/sizeof(defaults[0])) if(teams.htfind(defaults[i]) < 0) teams.add(teamscore(defaults[i], 0));
+            for(int i = 0; i < int(sizeof(defaults)/sizeof(defaults[0])); i++) if(teams.htfind(defaults[i]) < 0) teams.add(teamscore(defaults[i], 0));
         }
     }
 
@@ -71,7 +71,7 @@ namespace aiman
 	clientinfo *findaiclient(clientinfo *exclude = NULL)
 	{
         clientinfo *least = NULL;
-		loopv(clients)
+  loopv(clients)
 		{
 			clientinfo *ci = clients[i];
 			if(!validaiclient(ci) || ci==exclude) continue;
@@ -83,7 +83,7 @@ namespace aiman
 	bool addai(int skill, int limit)
 	{
 		int numai = 0, cn = -1, maxai = limit >= 0 ? std::min(limit, MAXBOTS) : MAXBOTS;
-		loopv(bots)
+  loopv(bots)
         {
       clientinfo *ci = bots[i];
             if(!ci || ci->ownernum < 0) { if(cn < 0) cn = i; continue; }
@@ -178,13 +178,13 @@ namespace aiman
 	void removeai(clientinfo *ci)
 	{ // either schedules a removal, or someone else to assign to
 
-		loopvrev(ci->bots) shiftai(ci->bots[i], findaiclient(ci));
+  loopvrev(ci->bots) shiftai(ci->bots[i], findaiclient(ci));
 	}
 
 	bool reassignai()
 	{
         clientinfo *hi = NULL, *lo = NULL;
-		loopv(clients)
+  loopv(clients)
 		{
 			clientinfo *ci = clients[i];
 			if(!validaiclient(ci)) continue;
@@ -193,7 +193,7 @@ namespace aiman
 		}
 		if(hi && lo && hi->bots.length() - lo->bots.length() > 1)
 		{
-			loopvrev(hi->bots)
+   loopvrev(hi->bots)
 			{
 				shiftai(hi->bots[i], lo);
 				return true;
@@ -206,7 +206,7 @@ namespace aiman
 	void checksetup()
 	{
 	    if(m_teammode && botbalance) balanceteams();
-		loopvrev(bots) if(bots[i]) reinitai(bots[i]);
+  loopvrev(bots) if(bots[i]) reinitai(bots[i]);
 	}
 
 	void clearai()

@@ -445,7 +445,7 @@ void attachentities()
     if(e.type!=ET_EMPTY) { addentity(n); if(oldtype!=e.type) attachentity(e); } \
     entities::editent(n, true)); \
 }
-#define addgroup(exp)   { loopv(entities::getents()) entfocus(i, if(exp) entadd(n)); }
+#define addgroup(exp) { loopv(entities::getents()) entfocus(i, if(exp) entadd(n)); }
 #define setgroup(exp)   { entcancel(); addgroup(exp); }
 #define groupeditloop(f){ entlooplevel++; int _ = efocus; loopv(entgroup) entedit(entgroup[i], f); efocus = _; entlooplevel--; }
 #define groupeditpure(f){ if(entlooplevel>0) { entedit(efocus, f); } else groupeditloop(f); }
@@ -464,10 +464,10 @@ undoblock *copyundoents(undoblock *u)
 {
     entcancel();
     undoent *e = u->ents();
-    loopi(u->numents)
+    for(int i = 0; i < int(u->numents); i++)
         entadd(e[i].i);
     undoblock *c = newundoent();
-   	loopi(u->numents) if(e[i].e.type==ET_EMPTY)
+    for(int i = 0; i < int(u->numents); i++) if(e[i].e.type==ET_EMPTY)
 		entgroup.removeobj(e[i].i);
     return c;
 }
@@ -475,7 +475,7 @@ undoblock *copyundoents(undoblock *u)
 void pasteundoents(undoblock *u)
 {
     undoent *ue = u->ents();
-    loopi(u->numents)
+    for(int i = 0; i < int(u->numents); i++)
         entedit(ue[i].i, (entity &)e = ue[i].e);
 }
 
@@ -575,7 +575,7 @@ void renderentring(const extentity &e, float radius, int axis)
 {
     if(radius <= 0) return;
     glBegin(GL_LINE_LOOP);
-    loopi(15)
+    for(int i = 0; i < int(15); i++)
     {
         vec p(e.o);
         const vec2 &sc = sincos360[i*(360/15)];
@@ -589,7 +589,7 @@ void renderentring(const extentity &e, float radius, int axis)
 void renderentsphere(const extentity &e, float radius)
 {
     if(radius <= 0) return;
-    loopk(3) renderentring(e, radius, k);
+    for(int k = 0; k < int(3); k++) renderentring(e, radius, k);
 }
 
 void renderentattachment(const extentity &e)
@@ -615,7 +615,7 @@ void renderentarrow(const extentity &e, const vec &dir, float radius)
     glEnd();
     glBegin(GL_TRIANGLE_FAN);
     glVertex3fv(target.v);
-    loopi(5)
+    for(int i = 0; i < int(5); i++)
     {
         vec p(spoke);
         p.rotate(2*M_PI*i/4.0f, dir);
@@ -633,7 +633,7 @@ void renderentcone(const extentity &e, const vec &dir, float radius, float angle
     spoke.normalize();
     spoke.mul(radius*sinf(angle*RAD));
     glBegin(GL_LINES);
-    loopi(8)
+    for(int i = 0; i < int(8); i++)
     {
         vec p(spoke);
         p.rotate(2*M_PI*i/8.0f, dir);
@@ -643,7 +643,7 @@ void renderentcone(const extentity &e, const vec &dir, float radius, float angle
     }
     glEnd();
     glBegin(GL_LINE_LOOP);
-    loopi(8)
+    for(int i = 0; i < int(8); i++)
     {
         vec p(spoke);
         p.rotate(2*M_PI*i/8.0f, dir);
@@ -715,7 +715,7 @@ void renderentselection(const vec &o, const vec &ray, bool entmoving)
     vec eo, es;
 
     glColor3ub(0, 40, 0);
-    loopv(entgroup) entfocus(entgroup[i],     
+    loopv(entgroup) entfocus(entgroup[i],
         entselectionbox(e, eo, es);
         boxs3D(eo, es, 1);
     );
@@ -994,7 +994,7 @@ void entcopy()
     if(noentedit()) return;
     entcopygrid = sel.grid;
     entcopybuf.shrink(0);
-    loopv(entgroup) 
+    loopv(entgroup)
         entfocus(entgroup[i], entcopybuf.add(e).o.sub(sel.o.tovec()));
 }
 
@@ -1076,7 +1076,7 @@ void nearestent()
             
 ICOMMAND(enthavesel,"",  (), addimplicit(intret(entgroup.length())));
 ICOMMAND(entselect, "e", (uint *body), if(!noentedit()) addgroup(e.type != ET_EMPTY && entgroup.find(n)<0 && executebool(body)));
-ICOMMAND(entloop,   "e", (uint *body), if(!noentedit()) addimplicit(groupeditloop(((void)e, execute(body)))));
+ICOMMAND(entloop, "e", (uint *body), if(!noentedit()) addimplicit(groupeditloop(((void)e, execute(body)))));
 ICOMMAND(insel,     "",  (), entfocus(efocus, intret(pointinsel(sel, e.o))));
 ICOMMAND(entget,    "",  (), entfocus(efocus, string s; printent(e, s); result(s)));
 ICOMMAND(entindex,  "",  (), intret(efocus));
@@ -1137,7 +1137,7 @@ int findentity(int type, int index, int attr1, int attr2)
         if(e.type==type && (attr1<0 || e.attr1==attr1) && (attr2<0 || e.attr2==attr2))
             return i;
     }
-    loopj(std::min(index, ents.length())) 
+    for(int j = 0; j < int(std::min(index, ents.length())); j++)
     {
         extentity &e = *ents[j];
         if(e.type==type && (attr1<0 || e.attr1==attr1) && (attr2<0 || e.attr2==attr2))
@@ -1154,7 +1154,7 @@ void findplayerspawn(dynent *d, int forceent, int tag)   // place at random spaw
     if(pick<0)
     {
         int r = rnd(10)+1;
-        loopi(r) spawncycle = findentity(ET_PLAYERSTART, spawncycle+1, -1, tag);
+        for(int i = 0; i < int(r); i++) spawncycle = findentity(ET_PLAYERSTART, spawncycle+1, -1, tag);
         pick = spawncycle;
     }
     if(pick!=-1)
@@ -1187,7 +1187,7 @@ void findplayerspawn(dynent *d, int forceent, int tag)   // place at random spaw
 void splitocta(cube *c, int size)
 {
     if(size <= 0x1000) return;
-    loopi(8)
+    for(int i = 0; i < int(8); i++)
     {
         if(!c[i].children) c[i].children = newcubes(isempty(c[i]) ? F_EMPTY : F_SOLID);
         splitocta(c[i].children, size>>1);
@@ -1235,7 +1235,7 @@ bool emptymap(int scale, bool force, const char *mname, bool usecfg)    // main 
     texmru.shrink(0);
     freeocta(worldroot);
     worldroot = newcubes(F_EMPTY);
-    loopi(4) solidfaces(worldroot[i]);
+    for(int i = 0; i < int(4); i++) solidfaces(worldroot[i]);
 
     if(worldsize > 0x1000) splitocta(worldroot, worldsize>>1);
 
@@ -1271,7 +1271,7 @@ bool enlargemap(bool force)
     worldsize *= 2;
     cube *c = newcubes(F_EMPTY);
     c[0].children = worldroot;
-    loopi(3) solidfaces(c[i+1]);
+    for(int i = 0; i < int(3); i++) solidfaces(c[i+1]);
     worldroot = c;
 
     if(worldsize > 0x1000) splitocta(worldroot, worldsize>>1);
@@ -1286,7 +1286,7 @@ bool enlargemap(bool force)
 static bool isallempty(cube &c)
 {
     if(!c.children) return isempty(c);
-    loopi(8) if(!isallempty(c.children[i])) return false;
+    for(int i = 0; i < int(8); i++) if(!isallempty(c.children[i])) return false;
     return true;
 }
 
@@ -1297,7 +1297,7 @@ void shrinkmap()
     if(worldsize <= 1<<10) return;
 
     int octant = -1;
-    loopi(8) if(!isallempty(worldroot[i]))
+    for(int i = 0; i < int(8); i++) if(!isallempty(worldroot[i]))
     {
         if(octant >= 0) return;
         octant = i;

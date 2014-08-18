@@ -113,7 +113,7 @@ static bool readzipdirectory(const char *archname, FILE *f, int entries, int off
 {
     uchar *buf = new uchar[size], *src = buf;
     if(fseek(f, offset, SEEK_SET) < 0 || (int)fread(buf, 1, size, f) != size) { delete[] buf; return false; }
-    loopi(entries)
+    for(int i = 0; i < int(entries); i++)
     {
         if(src + ZIP_FILE_SIZE > &buf[size]) break;
 

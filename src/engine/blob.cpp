@@ -150,7 +150,7 @@ struct blobrenderer
         int numout = 0;
         const vec *p = &in[numin-1];
         float pc = (*p)[C];
-        loopi(numin)
+        for(int i = 0; i < int(numin); i++)
         {
             const vec &v = in[i];
             float c = v[C];
@@ -182,7 +182,7 @@ struct blobrenderer
         int numout = 0;
         const vec *p = &in[numin-1];
         float pc = (*p)[C];
-        loopi(numin)
+        for(int i = 0; i < int(numin); i++)
         {
             const vec &v = in[i];
             float c = v[C];
@@ -256,7 +256,7 @@ struct blobrenderer
             while(availindexes < limit*3) if(!freeblob()) return;
 
             int i1 = addvert(v[0]), i2 = addvert(cur[-1]);
-            loopk(limit)
+            for(int k = 0; k < int(limit); k++)
             {
                 indexes[endindex++] = i1;
                 indexes[endindex++] = i2;
@@ -299,7 +299,7 @@ struct blobrenderer
     {
             vertinfo *verts = cu.ext->verts() + cu.ext->surfaces[orient].verts;
             ivec vo = ivec(o).mask(~0xFFF).shl(3);
-            loopj(numverts) pos[j] = verts[j].getxyz().add(vo).tovec().mul(1/8.0f);
+            for(int j = 0; j < int(numverts); j++) pos[j] = verts[j].getxyz().add(vo).tovec().mul(1/8.0f);
             if(numverts >= 4 && !(cu.merged&(1<<orient)) && !flataxisface(cu, orient) && faceconvexity(verts, numverts, size)) numplanes++;
             else flat = dim;
         }
@@ -333,7 +333,7 @@ struct blobrenderer
             return;
 
         vec v1[MAXFACEVERTS+6+4], v2[MAXFACEVERTS+6+4];
-        loopl(numplanes)
+        for(int l = 0; l < int(numplanes); l++)
     {
             vec *v = pos;
             int numv = numverts;
@@ -365,7 +365,7 @@ struct blobrenderer
     {
         materialsurface *matbuf = va->matbuf;
         int matsurfs = va->matsurfs;
-        loopi(matsurfs)
+        for(int i = 0; i < int(matsurfs); i++)
         {
             materialsurface &m = matbuf[i];
             if(!isclipped(m.material&MATF_VOLUME) || m.orient == O_BOTTOM) { i += m.skip; continue; }
@@ -390,7 +390,7 @@ struct blobrenderer
 
     void findescaped(cube *cu, const ivec &o, int size, int escaped)
     {
-        loopi(8)
+        for(int i = 0; i < int(8); i++)
     {
             if(escaped&(1<<i))
         {
@@ -399,7 +399,7 @@ struct blobrenderer
                 else
                 {
                     int vismask = cu[i].merged;
-                    if(vismask) loopj(6) if(vismask&(1<<j)) gentris(cu[i], j, co, size);
+                    if(vismask) for(int j = 0; j < int(6); j++) if(vismask&(1<<j)) gentris(cu[i], j, co, size);
                 }
             }
                 }
@@ -408,7 +408,7 @@ struct blobrenderer
     void gentris(cube *cu, const ivec &o, int size, int escaped = 0)
     {
         int overlap = octaboxoverlap(o, size, bbmin, bbmax);
-        loopi(8)
+        for(int i = 0; i < int(8); i++)
         {
             if(overlap&(1<<i))
             {
@@ -421,8 +421,8 @@ struct blobrenderer
                     int vismask = cu[i].visible;
                     if(vismask&0xC0) 
                     {
-                        if(vismask&0x80) loopj(6) gentris(cu[i], j, co, size, NULL, vismask);
-                        else loopj(6) if(vismask&(1<<j)) gentris(cu[i], j, co, size);
+                        if(vismask&0x80) for(int j = 0; j < int(6); j++) gentris(cu[i], j, co, size, NULL, vismask);
+                        else for(int j = 0; j < int(6); j++) if(vismask&(1<<j)) gentris(cu[i], j, co, size);
                     }
                 }
             }
@@ -433,7 +433,7 @@ struct blobrenderer
                 else
                 {
                     int vismask = cu[i].merged;
-                    if(vismask) loopj(6) if(vismask&(1<<j)) gentris(cu[i], j, co, size);
+                    if(vismask) for(int j = 0; j < int(6); j++) if(vismask&(1<<j)) gentris(cu[i], j, co, size);
                 }
             }
         }

@@ -303,7 +303,7 @@ struct Shader
 
     Shader() : name(NULL), vsstr(NULL), psstr(NULL), defer(NULL), type(SHADER_DEFAULT), vs(0), ps(0), program(0), vsobj(0), psobj(0), detailshader(NULL), variantshader(NULL), altshader(NULL), standard(false), forced(false), used(false), native(true), reusevs(NULL), reuseps(NULL), numextparams(0), extparams(NULL), extvertparams(NULL), extpixparams(NULL)
     {
-        loopi(MAXSHADERDETAIL) fastshader[i] = this;
+        for(int i = 0; i < int(MAXSHADERDETAIL); i++) fastshader[i] = this;
     }
 
     ~Shader()
@@ -451,7 +451,7 @@ struct ImageData
         if(!align) return w*h*bpp;
         int lw = w, lh = h,
             size = 0;
-        loopi(levels)
+        for(int i = 0; i < int(levels); i++)
         {
             if(lw<=0) lw = 1;
             if(lh<=0) lh = 1;
@@ -645,7 +645,7 @@ struct Slot
         loaded = false;
         grasstex = NULL;
         thumbnail = NULL;
-        loopv(sts) 
+        loopv(sts)
         {
             Tex &t = sts[i];
             t.t = NULL;

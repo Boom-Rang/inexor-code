@@ -473,7 +473,7 @@ void renderwaterff()
     varray::enable();
  
     bool wasbelow = false;
-    loopi(MAXREFLECTIONS)
+    for(int i = 0; i < int(MAXREFLECTIONS); i++)
     {
         Reflection &ref = reflections[i];
         if(ref.height<0 || ref.lastused<totalmillis || ref.matsurfs.empty()) continue;
@@ -687,7 +687,7 @@ void renderwater()
 
     vec ambient(std::max(skylightcolor[0], ambientcolor[0]), std::max(skylightcolor[1], ambientcolor[1]), std::max(skylightcolor[2], ambientcolor[2]));
     float offset = -WATER_OFFSET;
-    loopi(MAXREFLECTIONS)
+    for(int i = 0; i < int(MAXREFLECTIONS); i++)
     {
         Reflection &ref = reflections[i];
         if(ref.height<0 || ref.lastused<totalmillis || ref.matsurfs.empty()) continue;
@@ -796,7 +796,7 @@ void renderwater()
         }
     }
 
-    loopi(2)
+    for(int i = 0; i < int(2); i++)
     {
         glActiveTexture_(GL_TEXTURE1_ARB+i);
         glDisable(GL_TEXTURE_2D);
@@ -843,7 +843,7 @@ void cleanreflection(Reflection &ref)
 
 void cleanreflections()
 {
-    loopi(MAXREFLECTIONS) cleanreflection(reflections[i]);
+    for(int i = 0; i < int(MAXREFLECTIONS); i++) cleanreflection(reflections[i]);
     cleanreflection(waterfallrefraction);
     if(reflectionfb)
     {
@@ -953,7 +953,7 @@ void addreflection(materialsurface &m)
 {
     int mat = m.material, height = m.o.z;
     Reflection *ref = NULL, *oldest = NULL;
-    loopi(MAXREFLECTIONS)
+    for(int i = 0; i < int(MAXREFLECTIONS); i++)
     {
         Reflection &r = reflections[i];
         if(r.height<0)
@@ -1061,7 +1061,7 @@ void queryreflections()
     {
         if(!va->matsurfs || va->occluded >= OCCLUDE_BB || va->curvfc >= VFC_FOGGED) continue;
         int lastmat = -1;
-        loopi(va->matsurfs)
+        for(int i = 0; i < int(va->matsurfs); i++)
         {
             materialsurface &m = va->matbuf[i];
             if(m.material != lastmat)
@@ -1078,7 +1078,7 @@ void queryreflections()
         }
     }
   
-    loopi(MAXREFLECTIONS)
+    for(int i = 0; i < int(MAXREFLECTIONS); i++)
     {
         Reflection &ref = reflections[i];
         if(ref.height>=0 && ref.lastused>=totalmillis && ref.matsurfs.length())
@@ -1102,7 +1102,7 @@ void queryreflections()
     varray::enable();
 
     int refs = 0;
-    if(waterreflect || waterrefract) loopi(MAXREFLECTIONS)
+    if(waterreflect || waterrefract) for(int i = 0; i < int(MAXREFLECTIONS); i++)
     {
         Reflection &ref = reflections[i];
         ref.prevquery = oqwater > 1 ? ref.query : NULL;
@@ -1213,7 +1213,7 @@ static bool calcscissorbox(Reflection &ref, int size, vec &clipmin, vec &clipmax
 
     vec4 v[8];
     float sx1 = 1, sy1 = 1, sx2 = -1, sy2 = -1;
-    loopi(8)
+    for(int i = 0; i < int(8); i++)
     {
         vec4 &p = v[i];
         mvpmatrix.transform(vec(i&1 ? bbmax.x : bbmin.x, i&2 ? bbmax.y : bbmin.y, (i&4 ? bbmax.z + WATER_AMPLITUDE : bbmin.z - WATER_AMPLITUDE) - WATER_OFFSET), p);
@@ -1227,11 +1227,11 @@ static bool calcscissorbox(Reflection &ref, int size, vec &clipmin, vec &clipmax
         }
     }
     if(sx1 >= sx2 || sy1 >= sy2) return false;
-    loopi(8)
+    for(int i = 0; i < int(8); i++)
     {
         const vec4 &p = v[i];
         if(p.z >= -p.w) continue;    
-        loopj(3)
+        for(int j = 0; j < int(3); j++)
         { 
             const vec4 &o = v[i^(1<<j)];
             if(o.z <= -o.w) continue;
@@ -1279,7 +1279,7 @@ void drawreflections()
     if(!hasFBO) while(size>screen->w || size>screen->h) size /= 2;
     while(size>hwtexsize) size /= 2;
 
-    if(waterreflect || waterrefract) loopi(MAXREFLECTIONS)
+    if(waterreflect || waterrefract) for(int i = 0; i < int(MAXREFLECTIONS); i++)
     {
         Reflection &ref = reflections[++n%MAXREFLECTIONS];
         if(ref.height<0 || ref.lastused<lastquery || ref.matsurfs.empty()) continue;

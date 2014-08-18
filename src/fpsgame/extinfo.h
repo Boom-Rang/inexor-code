@@ -22,7 +22,7 @@
     B: 0 EXT_PLAYERSTATS cn #send by client# EXT_ACK EXT_VERSION 0 or 1 #error, if cn was > -1 and client does not exist# ...
          EXT_PLAYERSTATS_RESP_IDS pid(s) #1 packet#
          EXT_PLAYERSTATS_RESP_STATS pid playerdata #1 packet for each player#
-    C: 0 EXT_TEAMSCORE EXT_ACK EXT_VERSION 0 or 1 #error, no teammode# remaining_time gamemode loop(teamdata [numbases bases] or -1)
+    C: 0 EXT_TEAMSCORE EXT_ACK EXT_VERSION 0 or 1 #error, no teammode# remaining_time gamemode loop
 
     Errors:
     --------------

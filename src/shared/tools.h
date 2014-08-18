@@ -26,13 +26,6 @@ static inline T clamp(T a, U b, U c) {
 #define rndscale(x) (float((randomMT()&0x7FFFFFFF)*double(x)/double(0x7FFFFFFF)))
 #define detrnd(s, x) ((int)(((((uint)(s))*1103515245+12345)>>16)%(x)))
 
-#define loop(v,m) for(int v = 0; v<int(m); v++)
-#define loopi(m) loop(i,m)
-#define loopj(m) loop(j,m)
-#define loopk(m) loop(k,m)
-#define loopl(m) loop(l,m)
-#define loopirev(v) for(int i = v-1; i>=0; i--)
-
 #define DELETEP(p) if(p) { delete   p; p = 0; }
 #define DELETEA(p) if(p) { delete[] p; p = 0; }
 
@@ -100,9 +93,9 @@ struct stringformatter
 #define defformatstring(d) string d; formatstring(d)
 #define defvformatstring(d,last,fmt) string d; { va_list ap; va_start(ap, last); vformatstring(d, fmt, ap); va_end(ap); }
 
-#define loopv(v)    for(int i = 0; i<(v).length(); i++)
-#define loopvj(v)   for(int j = 0; j<(v).length(); j++)
-#define loopvk(v)   for(int k = 0; k<(v).length(); k++)
+#define loopv(v) for(int i = 0; i<(v).length(); i++)
+#define loopvj(v) for(int j = 0; j<(v).length(); j++)
+#define loopvk(v) for(int k = 0; k<(v).length(); k++)
 #define loopvrev(v) for(int i = (v).length()-1; i>=0; i--)
 
 template <class T>
@@ -554,19 +547,19 @@ template <class T> struct vector
     template<class U>
     int find(const U &o)
     {
-        loopi(ulen) if(buf[i]==o) return i;
+        for(int i = 0; i < int(ulen); i++) if(buf[i]==o) return i;
         return -1;
     }
 
     void removeobj(const T &o)
     {
-        loopi(ulen) if(buf[i]==o) remove(i--);
+        for(int i = 0; i < int(ulen); i++) if(buf[i]==o) remove(i--);
     }
 
     void replacewithlast(const T &o)
     {
         if(!ulen) return;
-        loopi(ulen-1) if(buf[i]==o)
+        for(int i = 0; i < int(ulen-1); i++) if(buf[i]==o)
         {
             buf[i] = buf[ulen-1];
         }
@@ -584,15 +577,15 @@ template <class T> struct vector
     T *insert(int i, const T *e, int n)
     {
         if(ulen+n>alen) growbuf(ulen+n);
-        loopj(n) add(T());
+        for(int j = 0; j < int(n); j++) add(T());
         for(int p = ulen-1; p>=i+n; p--) buf[p] = buf[p-n];
-        loopj(n) buf[i+j] = e[j];
+        for(int j = 0; j < int(n); j++) buf[i+j] = e[j];
         return &buf[i];
     }
 
     void reverse()
     {
-        loopi(ulen/2) std::swap(buf[i], buf[ulen-1-i]);
+        for(int i = 0; i < int(ulen/2); i++) std::swap(buf[i], buf[ulen-1-i]);
     }
 
     static int heapparent(int i) { return (i - 1) >> 1; }
@@ -651,7 +644,7 @@ template <class T> struct vector
     template<class K> 
     int htfind(const K &key)
     {
-        loopi(ulen) if(htcmp(key, buf[i])) return i;
+        for(int i = 0; i < int(ulen); i++) if(htcmp(key, buf[i])) return i;
         return -1;
     }
 };
@@ -680,7 +673,7 @@ template<class T> struct hashset
         chunks = NULL;
         unused = NULL;
         chains = new chain *[size];
-        loopi(size) chains[i] = NULL;
+        for(int i = 0; i < int(size); i++) chains[i] = NULL;
     }
 
     ~hashset()
@@ -696,7 +689,7 @@ template<class T> struct hashset
             chainchunk *chunk = new chainchunk;
             chunk->next = chunks;
             chunks = chunk;
-            loopi(CHUNKSIZE-1) chunk->chains[i].next = &chunk->chains[i+1];
+            for(int i = 0; i < int(CHUNKSIZE-1); i++) chunk->chains[i].next = &chunk->chains[i+1];
             chunk->chains[CHUNKSIZE-1].next = unused;
             unused = chunk->chains;
         }
@@ -778,7 +771,7 @@ template<class T> struct hashset
     void clear()
     {
         if(!numelems) return;
-        loopi(size) chains[i] = NULL;
+        for(int i = 0; i < int(size); i++) chains[i] = NULL;
         numelems = 0;
         unused = NULL;
         deletechunks();
@@ -855,9 +848,9 @@ template<class K, class T> struct hashtable : hashset<hashtableentry<K, T> >
     static inline T &getdata(void *i) { return ((chain *)i)->elem.data; }
 };
 
-#define enumerates(ht,t,e,b)      loopi((ht).size)  for(hashset<t>::chain *enumc = (ht).chains[i]; enumc;) { t &e = enumc->elem; enumc = enumc->next; b; }
-#define enumeratekt(ht,k,e,t,f,b) loopi((ht).size)  for(hashtable<k,t>::chain *enumc = (ht).chains[i]; enumc;) { const hashtable<k,t>::key &e = enumc->elem.key; t &f = enumc->elem.data; enumc = enumc->next; b; }
-#define enumerate(ht,t,e,b)       loopi((ht).size) for(void *enumc = (ht).chains[i]; enumc;) { t &e = (ht).getdata(enumc); enumc = (ht).getnext(enumc); b; }
+#define enumerates(ht,t,e,b) for(int i = 0; i < int((ht).size); i++) for(hashset<t>::chain *enumc = (ht).chains[i]; enumc;) { t &e = enumc->elem; enumc = enumc->next; b; }
+#define enumeratekt(ht,k,e,t,f,b) for(int i = 0; i < int((ht).size); i++) for(hashtable<k,t>::chain *enumc = (ht).chains[i]; enumc;) { const hashtable<k,t>::key &e = enumc->elem.key; t &f = enumc->elem.data; enumc = enumc->next; b; }
+#define enumerate(ht,t,e,b) for(int i = 0; i < int((ht).size); i++) for(void *enumc = (ht).chains[i]; enumc;) { t &e = (ht).getdata(enumc); enumc = (ht).getnext(enumc); b; }
 
 struct unionfind
 {

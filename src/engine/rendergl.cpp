@@ -1278,7 +1278,7 @@ static void blendfog(int fogmat, float blend, float logblend, float &start, floa
         {
             const bvec &wcol = getwatercolor(fogmat);
             int wfog = getwaterfog(fogmat);
-            loopk(3) fogc[k] += blend*wcol[k]/255.0f;
+            for(int k = 0; k < int(3); k++) fogc[k] += blend*wcol[k]/255.0f;
             end += logblend*std::min(fog, std::max(wfog*4, 32));
             break;
         }
@@ -1287,13 +1287,13 @@ static void blendfog(int fogmat, float blend, float logblend, float &start, floa
         {
             const bvec &lcol = getlavacolor(fogmat);
             int lfog = getlavafog(fogmat);
-            loopk(3) fogc[k] += blend*lcol[k]/255.0f;
+            for(int k = 0; k < int(3); k++) fogc[k] += blend*lcol[k]/255.0f;
             end += logblend*std::min(fog, std::max(lfog*4, 32));
             break;
         }
 
         default:
-            loopk(3) fogc[k] += blend*fogcolor[k]/255.0f;
+            for(int k = 0; k < int(3); k++) fogc[k] += blend*fogcolor[k]/255.0f;
             start += logblend*(fog+64)/8;
             end += logblend*fog;
             break;
@@ -1324,7 +1324,7 @@ static void blendfogoverlay(int fogmat, float blend, float *overlay)
         {
             const bvec &wcol = getwatercolor(fogmat);
             maxc = std::max(wcol[0], std::max(wcol[1], wcol[2]));
-            loopk(3) overlay[k] += blend*std::max(0.4f, wcol[k]/std::min(32.0f + maxc*7.0f/8.0f, 255.0f));
+            for(int k = 0; k < int(3); k++) overlay[k] += blend*std::max(0.4f, wcol[k]/std::min(32.0f + maxc*7.0f/8.0f, 255.0f));
             break;
         }
 
@@ -1332,12 +1332,12 @@ static void blendfogoverlay(int fogmat, float blend, float *overlay)
         {
             const bvec &lcol = getlavacolor(fogmat);
             maxc = std::max(lcol[0], std::max(lcol[1], lcol[2]));
-            loopk(3) overlay[k] += blend*std::max(0.4f, lcol[k]/std::min(32.0f + maxc*7.0f/8.0f, 255.0f));
+            for(int k = 0; k < int(3); k++) overlay[k] += blend*std::max(0.4f, lcol[k]/std::min(32.0f + maxc*7.0f/8.0f, 255.0f));
             break;
         }
 
         default:
-            loopk(3) overlay[k] += blend;
+            for(int k = 0; k < int(3); k++) overlay[k] += blend;
             break;
     }
 }
@@ -1764,14 +1764,14 @@ void bindminimap()
 
 void clipminimap(ivec &bbmin, ivec &bbmax, cube *c = worldroot, int x = 0, int y = 0, int z = 0, int size = worldsize>>1)
 {
-    loopi(8)
+    for(int i = 0; i < int(8); i++)
     {
         ivec o(i, x, y, z, size);
         if(c[i].children) clipminimap(bbmin, bbmax, c[i].children, o.x, o.y, o.z, size>>1);
         else if(!isentirelysolid(c[i]) && (c[i].material&MATF_CLIP)!=MAT_CLIP)
         {
-            loopk(3) bbmin[k] = std::min(bbmin[k], o[k]);
-            loopk(3) bbmax[k] = std::max(bbmax[k], o[k] + size);
+            for(int k = 0; k < int(3); k++) bbmin[k] = std::min(bbmin[k], o[k]);
+            for(int k = 0; k < int(3); k++) bbmax[k] = std::max(bbmax[k], o[k] + size);
         }
     }
 }
@@ -1791,7 +1791,7 @@ void drawminimap()
     loopv(valist)
     {
         vtxarray *va = valist[i];
-        loopk(3)
+        for(int k = 0; k < int(3); k++)
         {
             if(va->geommin[k]>va->geommax[k]) continue;
             bbmin[k] = std::min(bbmin[k], va->geommin[k]);
@@ -1802,8 +1802,8 @@ void drawminimap()
     {
         ivec clipmin(worldsize, worldsize, worldsize), clipmax(0, 0, 0);
         clipminimap(clipmin, clipmax);
-        loopk(2) bbmin[k] = std::max(bbmin[k], clipmin[k]);
-        loopk(2) bbmax[k] = std::min(bbmax[k], clipmax[k]); 
+        for(int k = 0; k < int(2); k++) bbmin[k] = std::max(bbmin[k], clipmin[k]);
+        for(int k = 0; k < int(2); k++) bbmax[k] = std::min(bbmax[k], clipmax[k]);
     }
  
     minimapradius = bbmax.tovec().sub(bbmin.tovec()).mul(0.5f); 
@@ -1858,7 +1858,7 @@ void drawminimap()
     queryreflections();
     drawreflections();
 
-    loopi(minimapheight > 0 && minimapheight < minimapcenter.z + minimapradius.z ? 2 : 1)
+    for(int i = 0; i < int(minimapheight > 0 && minimapheight < minimapcenter.z + minimapradius.z ? 2 : 1); i++)
     {
         if(i)
         {
@@ -2169,7 +2169,7 @@ void drawdamagecompass(int w, int h)
 {
     int dirs = 0;
     float size = damagecompasssize/100.0f*std::min(h, w)/2.0f;
-    loopi(8) if(dcompass[i]>0)
+    for(int i = 0; i < int(8); i++) if(dcompass[i]>0)
     {
         if(!dirs)
         {
@@ -2286,7 +2286,7 @@ ICOMMAND(getcrosshair, "i", (int *i),
  
 void writecrosshairs(stream *f)
 {
-    loopi(MAXCROSSHAIRS) if(crosshairs[i] && crosshairs[i]!=notexture)
+    for(int i = 0; i < int(MAXCROSSHAIRS); i++) if(crosshairs[i] && crosshairs[i]!=notexture)
         f->printf("loadcrosshair %s %d\n", escapestring(crosshairs[i]->name), i);
     f->printf("\n");
 }
@@ -2425,7 +2425,7 @@ void gl_drawhud(int w, int h)
                 }
                 int nextfps[3];
                 getfps(nextfps[0], nextfps[1], nextfps[2]);
-                loopi(3) if(prevfps[i]==curfps[i]) curfps[i] = nextfps[i];
+                for(int i = 0; i < int(3); i++) if(prevfps[i]==curfps[i]) curfps[i] = nextfps[i];
                 if(showfpsrange) draw_textf("fps %d+%d-%d", conw-7*FONTH, conh-FONTH*3/2, curfps[0], curfps[1], curfps[2]);
                 else draw_textf("fps %d", conw-5*FONTH, conh-FONTH*3/2, curfps[0]);
                 roffset += FONTH;
@@ -2469,7 +2469,7 @@ void gl_drawhud(int w, int h)
                     getnumqueries(),
                     rplanes
                 };
-                loopi(8) if(prevstats[i]==curstats[i]) curstats[i] = nextstats[i];
+                for(int i = 0; i < int(8); i++) if(prevstats[i]==curstats[i]) curstats[i] = nextstats[i];
 
                 abovehud -= 2*FONTH;
                 draw_textf("wtr:%dk(%d%%) wvt:%dk(%d%%) evt:%dk eva:%dk", FONTH/2, abovehud, wtris/1024, curstats[0], wverts/1024, curstats[1], curstats[2], curstats[3]);

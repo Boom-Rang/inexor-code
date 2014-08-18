@@ -134,7 +134,7 @@ int drawconlines(int conskip, int confade, int conwidth, int conheight, int cono
     }
 
     int totalheight = 0;
-    loopi(numl) //determine visible height
+    for(int i = 0; i < int(numl); i++) //determine visible height
     {
         // shuffle backwards to fill if necessary
         int idx = offset+i < numl ? offset+i : --offset;
@@ -150,7 +150,7 @@ int drawconlines(int conskip, int confade, int conwidth, int conheight, int cono
         totalheight += height;
     }
     if(dir > 0) y = conoff;
-    loopi(numl)
+    for(int i = 0; i < int(numl); i++)
     {
         int idx = offset + (dir > 0 ? numl-i-1 : i);
         if(!(conlines[idx].type&filter)) continue;
@@ -209,8 +209,8 @@ struct keym
     char *actions[NUMACTIONS];
     bool pressed;
 
-    keym() : code(-1), name(NULL), pressed(false) { loopi(NUMACTIONS) actions[i] = newstring(""); }
-    ~keym() { DELETEA(name); loopi(NUMACTIONS) DELETEA(actions[i]); }
+    keym() : code(-1), name(NULL), pressed(false) { for(int i = 0; i < int(NUMACTIONS); i++) actions[i] = newstring(""); }
+    ~keym() { DELETEA(name); for(int i = 0; i < int(NUMACTIONS); i++) DELETEA(actions[i]); }
 };
 
 hashtable<int, keym> keyms(128);
@@ -336,7 +336,7 @@ void pasteconsole()
     {
         case CF_UNICODETEXT:
             decoded = std::min(int(sizeof(commandbuf)-1-commandlen), cblen/2);
-            loopi(decoded) commandbuf[commandlen++] = uni2cube(cb[i]);
+            for(int i = 0; i < int(decoded); i++) commandbuf[commandlen++] = uni2cube(cb[i]);
             break;
         case CF_TEXT:
             decoded = std::min(int(sizeof(commandbuf)-1-commandlen), cblen);
@@ -369,13 +369,13 @@ void pasteconsole()
         cbend = (uchar *)memchr(cbline, '\0', &cb[cbsize] - cbline);
         if(!cbend) cbend = &cb[cbsize];
         int cblen = int(cbend-cbline), commandmax = int(sizeof(commandbuf)-1-commandlen); 
-        loopi(cblen) if((cbline[i]&0xC0) == 0x80) 
+        for(int i = 0; i < int(cblen); i++) if((cbline[i]&0xC0) == 0x80)
         { 
             commandlen += decodeutf8((uchar *)&commandbuf[commandlen], commandmax, cbline, cblen);
             goto nextline;
         }
         cblen = std::min(cblen, commandmax);
-        loopi(cblen) commandbuf[commandlen++] = uni2cube(*cbline++);
+        for(int i = 0; i < int(cblen); i++) commandbuf[commandlen++] = uni2cube(*cbline++);
     nextline:
         commandbuf[commandlen] = '\n';
         if(commandlen + 1 < sizeof(commandbuf) && cbend < &cb[cbsize]) ++commandlen;
@@ -445,7 +445,7 @@ void writehistory()
 {
     stream *f = openutf8file(path(historyfile(), true), "w");
     if(!f) return;
-	loopv(history)
+ loopv(history)
 	{
 		hline *h = history[i];
 		if(!h->buf) continue;
@@ -647,7 +647,7 @@ void consolekey(int code, bool isdown, int cooked)
                 {
                     if(maxhistory && history.length() >= maxhistory)
                     {
-                        loopi(history.length()-maxhistory+1) delete history[i];
+                        for(int i = 0; i < int(history.length()-maxhistory+1); i++) delete history[i];
                         history.remove(0, history.length()-maxhistory+1);
                     }
                     history.add(h = new hline)->save();
@@ -695,7 +695,7 @@ void writebinds(stream *f)
     vector<keym *> binds;
     enumerate(keyms, keym, km, binds.add(&km));
     binds.sort(sortbinds);
-    loopj(3)
+    for(int j = 0; j < int(3); j++)
     {
         loopv(binds)
         {

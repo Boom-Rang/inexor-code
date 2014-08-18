@@ -190,13 +190,13 @@ namespace varray
         if(forceattribs || changedattribs)
         {
             int diffmask = enabled & lastattribmask & ~attribmask;
-            if(diffmask) loopi(numlastattribs)
+            if(diffmask) for(int i = 0; i < int(numlastattribs); i++)
             {
                 const attribinfo &a = lastattribs[i];
                 if(diffmask & a.type) unsetattrib(a);
             }
             uchar *src = buf;
-            loopi(numattribs)
+            for(int i = 0; i < int(numattribs); i++)
             {
                 const attribinfo &a = attribs[i];
                 if(forceattribs || a != lastattribs[i])

@@ -106,7 +106,7 @@ namespace server
 
         bool remove(int val)
         {
-            loopi(numprojs) if(projs[i]==val)
+            for(int i = 0; i < int(numprojs); i++) if(projs[i]==val)
             {
                 projs[i] = projs[--numprojs];
                 return true;
@@ -464,7 +464,7 @@ namespace server
 
         int findmode(int mode) const
         {
-            if(!hasmode(mode)) loopi(NUMGAMEMODES) if(hasmode(i, 0)) return i+STARTGAMEMODE;
+            if(!hasmode(mode)) for(int i = 0; i < int(NUMGAMEMODES); i++) if(hasmode(i, 0)) return i+STARTGAMEMODE;
             return mode;
         }
 
@@ -560,14 +560,14 @@ namespace server
             {
                 case '*':
                     modemask |= (long)1<<NUMGAMEMODES;
-                    loopk(NUMGAMEMODES) if(m_checknot(k+STARTGAMEMODE, M_DEMO|M_EDIT|M_LOCAL)) modemask |= 1<<k;
+                    for(int k = 0; k < int(NUMGAMEMODES); k++) if(m_checknot(k+STARTGAMEMODE, M_DEMO|M_EDIT|M_LOCAL)) modemask |= 1<<k;
                     continue;
                 case '!':
                     mode++;
                     if(mode[0] != '?') break;
                 case '?':
                     mode++;
-                    loopk(NUMGAMEMODES) if(searchmodename(gamemodes[k].name, mode))
+                    for(int k = 0; k < int(NUMGAMEMODES); k++) if(searchmodename(gamemodes[k].name, mode))
                     {
                         if(op == '!') modemask &= ~(1<<k);
                         else modemask |= 1<<k;
@@ -576,7 +576,7 @@ namespace server
             }
             int modenum = INT_MAX;
             if(isdigit(mode[0])) modenum = atoi(mode);
-            else loopk(NUMGAMEMODES) if(searchmodename(gamemodes[k].name, mode)) { modenum = k+STARTGAMEMODE; break; }
+            else for(int k = 0; k < int(NUMGAMEMODES); k++) if(searchmodename(gamemodes[k].name, mode)) { modenum = k+STARTGAMEMODE; break; }
             if(!m_valid(modenum)) continue;
             switch(op)
             {
@@ -589,7 +589,7 @@ namespace server
          
     bool addmaprotation(int modemask, const char *map)
     {
-        if(!map[0]) loopk(NUMGAMEMODES) if(modemask&(1<<k) && !m_check(k+STARTGAMEMODE, M_EDIT)) modemask &= ~(1<<k);
+        if(!map[0]) for(int k = 0; k < int(NUMGAMEMODES); k++) if(modemask&(1<<k) && !m_check(k+STARTGAMEMODE, M_EDIT)) modemask &= ~(1<<k);
         if(!modemask) return false;
         if(!(modemask&((long)1<<NUMGAMEMODES))) maprotation::exclude |= modemask;
         maprotation &rot = maprotations.add();
@@ -703,7 +703,7 @@ namespace server
         if(!m_timed || actor->state.aitype != AI_NONE || actor->local || actor->privilege || (victim && victim->state.aitype != AI_NONE)) return;
         shouldcheckteamkills = true;
         uint ip = getclientip(actor->clientnum);
-        loopv(teamkills) if(teamkills[i].ip == ip) 
+        loopv(teamkills) if(teamkills[i].ip == ip)
         { 
             teamkills[i].teamkills += n;
             return;
@@ -815,7 +815,7 @@ namespace server
     int numclients(int exclude = -1, bool nospec = true, bool noai = true, bool priv = false)
     {
         int n = 0;
-        loopv(clients) 
+        loopv(clients)
         {
             clientinfo *ci = clients[i];
             if(ci->clientnum!=exclude && (!nospec || ci->state.state!=CS_SPECTATOR || (priv && (ci->privilege || ci->local))) && (!noai || ci->state.aitype == AI_NONE)) n++;
@@ -1018,7 +1018,7 @@ namespace server
             if(!selected) break;
             remaining -= selected;
         }
-        loopi(sizeof(team)/sizeof(team[0]))
+        for(int i = 0; i < int(sizeof(team)/sizeof(team[0])); i++)
         {
             addteaminfo(teamnames[i]);
             loopvj(team[i])
@@ -1051,7 +1051,7 @@ namespace server
             ci->state.timeplayed += lastmillis - ci->state.lasttimeplayed;
             ci->state.lasttimeplayed = lastmillis;
 
-            loopj(numteams) if(!strcmp(ci->team, teamranks[j].name))
+            for(int j = 0; j < int(numteams); j++) if(!strcmp(ci->team, teamranks[j].name))
             {
                 teamrank &ts = teamranks[j];
                 ts.rank += ci->state.effectiveness/std::max(ci->state.timeplayed, 1);
@@ -1060,7 +1060,7 @@ namespace server
             }
         }
         teamrank *worst = &teamranks[numteams-1];
-        loopi(numteams-1)
+        for(int i = 0; i < int(numteams-1); i++)
         {
             teamrank &ts = teamranks[i];
             if(smode && smode->hidefrags())
@@ -1076,7 +1076,7 @@ namespace server
     {
         int n = clamp(demos.length() + extra - maxdemos, 0, demos.length());
         if(n <= 0) return;
-        loopi(n) delete[] demos[i].data;
+        for(int i = 0; i < int(n); i++) delete[] demos[i].data;
         demos.remove(0, n);
     }
  
@@ -1772,7 +1772,7 @@ namespace server
         putint(p, gs.armourtype);
         putint(p, gs.gunselect);
         // TODO: gs.bombdelay gs.bombradius
-        loopi(GUN_PISTOL-GUN_SG+1) putint(p, gs.ammo[GUN_SG+i]);
+        for(int i = 0; i < int(GUN_PISTOL-GUN_SG+1); i++) putint(p, gs.ammo[GUN_SG+i]);
     }
 
     void spawnstate(clientinfo *ci)
@@ -2065,7 +2065,7 @@ namespace server
         if(smode){
         	smode->setup();
         	if(m_mp(gamemode))
-        		loopv(clients){
+          loopv(clients){
         			clientinfo* ci = clients[i];
         			if(ci->state.state == CS_SPECTATOR) continue;
         			if(!smode->canspawn(ci)){
@@ -2374,7 +2374,7 @@ namespace server
             // conoutf("server.cpp::explodeevent target=%i from=%i",target->clientnum, ci->clientnum);
 
             bool dup = false;
-            loopj(i) if(hits[j].target==h.target) { dup = true; break; }
+            for(int j = 0; j < int(i); j++) if(hits[j].target==h.target) { dup = true; break; }
             if(dup) continue;
 
             int damage = guns[gun].damage;
@@ -2545,7 +2545,7 @@ namespace server
         if(nextexceeded && gamemillis > nextexceeded && (!m_timed || gamemillis < gamelimit))
         {
             nextexceeded = 0;
-            loopvrev(clients) 
+            loopvrev(clients)
             {
                 clientinfo &c = *clients[i];
                 if(c.state.aitype != AI_NONE) continue;
@@ -2676,7 +2676,7 @@ namespace server
     void clientdisconnect(int n)
     {
         clientinfo *ci = getinfo(n);
-        loopv(clients) if(clients[i]->authkickvictim == ci->clientnum) clients[i]->cleanauth(); 
+        loopv(clients) if(clients[i]->authkickvictim == ci->clientnum) clients[i]->cleanauth();
         if(ci->connected)
         {
             if(ci->privilege) setmaster(ci, false);
@@ -2717,7 +2717,7 @@ namespace server
         union { uchar b[sizeof(enet_uint32)]; enet_uint32 i; } ip, mask;
         ip.i = 0;
         mask.i = 0;
-        loopi(4)
+        for(int i = 0; i < int(4); i++)
         {
             char *end = NULL;
             int n = strtol(name, &end, 10);
@@ -3051,19 +3051,19 @@ namespace server
                 clientinfo *cp = getinfo(pcn);
                 if(cp && pcn != sender && cp->ownernum != sender) cp = NULL;
                 vec pos;
-                loopk(3)
+                for(int k = 0; k < int(3); k++)
                 {
                     int n = p.get(); n |= p.get()<<8; if(flags&(1<<k)) { n |= p.get()<<16; if(n&0x800000) n |= -1<<24; }
                     pos[k] = n/DMF;
                 }
-                loopk(3) p.get();
+                for(int k = 0; k < int(3); k++) p.get();
                 int mag = p.get(); if(flags&(1<<3)) mag |= p.get()<<8;
                 int dir = p.get(); dir |= p.get()<<8;
                 vec vel = vec((dir%360)*RAD, (clamp(dir/360, 0, 180)-90)*RAD).mul(mag/DVELF);
                 if(flags&(1<<4))
                 {
                     p.get(); if(flags&(1<<5)) p.get();
-                    if(flags&(1<<6)) loopk(2) p.get();
+                    if(flags&(1<<6)) for(int k = 0; k < int(2); k++) p.get();
                 }
                 if(cp)
                 {
@@ -3230,10 +3230,10 @@ namespace server
                 shot->id = getint(p);
                 shot->millis = cq ? cq->geteventmillis(gamemillis, shot->id) : 0;
                 shot->gun = getint(p);
-                loopk(3) shot->from[k] = getint(p)/DMF;
-                loopk(3) shot->to[k] = getint(p)/DMF;
+                for(int k = 0; k < int(3); k++) shot->from[k] = getint(p)/DMF;
+                for(int k = 0; k < int(3); k++) shot->to[k] = getint(p)/DMF;
                 int hits = getint(p);
-                loopk(hits)
+                for(int k = 0; k < int(hits); k++)
                 {
                     if(p.overread()) break;
                     hitinfo &hit = shot->hits.add();
@@ -3241,7 +3241,7 @@ namespace server
                     hit.lifesequence = getint(p);
                     hit.dist = getint(p)/DMF;
                     hit.rays = getint(p);
-                    loopk(3) hit.dir[k] = getint(p)/DNF;
+                    for(int k = 0; k < int(3); k++) hit.dir[k] = getint(p)/DNF;
                 }
                 if(cq) 
                 {
@@ -3260,7 +3260,7 @@ namespace server
                 exp->gun = getint(p);
                 exp->id = getint(p);
                 int hits = getint(p);
-                loopk(hits)
+                for(int k = 0; k < int(hits); k++)
                 {
                     if(p.overread()) break;
                     hitinfo &hit = exp->hits.add();
@@ -3268,7 +3268,7 @@ namespace server
                     hit.lifesequence = getint(p);
                     hit.dist = getint(p)/DMF;
                     hit.rays = getint(p);
-                    loopk(3) hit.dir[k] = getint(p)/DNF;
+                    for(int k = 0; k < int(3); k++) hit.dir[k] = getint(p)/DNF;
                 }
                 if(cq) cq->addevent(exp);
                 else delete exp;
@@ -3372,9 +3372,9 @@ namespace server
             case N_EDITENT:
             {
                 int i = getint(p);
-                loopk(3) getint(p);
+                for(int k = 0; k < int(3); k++) getint(p);
                 int type = getint(p);
-                loopk(5) getint(p);
+                for(int k = 0; k < int(5); k++) getint(p);
                 if(!ci || ci->state.state==CS_SPECTATOR) break;
                 QUEUE_MSG;
                 bool canspawn = canspawnitem(type);
@@ -3743,7 +3743,7 @@ namespace server
             {
                 int size = server::msgsizelookup(type);
                 if(size<=0) { disconnect_client(sender, DISC_MSGERR); return; }
-                loopi(size-1) getint(p);
+                for(int i = 0; i < int(size-1); i++) getint(p);
                 if(ci && cq && (ci != cq || ci->state.state!=CS_SPECTATOR)) { QUEUE_AI; QUEUE_MSG; }
                 break;
             }

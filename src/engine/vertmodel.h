@@ -53,7 +53,7 @@ struct vertmodel : animmodel
 
         void buildnorms(bool areaweight = true)
         {
-            loopk(((vertmeshgroup *)group)->numframes)
+            for(int k = 0; k < int(((vertmeshgroup *)group)->numframes); k++)
                 mesh::buildnorms(&verts[k*numverts], numverts, tris, numtris, areaweight); 
         }
 
@@ -61,16 +61,16 @@ struct vertmodel : animmodel
         {
             if(bumpverts) return;
             bumpverts = new bumpvert[((vertmeshgroup *)group)->numframes*numverts];
-            loopk(((vertmeshgroup *)group)->numframes)
+            for(int k = 0; k < int(((vertmeshgroup *)group)->numframes); k++)
                 mesh::calctangents(&bumpverts[k*numverts], &verts[k*numverts], tcverts, numverts, tris, numtris, areaweight);
         }
 
         void calcbb(vec &bbmin, vec &bbmax, const matrix3x4 &m)
         {
-            loopj(numverts)
+            for(int j = 0; j < int(numverts); j++)
             {
                 vec v = m.transform(verts[j].pos);
-                loopi(3)
+                for(int i = 0; i < int(3); i++)
                 {
                     bbmin[i] = std::min(bbmin[i], v[i]);
                     bbmax[i] = std::max(bbmax[i], v[i]);
@@ -80,7 +80,7 @@ struct vertmodel : animmodel
 
         void gentris(Texture *tex, vector<BIH::tri> *out, const matrix3x4 &m)
         {
-            loopj(numtris)
+            for(int j = 0; j < int(numtris); j++)
             {
                 BIH::tri &t = out[noclip ? 1 : 0].add();
                 t.tex = tex;
@@ -148,16 +148,16 @@ struct vertmodel : animmodel
             voffset = offset;
             eoffset = idxs.length();
             minvert = 0xFFFF;
-            loopi(numtris)
+            for(int i = 0; i < int(numtris); i++)
             {
                 tri &t = tris[i];
-                loopj(3) 
+                for(int j = 0; j < int(3); j++)
                 {
                     int index = t.vert[j];
                     tcvert &tc = tcverts[index];
                     vert &v = verts[index];
                     int htidx = hthash(v.pos)&(htlen-1);
-                    loopk(htlen)
+                    for(int k = 0; k < int(htlen); k++)
                     {
                         int &vidx = htdata[(htidx+k)&(htlen-1)];
                         if(vidx < 0) { vidx = idxs.add(ushort(vverts.length())); assignvert(vverts.add(), index, tc, v); break; }
@@ -175,10 +175,10 @@ struct vertmodel : animmodel
         {
             voffset = offset;
             eoffset = idxs.length();
-            loopi(numtris)
+            for(int i = 0; i < int(numtris); i++)
             {
                 tri &t = tris[i];
-                loopj(3) idxs.add(voffset+t.vert[j]);
+                for(int j = 0; j < int(3); j++) idxs.add(voffset+t.vert[j]);
             }
             minvert = voffset;
             maxvert = voffset + numverts-1;
@@ -189,7 +189,7 @@ struct vertmodel : animmodel
         void filltc(uchar *vdata, size_t stride)
         {
             vdata = (uchar *)&((vvertff *)&vdata[voffset*stride])->u;
-            loopi(numverts)
+            for(int i = 0; i < int(numverts); i++)
             {
                 *(tcvert *)vdata = tcverts[i];
                 vdata += stride;
@@ -206,8 +206,8 @@ struct vertmodel : animmodel
             #define ipbvert(attrib)  v.attrib.lerp(bvert1[i].attrib, bvert2[i].attrib, as.cur.t)
             #define ipvertp(attrib)  v.attrib.lerp(pvert1[i].attrib, pvert2[i].attrib, as.prev.t).lerp(vec().lerp(vert1[i].attrib, vert2[i].attrib, as.cur.t), as.interp)
             #define ipbvertp(attrib) v.attrib.lerp(bpvert1[i].attrib, bpvert2[i].attrib, as.prev.t).lerp(vec().lerp(bvert1[i].attrib, bvert2[i].attrib, as.cur.t), as.interp)
-            #define iploop(type, body) \
-                loopi(numverts) \
+#define iploop(type, body)\
+                for(int i = 0; i < int(numverts); i++)\
                 { \
                     type &v = ((type * RESTRICT)vdata)[i]; \
                     body; \
@@ -341,7 +341,7 @@ struct vertmodel : animmodel
         {
             DELETEA(tags);
             if(ebuf) glDeleteBuffers_(1, &ebuf);
-            loopi(MAXVBOCACHE) 
+            for(int i = 0; i < int(MAXVBOCACHE); i++)
             {
                 DELETEA(vbocache[i].vdata);
                 if(vbocache[i].vbuf) glDeleteBuffers_(1, &vbocache[i].vbuf);
@@ -351,7 +351,7 @@ struct vertmodel : animmodel
 
         int findtag(const char *name)
         {
-            loopi(numtags) if(!strcmp(tags[i].name, name)) return i;
+            for(int i = 0; i < int(numtags); i++) if(!strcmp(tags[i].name, name)) return i;
             return -1;
         }
 
@@ -397,7 +397,7 @@ struct vertmodel : animmodel
                     { \
                         DELETEA(vdata); \
                         vdata = new uchar[vlen*vertsize]; \
-                        loopv(meshes) ((vertmesh *)meshes[i])->filltc(vdata, vertsize); \
+                        loopv(meshes) ((vertmesh *)meshes[i])->filltc(vdata, vertsize);\
                     } while(0)
                 if(!vc.vdata) ALLOCVDATA(vc.vdata);
                 return;
@@ -423,7 +423,7 @@ struct vertmodel : animmodel
                     do \
                     { \
                         vector<type> vverts; \
-                        loopv(meshes) vlen += ((vertmesh *)meshes[i])->genvbo(idxs, vlen, vverts, htdata, htlen); \
+                        loopv(meshes) vlen += ((vertmesh *)meshes[i])->genvbo(idxs, vlen, vverts, htdata, htlen);\
                         if(hasVBO) glBufferData_(GL_ARRAY_BUFFER_ARB, vverts.length()*sizeof(type), vverts.getbuf(), GL_STATIC_DRAW_ARB); \
                         else \
                         { \
@@ -514,7 +514,7 @@ struct vertmodel : animmodel
 
         void cleanup()
         {
-            loopi(MAXVBOCACHE)
+            for(int i = 0; i < int(MAXVBOCACHE); i++)
             {
                 vbocacheentry &c = vbocache[i];
                 if(c.vbuf) { glDeleteBuffers_(1, &c.vbuf); c.vbuf = 0; }
@@ -547,7 +547,7 @@ struct vertmodel : animmodel
             }
 
             bool norms = false, tangents = false;
-            loopv(p->skins) 
+            loopv(p->skins)
             {
                 if(p->skins[i].normals()) norms = true;
                 if(p->skins[i].tangents()) tangents = true;
@@ -557,13 +557,13 @@ struct vertmodel : animmodel
             if(numframes<=1) vc = vbocache;
             else
             {
-                loopi(MAXVBOCACHE)
+                for(int i = 0; i < int(MAXVBOCACHE); i++)
                 {
                     vbocacheentry &c = vbocache[i];
                     if(hasVBO ? !c.vbuf : !c.vdata) continue;
                     if(c.as==*as) { vc = &c; break; }
                 }
-                if(!vc) loopi(MAXVBOCACHE) { vc = &vbocache[i]; if((hasVBO ? !vc->vbuf : !vc->vdata) || vc->millis < lastmillis) break; }
+                if(!vc) for(int i = 0; i < int(MAXVBOCACHE); i++) { vc = &vbocache[i]; if((hasVBO ? !vc->vbuf : !vc->vdata) || vc->millis < lastmillis) break; }
             }
             if(hasVBO ? !vc->vbuf : !vc->vdata) genvbo(norms, tangents, *vc);
             if(numframes>1)
@@ -572,7 +572,7 @@ struct vertmodel : animmodel
                 {
                     vc->as = *as;
                     vc->millis = lastmillis;
-                    loopv(meshes) 
+                    loopv(meshes)
                     {
                         vertmesh &m = *(vertmesh *)meshes[i];
                         m.interpverts(*as, norms, tangents, (hasVBO ? vdata : vc->vdata) + m.voffset*vertsize, p->skins[i]);

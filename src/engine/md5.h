@@ -55,11 +55,11 @@ struct md5 : skelmodel, skelloader<md5>
 
         void buildverts(vector<md5joint> &joints)
         {
-            loopi(numverts)
+            for(int i = 0; i < int(numverts); i++)
             {
                 md5vert &v = vertinfo[i];
                 vec pos(0, 0, 0);
-                loopk(v.count)
+                for(int k = 0; k < int(v.count); k++)
                 {
                     md5weight &w = weightinfo[v.start+k];
                     md5joint &j = joints[w.joint];
@@ -75,7 +75,7 @@ struct md5 : skelmodel, skelloader<md5>
 
                 blendcombo c;
                 int sorted = 0;
-                loopj(v.count)
+                for(int j = 0; j < int(v.count); j++)
                 {
                     md5weight &w = weightinfo[v.start+j];
                     sorted = c.addweight(sorted, w.bias, w.joint); 
@@ -238,7 +238,7 @@ struct md5 : skelmodel, skelloader<md5>
             if(skel->shared <= 1) 
             {
                 skel->linkchildren();
-                loopv(basejoints) 
+                loopv(basejoints)
                 {
                     boneinfo &b = skel->bones[i];
                     b.base = dualquat(basejoints[i].orient, basejoints[i].pos);
@@ -444,7 +444,7 @@ struct md5 : skelmodel, skelloader<md5>
         }
         scale /= 4;
         parts[0]->translate = translate;
-        loopv(parts) 
+        loopv(parts)
         {
             skelpart *p = (skelpart *)parts[i];
             p->endanimparts();

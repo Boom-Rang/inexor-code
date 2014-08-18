@@ -352,7 +352,7 @@ static int findsound(const char *name, int vol, vector<soundconfig> &sounds, vec
     loopv(sounds)
     {
         soundconfig &s = sounds[i];
-        loopj(s.numslots)
+        for(int j = 0; j < int(s.numslots); j++)
         {
             soundslot &c = slots[s.slots+j];
             if(!strcmp(c.sample->name, name) && (!vol || c.volume==vol)) return i;
@@ -537,7 +537,7 @@ void updatesounds()
     if(dirty)
     {
         SDL_LockAudio(); // workaround for race conditions inside Mix_SetPanning
-        loopv(channels) 
+        loopv(channels)
         {
             soundchannel &chan = channels[i];
             if(chan.inuse && chan.dirty) syncchannel(chan);
@@ -580,7 +580,7 @@ static bool loadsoundslot(soundslot &slot, bool msg = false)
 
     static const char * const exts[] = { "", ".wav", ".ogg" };
     string filename;
-    loopi(sizeof(exts)/sizeof(exts[0]))
+    for(int i = 0; i < int(sizeof(exts)/sizeof(exts[0])); i++)
     {
         formatstring(filename)("packages/sounds/%s%s", slot.sample->name, exts[i]);
         if(msg && !i) renderprogress(0, filename);
@@ -597,7 +597,7 @@ static inline void preloadsound(vector<soundconfig> &sounds, vector<soundslot> &
 {
     if(!sounds.inrange(n)) return;
     soundconfig &config = sounds[n];
-    loopk(config.numslots) loadsoundslot(slots[config.slots+k], true);
+    for(int k = 0; k < int(config.numslots); k++) loadsoundslot(slots[config.slots+k], true);
 }
 
 void preloadsound(int n)

@@ -46,7 +46,7 @@ struct dynlight
         }
         curcolor.mul(intensity);
         // KLUGE: this prevents nvidia drivers from trying to recompile dynlight fragment programs
-        loopk(3) if(fmod(curcolor[k], 1.0f/256) < 0.001f) curcolor[k] += 0.001f;
+        for(int k = 0; k < int(3); k++) if(fmod(curcolor[k], 1.0f/256) < 0.001f) curcolor[k] += 0.001f;
     }
 };
 
@@ -200,7 +200,7 @@ int setdynlights(vtxarray *va)
     if(closedynlights.empty() || !va->dynlightmask) return 0;
 
     static string posparams[MAXDYNLIGHTS] = { "" }, colorparams[MAXDYNLIGHTS] = { "" }, offsetparams[MAXDYNLIGHTS] = { "" };
-    if(!*posparams[0]) loopi(MAXDYNLIGHTS)
+    if(!*posparams[0]) for(int i = 0; i < int(MAXDYNLIGHTS); i++)
     {
         formatstring(posparams[i])("dynlight%dpos", i);
         formatstring(colorparams[i])("dynlight%dcolor", i);

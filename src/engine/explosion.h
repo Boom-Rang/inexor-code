@@ -19,8 +19,8 @@ static void subdivide(int depth, int face)
 {
     if(depth-- <= 0) return;
     int idx[6];
-    loopi(3) idx[i] = hemiindices[face+i];
-    loopi(3)
+    for(int i = 0; i < int(3); i++) idx[i] = hemiindices[face+i];
+    for(int i = 0; i < int(3); i++)
     {
         int vert = heminumverts++;
         hemiverts[vert] = vec(hemiverts[idx[i]]).add(hemiverts[idx[(i+1)%3]]).normalize(); //push on to unit sphere
@@ -28,7 +28,7 @@ static void subdivide(int depth, int face)
         hemiindices[face+i] = vert;
     }
     subdivide(depth, face);
-    loopi(3) genface(depth, idx[i], idx[3+i], idx[3+(i+2)%3]);
+    for(int i = 0; i < int(3); i++) genface(depth, idx[i], idx[3+i], idx[3+(i+2)%3]);
 }
 
 //subdiv version wobble much more nicely than a lat/longitude version
@@ -41,8 +41,8 @@ static void inithemisphere(int hres, int depth)
     hemiverts = new vec[tris+1];
     hemiindices = new GLushort[tris*3];
     hemiverts[heminumverts++] = vec(0.0f, 0.0f, 1.0f); //build initial 'hres' sided pyramid
-    loopi(hres) hemiverts[heminumverts++] = vec(sincos360[(360*i)/hres], 0.0f);
-    loopi(hres) genface(depth, 0, i+1, 1+(i+1)%hres);
+    for(int i = 0; i < int(hres); i++) hemiverts[heminumverts++] = vec(sincos360[(360*i)/hres], 0.0f);
+    for(int i = 0; i < int(hres); i++) genface(depth, 0, i+1, 1+(i+1)%hres);
 
     if(hasVBO)
     {
@@ -67,12 +67,12 @@ static GLuint lastexpmodtex = 0;
 static GLuint createexpmodtex(int size, float minval)
 {
     uchar *data = new uchar[size*size], *dst = data;
-    loop(y, size) loop(x, size)
+    for(int y = 0; y < int(size); y++) for(int x = 0; x < int(size); x++)
     {
         float dx = 2*float(x)/(size-1) - 1, dy = 2*float(y)/(size-1) - 1;
         float z = std::max(0.0f, 1.0f - dx*dx - dy*dy);
         if(minval) z = sqrtf(z);
-        else loopk(2) z *= z;
+        else for(int k = 0; k < int(2); k++) z *= z;
         *dst++ = uchar(std::max(z, minval)*255);
     }
     GLuint tex = 0;
@@ -100,7 +100,7 @@ static void animateexplosion()
     lastexpmillis = lastmillis;
     vec center = vec(13.0f, 2.3f, 7.1f);  //only update once per frame! - so use the same center for all...
     if(!expverts) expverts = new expvert[heminumverts];
-    loopi(heminumverts)
+    for(int i = 0; i < int(heminumverts); i++)
     {
         expvert &e = expverts[i];
         vec &v = hemiverts[i];
@@ -140,10 +140,10 @@ static void initsphere(int slices, int stacks)
     spherenumverts = (stacks+1)*(slices+1);
     sphereverts = new spherevert[spherenumverts];
     float ds = 1.0f/slices, dt = 1.0f/stacks, t = 1.0f;
-    loopi(stacks+1)
+    for(int i = 0; i < int(stacks+1); i++)
     {
         float rho = M_PI*(1-t), s = 0.0f;
-        loopj(slices+1)
+        for(int j = 0; j < int(slices+1); j++)
         {
             float theta = j==slices ? 0 : 2*M_PI*s;
             spherevert &v = sphereverts[i*(slices+1) + j];
@@ -159,9 +159,9 @@ static void initsphere(int slices, int stacks)
     spherenumindices = stacks*slices*3*2;
     sphereindices = new ushort[spherenumindices];
     GLushort *curindex = sphereindices;
-    loopi(stacks)
+    for(int i = 0; i < int(stacks); i++)
     {
-        loopk(slices)
+        for(int k = 0; k < int(slices); k++)
         {
             int j = i%2 ? slices-k-1 : k;
 
@@ -303,7 +303,7 @@ static void drawexplosion(bool inside, uchar r, uchar g, uchar b, uchar a)
     if(renderpath!=R_FIXEDFUNCTION && !explosion2d)
     {
         if(inside) glScalef(1, 1, -1);
-        loopi(passes)
+        for(int i = 0; i < int(passes); i++)
         {
             glColor4ub(r, g, b, i ? a/2 : a);
             if(i) glDepthFunc(GL_GEQUAL);
@@ -312,7 +312,7 @@ static void drawexplosion(bool inside, uchar r, uchar g, uchar b, uchar a)
         }
         return;
     }
-    loopi(passes)
+    for(int i = 0; i < int(passes); i++)
     {
         glColor4ub(r, g, b, i ? a/2 : a);
         if(i)
@@ -371,7 +371,7 @@ static void cleanupexplosion()
 
 static void deleteexplosions()
 {
-    loopi(2) if(expmodtex[i]) { glDeleteTextures(1, &expmodtex[i]); expmodtex[i] = 0; }
+    for(int i = 0; i < int(2); i++) if(expmodtex[i]) { glDeleteTextures(1, &expmodtex[i]); expmodtex[i] = 0; }
     if(hemivbuf) { glDeleteBuffers_(1, &hemivbuf); hemivbuf = 0; }
     if(hemiebuf) { glDeleteBuffers_(1, &hemiebuf); hemiebuf = 0; }
     DELETEA(hemiverts);
@@ -440,14 +440,14 @@ struct fireballrenderer : listrenderer
             dir.mul(psize/dist).add(p->o);
             float depth = depthfxtex.eyedepth(dir);
 
-            loopk(3)
+            for(int k = 0; k < int(3); k++)
             {
                 bbmin[k] = std::min(bbmin[k], p->o[k] - psize);
                 bbmax[k] = std::max(bbmax[k], p->o[k] + psize);
             }
 
             int pos = numranges;
-            loopi(numranges) if(depth < ranges[i]) { pos = i; break; }
+            for(int i = 0; i < int(numranges); i++) if(depth < ranges[i]) { pos = i; break; }
             if(pos >= maxranges) continue;
 
             if(numranges > pos)

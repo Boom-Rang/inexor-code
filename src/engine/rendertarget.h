@@ -210,7 +210,7 @@ struct rendertarget
             memcpy(tiles, blurtiles, sizeof(blurtiles));
 
             float tsz = 1.0f/BLURTILES;
-            loop(y, BLURTILES+1)
+            for(int y = 0; y < int(BLURTILES+1); y++)
             {
                 uint mask = tiles[y];
                 int x = 0;
@@ -273,7 +273,7 @@ struct rendertarget
             glEnable(GL_SCISSOR_TEST);
         }
 
-        loopi(2)
+        for(int i = 0; i < int(2); i++)
         {
             setblurshader(i, target == GL_TEXTURE_RECTANGLE_ARB ? 1 : (i ? texh : texw), blursize, blurweights, bluroffsets, target);
 
@@ -495,7 +495,7 @@ struct rendertarget
     {
         if(!blurtile) return;
         float vxsz = float(w)/BLURTILES, vysz = float(h)/BLURTILES;
-        loop(y, BLURTILES+1)
+        for(int y = 0; y < int(BLURTILES+1); y++)
         {
             uint mask = blurtiles[y];
             int x = 0;
@@ -513,7 +513,7 @@ struct rendertarget
                       vw = (x-xstart)*vxsz,
                       vh = (yend-y)*vysz;
                 if(flipdebug()) { vy = h - vy; vh = -vh; }
-                loopi(lines ? 1 : 2)
+                for(int i = 0; i < int(lines ? 1 : 2); i++)
                 {
                     if(!lines) glColor3f(1, 1, i ? 1.0f : 0.5f);
                     glBegin(lines || i ? GL_LINE_LOOP : GL_TRIANGLE_STRIP);

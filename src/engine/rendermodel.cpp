@@ -424,7 +424,7 @@ model *loadmodel(const char *name, int i, bool msg)
             defformatstring(filename)("packages/models/%s", name);
             renderprogress(loadprogress, filename);
         }
-        loopi(NUMMODELTYPES)
+        for(int i = 0; i < int(NUMMODELTYPES); i++)
         {
             m = modeltypes[i](name);
             if(!m) continue;
@@ -513,7 +513,7 @@ void renderellipse(vec &o, float xradius, float yradius, float yaw)
     glDisable(GL_TEXTURE_2D);
     glColor3f(0.5f, 0.5f, 0.5f);
     glBegin(GL_LINE_LOOP);
-    loopi(15)
+    for(int i = 0; i < int(15); i++)
     {
         const vec2 &sc = sincos360[i*(360/15)];
         vec p(xradius*sc.x, yradius*sc.y, 0);
@@ -606,7 +606,7 @@ static inline bool sorttransparentmodels(const transparentmodel &x, const transp
 void endmodelbatches()
 {
     vector<transparentmodel> transparent;
-    loopi(numbatches)
+    for(int i = 0; i < int(numbatches); i++)
     {
         modelbatch &b = *batches[i];
         if(b.batched.empty()) continue;
@@ -639,7 +639,7 @@ void endmodelbatches()
                 rendered = false;
             }
         }
-        loopvj(b.batched) 
+        loopvj(b.batched)
         {
             batchedmodel &bm = b.batched[j];
             if(bm.flags&(MDL_CULL_VFC|MDL_GHOST)) continue;
@@ -698,7 +698,7 @@ void startmodelquery(occludequery *query)
 void endmodelquery()
 {
     int querybatches = 0;
-    loopi(numbatches)
+    for(int i = 0; i < int(numbatches); i++)
     {
         modelbatch &b = *batches[i];
         if(b.batched.empty() || b.batched.last().query!=modelquery) continue;
@@ -712,7 +712,7 @@ void endmodelquery()
     }
     int minattached = modelattached.length();
     startquery(modelquery);
-    loopi(numbatches)
+    for(int i = 0; i < int(numbatches); i++)
     {
         modelbatch &b = *batches[i];
         if(b.batched.empty() || b.batched.last().query!=modelquery) continue;
@@ -990,7 +990,7 @@ bool matchanim(const char *name, const char *pattern)
 
 void findanims(const char *pattern, vector<int> &anims)
 {
-    loopi(sizeof(animnames)/sizeof(animnames[0])) if(matchanim(animnames[i], pattern)) anims.add(i);
+    for(int i = 0; i < int(sizeof(animnames)/sizeof(animnames[0])); i++) if(matchanim(animnames[i], pattern)) anims.add(i);
 }
 
 ICOMMAND(findanims, "s", (char *name),

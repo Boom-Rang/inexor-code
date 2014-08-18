@@ -674,11 +674,11 @@ struct gui : g3d_gui
         int xoff = vslot.xoffset, yoff = vslot.yoffset;
         if(vslot.rotation)
         {
-            if((vslot.rotation&5) == 1) { std::swap(xoff, yoff); loopk(4) std::swap(tc[k][0], tc[k][1]); }
-            if(vslot.rotation >= 2 && vslot.rotation <= 4) { xoff *= -1; loopk(4) tc[k][0] *= -1; }
-            if(vslot.rotation <= 2 || vslot.rotation == 5) { yoff *= -1; loopk(4) tc[k][1] *= -1; }
+            if((vslot.rotation&5) == 1) { std::swap(xoff, yoff); for(int k = 0; k < int(4); k++) std::swap(tc[k][0], tc[k][1]); }
+            if(vslot.rotation >= 2 && vslot.rotation <= 4) { xoff *= -1; for(int k = 0; k < int(4); k++) tc[k][0] *= -1; }
+            if(vslot.rotation <= 2 || vslot.rotation == 5) { yoff *= -1; for(int k = 0; k < int(4); k++) tc[k][1] *= -1; }
         }
-        loopk(4) { tc[k][0] = tc[k][0]/xt - float(xoff)/t->xs; tc[k][1] = tc[k][1]/yt - float(yoff)/t->ys; }
+        for(int k = 0; k < int(4); k++) { tc[k][0] = tc[k][0]/xt - float(xoff)/t->xs; tc[k][1] = tc[k][1]/yt - float(yoff)/t->ys; }
         if(slot.loaded) glColor3f(color.x*vslot.colorscale.x, color.y*vslot.colorscale.y, color.z*vslot.colorscale.z);
         else glColor3fv(color.v);
         glBindTexture(GL_TEXTURE_2D, t->id);
@@ -800,12 +800,12 @@ struct gui : g3d_gui
         int gapx1 = INT_MAX, gapy1 = INT_MAX, gapx2 = INT_MAX, gapy2 = INT_MAX;
         float wscale = 1.0f/(SKIN_W*SKIN_SCALE), hscale = 1.0f/(SKIN_H*SKIN_SCALE);
         
-        loopj(passes)
+        for(int j = 0; j < int(passes); j++)
         {	
             bool quads = false;
             if(passes>1) glDepthFunc(j ? GL_LEQUAL : GL_GREATER);
             glColor4f(j ? light.x : 1.0f, j ? light.y : 1.0f, j ? light.z : 1.0f, passes<=1 || j ? alpha : alpha/2); //ghost when its behind something in depth
-            loopi(n)
+            for(int i = 0; i < int(n); i++)
             {
                 const patch &p = patches[start+i];
                 int left = skinx[p.left]*SKIN_SCALE, right = skinx[p.right]*SKIN_SCALE,
@@ -1156,7 +1156,7 @@ bool menukey(int code, bool isdown, int cooked)
                     if(windowhit->gui2d)
                     {
                         vec origin = *guis2d[0].savedorigin;
-                        loopj(guis2d.length()-1) *guis2d[j].savedorigin = *guis2d[j + 1].savedorigin;
+                        for(int j = 0; j < int(guis2d.length()-1); j++) *guis2d[j].savedorigin = *guis2d[j + 1].savedorigin;
                         *guis2d.last().savedorigin = origin;
                         if(guis2d.length() > 1)
                         {

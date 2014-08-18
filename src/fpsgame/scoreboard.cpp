@@ -111,7 +111,7 @@ namespace game
             if(o->state==CS_SPECTATOR) { spectators.add(o); continue; }
             const char *team = m_teammode && o->team[0] ? o->team : NULL;
             bool found = false;
-            loopj(numgroups)
+            for(int j = 0; j < int(numgroups); j++)
             {
                 scoregroup &g = *groups[j];
                 if(team!=g.team && (!team || !g.team || strcmp(team, g.team))) continue;
@@ -128,7 +128,7 @@ namespace game
             g.players.setsize(0);
             g.players.add(o);
         }
-        loopi(numgroups) groups[i]->players.sort(playersort);
+        for(int i = 0; i < int(numgroups); i++) groups[i]->players.sort(playersort);
         spectators.sort(playersort);
         groups.sort(scoregroupcmp, 0, numgroups);
         return numgroups;
@@ -183,7 +183,7 @@ namespace game
         g.separator();
  
         int numgroups = groupplayers();
-        loopk(numgroups)
+        for(int k = 0; k < int(numgroups); k++)
         {
             if((k%2)==0) g.pushlist(); // horizontal
             
@@ -195,7 +195,7 @@ namespace game
             g.pushlist(); // horizontal
 
             #define loopscoregroup(o, b) \
-                loopv(sg.players) \
+                loopv(sg.players)\
                 { \
                     fpsent *o = sg.players[i]; \
                     b; \
@@ -321,7 +321,7 @@ namespace game
                 
                 g.pushlist();
                 g.text("spectator", 0xFFFF80, " ");
-                loopv(spectators) 
+                loopv(spectators)
                 {
                     fpsent *o = spectators[i];
                     int status = 0xFFFFDD;

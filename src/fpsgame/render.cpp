@@ -78,7 +78,7 @@ namespace game
     {
         if(player1->clientnum < 0) player1->playermodel = playermodel;
         if(player1->ragdoll) cleanragdoll(player1);
-        loopv(ragdolls) 
+        loopv(ragdolls)
         {
             fpsent *d = ragdolls[i];
             if(!d->ragdoll) continue;
@@ -104,7 +104,7 @@ namespace game
 
     void preloadplayermodel()
     {
-        loopi(sizeof(playermodels)/sizeof(playermodels[0]))
+        for(int i = 0; i < int(sizeof(playermodels)/sizeof(playermodels[0])); i++)
         {
             const playermodelinfo *mdl = getplayermodelinfo(i);
             if(!mdl) break;
@@ -117,7 +117,7 @@ namespace game
             else preloadmodel(mdl->ffa);
             if(mdl->vwep) preloadmodel(mdl->vwep);
             if(mdl->quad) preloadmodel(mdl->quad);
-            loopj(3) if(mdl->armour[j]) preloadmodel(mdl->armour[j]);
+            for(int j = 0; j < int(3); j++) if(mdl->armour[j]) preloadmodel(mdl->armour[j]);
         }
     }
     
@@ -363,7 +363,7 @@ namespace game
             previewent->o = vec(0, 0.9f*(previewent->eyeheight + previewent->aboveeye), previewent->eyeheight - (previewent->eyeheight + previewent->aboveeye)/2);
             previewent->light.color = vec(1, 1, 1);
             previewent->light.dir = vec(0, -1, 2).normalize();
-            loopi(GUN_PISTOL-GUN_FIST) previewent->ammo[GUN_FIST+1+i] = 1;
+            for(int i = 0; i < int(GUN_PISTOL-GUN_FIST); i++) previewent->ammo[GUN_FIST+1+i] = 1;
         }
         previewent->gunselect = clamp(weap, int(GUN_FIST), int(GUN_PISTOL));
         previewent->yaw = fmod(lastmillis/10000.0f*360.0f, 360.0f);
@@ -404,7 +404,7 @@ namespace game
     void preloadweapons()
     {
         const playermodelinfo &mdl = getplayermodelinfo(player1);
-        loopi(NUMGUNS)
+        for(int i = 0; i < int(NUMGUNS); i++)
         {
             const char *file = guns[i].file;
             if(!file) continue;

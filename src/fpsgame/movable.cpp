@@ -94,7 +94,7 @@ namespace game
             movables.deletecontents();
         }
         if(!m_dmsp && !m_classicsp && !m_obstacles) return;
-        loopv(entities::ents) 
+        loopv(entities::ents)
         {
             const entity &e = *entities::ents[i];
             if(e.type!=BOX && e.type!=BARREL && e.type!=OBSTACLE && e.type!=PLATFORM && e.type!=ELEVATOR) continue;

@@ -5,7 +5,7 @@ Texture *sky[6] = { 0, 0, 0, 0, 0, 0 }, *clouds[6] = { 0, 0, 0, 0, 0, 0 };
 void loadsky(const char *basename, Texture *texs[6])
 {
     const char *wildcard = strchr(basename, '*');
-    loopi(6)
+    for(int i = 0; i < int(6); i++)
     {
         const char *side = cubemapsides[i].name;
         string name;
@@ -143,7 +143,7 @@ void draw_env_overlay(int w, Texture *overlay = NULL, float tx = 0, float ty = 0
     float r = (cloudcolour>>16)/255.0f, g = ((cloudcolour>>8)&255)/255.0f, b = (cloudcolour&255)/255.0f;
     glColor4f(r, g, b, cloudalpha);
     glBegin(GL_TRIANGLE_FAN);
-    loopi(cloudsubdiv+1)
+    for(int i = 0; i < int(cloudsubdiv+1); i++)
     {
         vec p(1, 1, 0);
         p.rotate_around_z((-2.0f*M_PI*i)/cloudsubdiv);
@@ -152,7 +152,7 @@ void draw_env_overlay(int w, Texture *overlay = NULL, float tx = 0, float ty = 0
     glEnd();
     float tsz2 = 0.5f/cloudscale;
     glBegin(GL_TRIANGLE_STRIP);
-    loopi(cloudsubdiv+1)
+    for(int i = 0; i < int(cloudsubdiv+1); i++)
     {
         vec p(1, 1, 0);
         p.rotate_around_z((-2.0f*M_PI*i)/cloudsubdiv);
@@ -202,8 +202,8 @@ static void subdivide(int depth, int face)
 {
     if(depth-- <= 0) return;
     int idx[6];
-    loopi(3) idx[i] = domeindices[face+2-i];
-    loopi(3)
+    for(int i = 0; i < int(3); i++) idx[i] = domeindices[face+2-i];
+    for(int i = 0; i < int(3); i++)
     {
         int vert = domenumverts++;
         domeverts[vert] = domevert(domeverts[idx[i]], domeverts[idx[(i+1)%3]]); //push on to unit sphere
@@ -211,7 +211,7 @@ static void subdivide(int depth, int face)
         domeindices[face+2-i] = vert;
     }
     subdivide(depth, face);
-    loopi(3) genface(depth, idx[i], idx[3+i], idx[3+(i+2)%3]);
+    for(int i = 0; i < int(3); i++) genface(depth, idx[i], idx[3+i], idx[3+(i+2)%3]);
 }
 
 static int sortdomecap(GLushort x, GLushort y)
@@ -231,25 +231,25 @@ static void initdome(const bvec &color, float minalpha = 0.0f, float maxalpha = 
     if(clipz >= 1)
     {
         domeverts[domenumverts++] = domevert(vec(0.0f, 0.0f, 1.0f), color, minalpha); //build initial 'hres' sided pyramid
-        loopi(hres) domeverts[domenumverts++] = domevert(vec(sincos360[(360*i)/hres], 0.0f), color, maxalpha);
-        loopi(hres) genface(depth, 0, i+1, 1+(i+1)%hres);
+        for(int i = 0; i < int(hres); i++) domeverts[domenumverts++] = domevert(vec(sincos360[(360*i)/hres], 0.0f), color, maxalpha);
+        for(int i = 0; i < int(hres); i++) genface(depth, 0, i+1, 1+(i+1)%hres);
     }
     else if(clipz <= 0)
     {
-        loopi(hres<<depth) domeverts[domenumverts++] = domevert(vec(sincos360[(360*i)/(hres<<depth)], 0.0f), color, maxalpha);
+        for(int i = 0; i < int(hres<<depth); i++) domeverts[domenumverts++] = domevert(vec(sincos360[(360*i)/(hres<<depth)], 0.0f), color, maxalpha);
     }
     else
     {
         float clipxy = sqrtf(1 - clipz*clipz);
         const vec2 &scm = sincos360[180/hres];
-        loopi(hres)
+        for(int i = 0; i < int(hres); i++)
         {
             const vec2 &sc = sincos360[(360*i)/hres];
             domeverts[domenumverts++] = domevert(vec(sc.x*clipxy, sc.y*clipxy, clipz), color, minalpha);
             domeverts[domenumverts++] = domevert(vec(sc.x, sc.y, 0.0f), color, maxalpha);
             domeverts[domenumverts++] = domevert(vec(sc.x*scm.x - sc.y*scm.y, sc.y*scm.x + sc.x*scm.y, 0.0f), color, maxalpha);
         }
-        loopi(hres)
+        for(int i = 0; i < int(hres); i++)
         {
             genface(depth-1, 3*i, 3*i+1, 3*i+2);
             genface(depth-1, 3*i, 3*i+2, 3*((i+1)%hres));
@@ -261,10 +261,10 @@ static void initdome(const bvec &color, float minalpha = 0.0f, float maxalpha = 
     {
         GLushort *domecap = &domeindices[domenumindices];
         int domecapverts = 0;
-        loopi(domenumverts) if(!domeverts[i].pos.z) domecap[domecapverts++] = i;
+        for(int i = 0; i < int(domenumverts); i++) if(!domeverts[i].pos.z) domecap[domecapverts++] = i;
         domeverts[domenumverts++] = domevert(vec(0.0f, 0.0f, -capsize), color, maxalpha);
         quicksort(domecap, domecapverts, sortdomecap); 
-        loopi(domecapverts)
+        for(int i = 0; i < int(domecapverts); i++)
         {
             int n = domecapverts-1-i;
             domecap[n*3] = domecap[n];

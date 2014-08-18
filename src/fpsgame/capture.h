@@ -188,23 +188,23 @@ struct captureclientmode : clientmode
 
         if(b.ammogroup)
         {
-            loopi(bases.length()-1) if(b.ammogroup == bases[i].ammogroup)
+            for(int i = 0; i < int(bases.length()-1); i++) if(b.ammogroup == bases[i].ammogroup)
             {
                 b.ammotype = bases[i].ammotype;
                 return;
             }
             int uses[I_GRENADES-I_SHELLS+1];
             memset(uses, 0, sizeof(uses));
-            loopi(bases.length()-1) if(bases[i].ammogroup)
+            for(int i = 0; i < int(bases.length()-1); i++) if(bases[i].ammogroup)
             {
-                loopj(i) if(bases[j].ammogroup == bases[i].ammogroup) goto nextbase;
+                for(int j = 0; j < int(i); j++) if(bases[j].ammogroup == bases[i].ammogroup) goto nextbase;
                 uses[bases[i].ammotype-1]++;
                 nextbase:;
             }
             int mintype = 0;
-            loopi(I_GRENADES-I_SHELLS+1) if(uses[i] < uses[mintype]) mintype = i;
+            for(int i = 0; i < int(I_GRENADES-I_SHELLS+1); i++) if(uses[i] < uses[mintype]) mintype = i;
             int numavail = 0, avail[I_GRENADES-I_SHELLS+1];
-            loopi(I_GRENADES-I_SHELLS+1) if(uses[i] == uses[mintype]) avail[numavail++] = i+1;
+            for(int i = 0; i < int(I_GRENADES-I_SHELLS+1); i++) if(uses[i] == uses[mintype]) avail[numavail++] = i+1;
             b.ammotype = avail[rnd(numavail)];
         }
     }
@@ -330,7 +330,7 @@ struct captureclientmode : clientmode
     void preload()
     {
         static const char * const basemodels[3] = { "base/neutral", "base/red", "base/blue" };
-        loopi(3) preloadmodel(basemodels[i]);
+        for(int i = 0; i < int(3); i++) preloadmodel(basemodels[i]);
         preloadsound(S_V_BASECAP);
         preloadsound(S_V_BASELOST);
     }
@@ -367,7 +367,7 @@ struct captureclientmode : clientmode
                 ammopos.z -= height.z/2 + sinf(lastmillis/100.0f)/20;
                 rendermodel(&b.light, ammoname, ANIM_MAPMODEL|ANIM_LOOP, ammopos, lastmillis/10.0f, 0, MDL_SHADOW | MDL_CULL_VFC | MDL_CULL_OCCLUDED);
             }
-            else loopj(b.ammo)
+            else for(int j = 0; j < int(b.ammo); j++)
             {
                 float angle = 2*M_PI*(lastmillis/4000.0f + j/float(MAXAMMO));
                 vec ammopos(b.o);
@@ -677,7 +677,7 @@ struct captureclientmode : clientmode
 	void aifind(fpsent *d, ai::aistate &b, vector<ai::interest> &interests)
 	{
 		vec pos = d->feetpos();
-		loopvj(bases)
+  loopvj(bases)
 		{
 			baseinfo &f = bases[j];
             if(!f.valid()) continue;
@@ -692,7 +692,7 @@ struct captureclientmode : clientmode
 				if(f.ammo > 0 && !d->hasmaxammo(gun))
 					regen = gun != d->ai->weappref ? 2 : 4;
 			}
-			loopi(numdynents()) if((e = (fpsent *)iterdynents(i)) && !e->ai && e->state == CS_ALIVE && isteam(d->team, e->team))
+   for(int i = 0; i < int(numdynents()); i++) if((e = (fpsent *)iterdynents(i)) && !e->ai && e->state == CS_ALIVE && isteam(d->team, e->team))
 			{ // try to guess what non ai are doing
 				vec ep = e->feetpos();
 				if(targets.find(e->clientnum) < 0 && ep.squaredist(f.o) <= (CAPTURERADIUS*CAPTURERADIUS))
@@ -729,7 +729,7 @@ struct captureclientmode : clientmode
 			targets.setsize(0);
 			ai::checkothers(targets, d, ai::AI_S_DEFEND, ai::AI_T_AFFINITY, b.target, true);
 			fpsent *e = NULL;
-			loopi(numdynents()) if((e = (fpsent *)iterdynents(i)) && !e->ai && e->state == CS_ALIVE && isteam(d->team, e->team))
+   for(int i = 0; i < int(numdynents()); i++) if((e = (fpsent *)iterdynents(i)) && !e->ai && e->state == CS_ALIVE && isteam(d->team, e->team))
 			{ // try to guess what non ai are doing
 				vec ep = e->feetpos();
 				if(targets.find(e->clientnum) < 0 && (ep.squaredist(f.o) <= (CAPTURERADIUS*CAPTURERADIUS*4)))
@@ -1062,11 +1062,11 @@ ICOMMAND(insidebases, "", (),
     void parsebases(ucharbuf &p, bool commit)
     {
         int numbases = getint(p);
-        loopi(numbases)
+        for(int i = 0; i < int(numbases); i++)
         {
             int ammotype = getint(p);
             vec o;
-            loopk(3) o[k] = std::max(getint(p)/DMF, 0.0f);
+            for(int k = 0; k < int(3); k++) o[k] = std::max(getint(p)/DMF, 0.0f);
             if(p.overread()) break;
             if(commit && notgotbases) addbase(ammotype>=GUN_SG && ammotype<=GUN_PISTOL ? ammotype : std::min(ammotype, 0), o);
         }
@@ -1132,7 +1132,7 @@ case N_BASEREGEN:
 case N_BASES:
 {
     int numbases = getint(p);
-    loopi(numbases)
+    for(int i = 0; i < int(numbases); i++)
     {
         int ammotype = getint(p);
         string owner, enemy;

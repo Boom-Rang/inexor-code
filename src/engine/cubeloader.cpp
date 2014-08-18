@@ -119,7 +119,7 @@ struct cubeloader
         o[2] = &t+ssize;
         o[3] = &t+ssize+1;
         int best = 0xFFFF;
-        loopi(4) if(o[i]->vdelta<best) best = o[i]->vdelta;
+        for(int i = 0; i < int(4); i++) if(o[i]->vdelta<best) best = o[i]->vdelta;
         return best;
     }
 
@@ -128,15 +128,15 @@ struct cubeloader
         for(;;)
         {
             bool changed = false;
-            loop(x, ssize)
+            for(int x = 0; x < int(ssize); x++)
             {
-                loop(y, ssize)
+                for(int y = 0; y < int(ssize); y++)
                 {
                     c_sqr &t = world[x+y*ssize];
                     if(t.type==C_FHF || t.type==C_CHF)
                     {
                         int bottom = (neighbours(t)&(~3))+4;
-                        loopj(4) if(o[j]->vdelta>bottom) { o[j]->vdelta = bottom; changed = true; }
+                        for(int j = 0; j < int(4); j++) if(o[j]->vdelta>bottom) { o[j]->vdelta = bottom; changed = true; }
                     }
                 }
             }
@@ -164,7 +164,7 @@ struct cubeloader
         x1 = y1 = 0;
         z0 = 128;
         z1 = -128;
-        loop(x, ssize) loop(y, ssize)
+        for(int x = 0; x < int(ssize); x++) for(int y = 0; y < int(ssize); y++)
         {
             c_sqr &t = world[x+y*ssize];
             if(t.type!=C_SOLID)
@@ -184,7 +184,7 @@ struct cubeloader
     void hf(int x, int y, int z, int side, int dir, int cap)
     {
         cube &c = getcube(x, y, z);
-        loopi(2) loopj(2) edgeset(cubeedge(c, 2, i, j), side, dir*(o[(j<<1)+i]->vdelta-cap)*2+side*8);
+        for(int i = 0; i < int(2); i++) for(int j = 0; j < int(2); j++) edgeset(cubeedge(c, 2, i, j), side, dir*(o[(j<<1)+i]->vdelta-cap)*2+side*8);
     }
 
     bool cornersolid(int z, c_sqr *s) { return s->type==C_SOLID || z<s->floor || z>=s->ceil; }
@@ -298,7 +298,7 @@ struct cubeloader
             hdr.waterlevel = -100000;
         }
         if(mod) f->seek(hdr.numents*sizeof(c_persistent_entity), SEEK_CUR);
-        else loopi(hdr.numents)
+        else for(int i = 0; i < int(hdr.numents); i++)
         {
             c_persistent_entity e;
             f->read(&e, sizeof(c_persistent_entity));
@@ -308,7 +308,7 @@ struct cubeloader
         ssize = 1<<hdr.sfactor;
         world = new c_sqr[ssize*ssize];
         c_sqr *t = NULL;
-        loopk(ssize*ssize)
+        for(int k = 0; k < int(ssize*ssize); k++)
         {
             c_sqr *s = &world[k];
             int type = f->getchar();

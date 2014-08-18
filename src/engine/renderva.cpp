@@ -24,7 +24,7 @@ vtxarray *visibleva;
 
 bool isfoggedsphere(float rad, const vec &cv)
 {
-    loopi(4) if(vfcP[i].dist(cv) < -rad) return true;
+    for(int i = 0; i < int(4); i++) if(vfcP[i].dist(cv) < -rad) return true;
     float dist = vfcP[4].dist(cv);
     return dist < -rad || dist > vfcDfog + rad;
 }
@@ -34,7 +34,7 @@ int isvisiblesphere(float rad, const vec &cv)
     int v = VFC_FULL_VISIBLE;
     float dist;
 
-    loopi(5)
+    for(int i = 0; i < int(5); i++)
     {
         dist = vfcP[i].dist(cv);
         if(dist < -rad) return VFC_NOT_VISIBLE;
@@ -50,13 +50,13 @@ int isvisiblesphere(float rad, const vec &cv)
 
 static inline int ishiddencube(const ivec &o, int size)
 {
-    loopi(5) if(o.dist(vfcP[i]) < -vfcDfar[i]*size) return true;
+    for(int i = 0; i < int(5); i++) if(o.dist(vfcP[i]) < -vfcDfar[i]*size) return true;
     return false;
 }
 
 static inline int isfoggedcube(const ivec &o, int size)
 {
-    loopi(4) if(o.dist(vfcP[i]) < -vfcDfar[i]*size) return true;
+    for(int i = 0; i < int(4); i++) if(o.dist(vfcP[i]) < -vfcDfar[i]*size) return true;
     float dist = o.dist(vfcP[4]);
     return dist < -vfcDfar[4]*size || dist > vfcDfog - vfcDnear[4]*size;
 }
@@ -66,7 +66,7 @@ int isvisiblecube(const ivec &o, int size)
     int v = VFC_FULL_VISIBLE;
     float dist;
 
-    loopi(5)
+    for(int i = 0; i < int(5); i++)
     {
         dist = o.dist(vfcP[i]);
         if(dist < -vfcDfar[i]*size) return VFC_NOT_VISIBLE;
@@ -111,7 +111,7 @@ void sortvisiblevas()
 {
     visibleva = NULL; 
     vtxarray **last = &visibleva;
-    loopi(VASORTSIZE) if(vasort[i])
+    for(int i = 0; i < int(VASORTSIZE); i++) if(vasort[i])
     {
         vtxarray *va = vasort[i];
         *last = va;
@@ -147,11 +147,11 @@ void findvisiblevas(vector<vtxarray *> &vas, bool resetocclude = false)
 
 void calcvfcD()
 {
-    loopi(5)
+    for(int i = 0; i < int(5); i++)
     {
         plane &p = vfcP[i];
         vfcDnear[i] = vfcDfar[i] = 0;
-        loopk(3) if(p[k] > 0) vfcDfar[i] += p[k];
+        for(int k = 0; k < int(3); k++) if(p[k] > 0) vfcDfar[i] += p[k];
         else vfcDnear[i] += p[k];
     }
 } 
@@ -164,7 +164,7 @@ void setvfcP(float z, const vec &bbmin, const vec &bbmax)
     vfcP[2] = plane(vec4(pw).mul(-bbmin.y).add(py)).normalize(); // bottom plane
     vfcP[3] = plane(vec4(pw).mul(bbmax.y).sub(py)).normalize(); // top plane
     vfcP[4] = plane(vec4(pw).add(pz)).normalize(); // near/far planes
-    if(z >= 0) loopi(5) vfcP[i].reflectz(z);
+    if(z >= 0) for(int i = 0; i < int(5); i++) vfcP[i].reflectz(z);
 
     extern int fog;
     vfcDfog = fog;
@@ -235,7 +235,7 @@ struct queryframe
 
     queryframe() : cur(0), max(0) {}
 
-    void flip() { loopi(cur) queries[i].owner = NULL; cur = 0; }
+    void flip() { for(int i = 0; i < int(cur); i++) queries[i].owner = NULL; cur = 0; }
 
     occludequery *newquery(void *owner)
     {
@@ -250,11 +250,11 @@ struct queryframe
         return query;
     }
 
-    void reset() { loopi(max) queries[i].owner = NULL; }
+    void reset() { for(int i = 0; i < int(max); i++) queries[i].owner = NULL; }
 
     void cleanup()
     {
-        loopi(max)
+        for(int i = 0; i < int(max); i++)
         {
             glDeleteQueries_(1, &queries[i].id);
             queries[i].owner = NULL;
@@ -284,12 +284,12 @@ occludequery *newquery(void *owner)
 
 void resetqueries()
 {
-    loopi(MAXQUERYFRAMES) queryframes[i].reset();
+    for(int i = 0; i < int(MAXQUERYFRAMES); i++) queryframes[i].reset();
 }
 
 void clearqueries()
 {
-    loopi(MAXQUERYFRAMES) queryframes[i].cleanup();
+    for(int i = 0; i < int(MAXQUERYFRAMES); i++) queryframes[i].cleanup();
 }
 
 VAR(oqfrags, 0, 8, 64);
@@ -419,7 +419,7 @@ void renderreflectedmapmodels()
         for(vtxarray *va = reflectedva; va; va = va->rnext)
         {
             if(va->mapmodels.empty() || va->distance > reflectdist) continue;
-            loopv(va->mapmodels) 
+            loopv(va->mapmodels)
             {
                 octaentities *oe = va->mapmodels[i];
                 *lastmms = oe;
@@ -777,7 +777,7 @@ void renderdepthobstacles(const vec &bbmin, const vec &bbmax, float scale, float
     {
         SETSHADER(depthfxsplitworld);
 
-        loopi(-numranges)
+        for(int i = 0; i < int(-numranges); i++)
         {
             if(!i) scales[i] = 1.0f/scale;
             else scales[i] = scales[i-1]*256;
@@ -787,8 +787,8 @@ void renderdepthobstacles(const vec &bbmin, const vec &bbmax, float scale, float
     {
         SETSHADER(depthfxworld);
 
-        if(!numranges) loopi(4) scales[i] = 1.0f/scale;
-        else loopi(numranges) 
+        if(!numranges) for(int i = 0; i < int(4); i++) scales[i] = 1.0f/scale;
+        else for(int i = 0; i < int(numranges); i++)
         {
             scales[i] = 1.0f/scale;
             offsets[i] = -ranges[i]/scale;
@@ -867,8 +867,8 @@ struct renderstate
 
     renderstate() : colormask(true), depthmask(true), blending(false), mtglow(false), skipped(0), alphaing(0), vbuf(0), diffusetmu(0), lightmaptmu(1), glowtmu(-1), causticstmu(-1), colorscale(1, 1, 1), glowcolor(1, 1, 1), envscale(0, 0, 0), alphascale(0), slot(NULL), texgenslot(NULL), vslot(NULL), texgenvslot(NULL), texgenscrollS(0), texgenscrollT(0), texgendim(-1), mttexgen(false), specmask(false), visibledynlights(0), dynlightmask(0)
     {
-        loopk(4) color[k] = 1;
-        loopk(8) textures[k] = 0;
+        for(int k = 0; k < int(4); k++) color[k] = 1;
+        for(int k = 0; k < int(8); k++) textures[k] = 0;
     }
 };
 
@@ -967,7 +967,7 @@ static void mergetexs(renderstate &cur, vtxarray *va, elementset *texs = NULL, i
     {
         firstbatch = geombatches.length();
         numbatches = numtexs;
-        loopi(numtexs-1) 
+        for(int i = 0; i < int(numtexs-1); i++)
         {
             geombatches.add(geombatch(texs[i], edata, va)).next = i+1;
             edata += texs[i].length[1];
@@ -1836,7 +1836,7 @@ void rendershadowmappass(renderstate &cur, vtxarray *va)
 
     elementset *texs = va->eslist;
     ushort *edata = va->edata;
-    loopi(va->texs)
+    for(int i = 0; i < int(va->texs); i++)
     {
         elementset &es = texs[i];
         int len = es.length[1] - es.length[0];
@@ -1933,7 +1933,7 @@ GLuint attenxytex = 0, attenztex = 0;
 static GLuint createattenxytex(int size)
 {
     uchar *data = new uchar[size*size], *dst = data;
-    loop(y, size) loop(x, size)
+    for(int y = 0; y < int(size); y++) for(int x = 0; x < int(size); x++)
     {
         float dx = 2*float(x)/(size-1) - 1, dy = 2*float(y)/(size-1) - 1;
         float atten = std::max(0.0f, 1.0f - dx*dx - dy*dy);
@@ -1949,7 +1949,7 @@ static GLuint createattenxytex(int size)
 static GLuint createattenztex(int size)
 {
     uchar *data = new uchar[size], *dst = data;
-    loop(z, size) 
+    for(int z = 0; z < int(size); z++)
     {
         float dz = 2*float(z)/(size-1) - 1;
         float atten = dz*dz;
@@ -1973,7 +1973,7 @@ void loadcaustics(bool force)
     if(!caustics || !needcaustics) return;
     useshaderbyname("caustic");
     if(caustictex[0]) return;
-    loopi(NUMCAUSTICS)
+    for(int i = 0; i < int(NUMCAUSTICS); i++)
     {
         defformatstring(name)(
             renderpath==R_FIXEDFUNCTION ? 
@@ -1990,7 +1990,7 @@ void cleanupva()
     clearqueries();
     if(attenxytex) { glDeleteTextures(1, &attenxytex); attenxytex = 0; }
     if(attenztex) { glDeleteTextures(1, &attenztex); attenztex = 0; }
-    loopi(NUMCAUSTICS) caustictex[i] = NULL;
+    for(int i = 0; i < int(NUMCAUSTICS); i++) caustictex[i] = NULL;
 }
 
 VARR(causticscale, 0, 50, 10000);
@@ -2003,7 +2003,7 @@ void setupcaustics(int tmu, float blend, GLfloat *color = NULL)
 
     GLfloat s[4] = { 0.011f, 0, 0.0066f, 0 };
     GLfloat t[4] = { 0, 0.011f, 0.0066f, 0 };
-    loopk(3)
+    for(int k = 0; k < int(3); k++)
     {
         s[k] *= 100.0f/causticscale;
         t[k] *= 100.0f/causticscale;
@@ -2012,7 +2012,7 @@ void setupcaustics(int tmu, float blend, GLfloat *color = NULL)
     float frac = float(lastmillis%causticmillis)/causticmillis;
     if(color) color[3] = frac;
     else glColor4f(1, 1, 1, frac);
-    loopi(2)
+    for(int i = 0; i < int(2); i++)
     {
         glActiveTexture_(GL_TEXTURE0_ARB+tmu+i);
         glEnable(GL_TEXTURE_2D);
@@ -2071,7 +2071,7 @@ void setupTMUs(renderstate &cur, float causticspass, bool fogpass)
         invalidateenvparams(SHPARAM_VERTEX, 10, RESERVEDSHADERPARAMS + MAXSHADERPARAMS - 10);
         glEnableClientState(GL_NORMAL_ARRAY);
         glEnableClientState(GL_COLOR_ARRAY);
-        loopi(8-2) { glActiveTexture_(GL_TEXTURE2_ARB+i); glEnable(GL_TEXTURE_2D); }
+        for(int i = 0; i < int(8-2); i++) { glActiveTexture_(GL_TEXTURE2_ARB+i); glEnable(GL_TEXTURE_2D); }
         glActiveTexture_(GL_TEXTURE0_ARB);
         setenvparamf("colorparams", SHPARAM_PIXEL, 6, 2, 2, 2, 1);
         setenvparamf("camera", SHPARAM_VERTEX, 4, camera1->o.x, camera1->o.y, camera1->o.z, 1);
@@ -2131,7 +2131,7 @@ void cleanupTMUs(renderstate &cur, float causticspass, bool fogpass)
         glLoadIdentity();
         glMatrixMode(GL_MODELVIEW);
     }
-    if(cur.causticstmu>=0) loopi(2)
+    if(cur.causticstmu>=0) for(int i = 0; i < int(2); i++)
     {
         glActiveTexture_(GL_TEXTURE0_ARB+cur.causticstmu+i);
         resettmu(cur.causticstmu+i);
@@ -2156,7 +2156,7 @@ void cleanupTMUs(renderstate &cur, float causticspass, bool fogpass)
     {
         glDisableClientState(GL_NORMAL_ARRAY);
         glDisableClientState(GL_COLOR_ARRAY);
-        loopi(8-2) { glActiveTexture_(GL_TEXTURE2_ARB+i); glDisable(GL_TEXTURE_2D); }
+        for(int i = 0; i < int(8-2); i++) { glActiveTexture_(GL_TEXTURE2_ARB+i); glDisable(GL_TEXTURE_2D); }
     }
 
     if(cur.lightmaptmu>=0)
@@ -2470,7 +2470,7 @@ void rendergeom(float causticspass, bool fogpass)
             if(fading) glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_FALSE);
             rendergeommultipass(cur, RENDERPASS_CAUSTICS, fogpass);
             if(fading) glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
-            loopi(2)
+            for(int i = 0; i < int(2); i++)
             {
                 glActiveTexture_(GL_TEXTURE0_ARB+i);
                 resettmu(i);
@@ -2605,7 +2605,7 @@ void renderalphageom(bool fogpass)
 
     glGetFloatv(GL_FOG_COLOR, cur.fogcolor);
 
-    loop(front, 2) if(front || hasback)
+    for(int front = 0; front < int(2); front++) if(front || hasback)
     {
         cur.alphaing = front+1;
         if(!front) glCullFace(GL_FRONT);
@@ -2626,7 +2626,7 @@ void renderalphageom(bool fogpass)
         cur.texgendim = -1;
         cur.skipped = 0;
         cur.colorscale = vec(1, 1, 1);
-        loopk(3) cur.color[k] = 1;
+        for(int k = 0; k < int(3); k++) cur.color[k] = 1;
         cur.alphascale = -1;
         loopv(alphavas) if(front || alphavas[i]->alphabacktris) renderva(cur, alphavas[i], RENDERPASS_LIGHTMAP, fogpass);
         if(geombatches.length()) renderbatches(cur, nolights ? RENDERPASS_COLOR : RENDERPASS_LIGHTMAP);

@@ -264,7 +264,7 @@ struct editor
         b->clear(NULL);
         int sx, sy, ex, ey;
         region(sx, sy, ex, ey);
-        loopi(1+ey-sy)
+        for(int i = 0; i < int(1+ey-sy); i++)
         {
             if(b->maxy != -1 && b->lines.length() >= b->maxy) break;
             int y = sy+i;
@@ -304,7 +304,7 @@ struct editor
         vector<char> buf;
         int sx, sy, ex, ey;
         region(sx, sy, ex, ey);
-        loopi(1+ey-sy)
+        for(int i = 0; i < int(1+ey-sy); i++)
         {
             int y = sy+i;
             char *line = lines[y].text;
@@ -325,7 +325,7 @@ struct editor
 
     void removelines(int start, int count)
     {
-        loopi(count) lines[start+i].clear();
+        for(int i = 0; i < int(count); i++) lines[start+i].clear();
         lines.remove(start, count);
     }
             
@@ -412,7 +412,7 @@ struct editor
         } 
         else 
         {
-            loopv(b->lines) 
+            loopv(b->lines)
             {   
                 if(!i) 
                 {
@@ -670,7 +670,7 @@ static void readyeditors()
 
 static void flusheditors() 
 {
-    loopvrev(editors) if(!editors[i]->active) 
+    loopvrev(editors) if(!editors[i]->active)
     {
         editor *e = editors.remove(i);
         DELETEP(e);
@@ -679,7 +679,7 @@ static void flusheditors()
 
 static editor *useeditor(const char *name, int mode, bool focus, const char *initval = NULL) 
 {
-    loopv(editors) if(strcmp(editors[i]->name, name) == 0) 
+    loopv(editors) if(strcmp(editors[i]->name, name) == 0)
     {
         editor *e = editors[i];
         if(focus) { editors.add(e); editors.remove(i); } // re-position as last

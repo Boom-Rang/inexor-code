@@ -86,7 +86,7 @@ namespace ai
         void build(int *indices, int numindices, const vec &vmin, const vec &vmax, int depth = 1)
         {
             int axis = 2;
-            loopk(2) if(vmax[k] - vmin[k] > vmax[axis] - vmin[axis]) axis = k;
+            for(int k = 0; k < int(2); k++) if(vmax[k] - vmin[k] > vmax[axis] - vmin[axis]) axis = k;
 
             vec leftmin(1e16f, 1e16f, 1e16f), leftmax(-1e16f, -1e16f, -1e16f), rightmin(1e16f, 1e16f, 1e16f), rightmax(-1e16f, -1e16f, -1e16f);
             float split = 0.5f*(vmax[axis] + vmin[axis]), splitleft = -1e16f, splitright = 1e16f;
@@ -119,7 +119,7 @@ namespace ai
                 left = right = numindices/2;
                 splitleft = -1e16f;
                 splitright = 1e16f;
-                loopi(numindices)
+                for(int i = 0; i < int(numindices); i++)
                 {
                     waypoint &w = waypoints[indices[i]];
                     float radius = WAYPOINTRADIUS;
@@ -166,12 +166,12 @@ namespace ai
     static inline void invalidatewpcache(int wp)
     {
         if(++numinvalidatewpcaches >= 1000) { numinvalidatewpcaches = 0; invalidatedwpcaches = (1<<NUMWPCACHES)-1; }
-        else loopi(NUMWPCACHES) if((wp >= wpcaches[i].firstwp && wp <= wpcaches[i].lastwp) || i+1 >= NUMWPCACHES) { invalidatedwpcaches |= 1<<i; break; }
+        else for(int i = 0; i < int(NUMWPCACHES); i++) if((wp >= wpcaches[i].firstwp && wp <= wpcaches[i].lastwp) || i+1 >= NUMWPCACHES) { invalidatedwpcaches |= 1<<i; break; }
     }
 
     void clearwpcache(bool full = true)
     {
-        loopi(NUMWPCACHES) if(full || invalidatedwpcaches&(1<<i)) { wpcaches[i].clear(); clearedwpcaches |= 1<<i; }
+        for(int i = 0; i < int(NUMWPCACHES); i++) if(full || invalidatedwpcaches&(1<<i)) { wpcaches[i].clear(); clearedwpcaches |= 1<<i; }
         if(full || invalidatedwpcaches == (1<<NUMWPCACHES)-1)
 	      {
             numinvalidatewpcaches = 0;
@@ -185,13 +185,13 @@ namespace ai
 
     void buildwpcache()
     {
-        loopi(NUMWPCACHES) if(wpcaches[i].maxdepth < 0)
+        for(int i = 0; i < int(NUMWPCACHES); i++) if(wpcaches[i].maxdepth < 0)
             wpcaches[i].build(i > 0 ? wpcaches[i-1].lastwp+1 : 1, i+1 >= NUMWPCACHES || wpcaches[i+1].maxdepth < 0 ? -1 : wpcaches[i+1].firstwp);
         clearedwpcaches = 0;
         lastwpcache = waypoints.length();
 
 		    wpavoid.clear();
-		    loopv(waypoints) if(waypoints[i].weight < 0) wpavoid.avoidnear(NULL, waypoints[i].o.z + WAYPOINTRADIUS, waypoints[i].o, WAYPOINTRADIUS);
+      loopv(waypoints) if(waypoints[i].weight < 0) wpavoid.avoidnear(NULL, waypoints[i].o.z + WAYPOINTRADIUS, waypoints[i].o, WAYPOINTRADIUS);
     }
 
     struct wpcachestack
@@ -218,7 +218,7 @@ namespace ai
         } while(0)
         int closest = -1;
         wpcachenode *curnode;
-        loop(which, NUMWPCACHES) for(curnode = &wpcaches[which].nodes[0], wpcachestack.setsize(0);;)
+        for(int which = 0; which < int(NUMWPCACHES); which++) for(curnode = &wpcaches[which].nodes[0], wpcachestack.setsize(0);;)
         {
             int axis = curnode->axis();
             float dist1 = pos[axis] - curnode->split[0], dist2 = curnode->split[1] - pos[axis];
@@ -269,7 +269,7 @@ namespace ai
             if(dist > mindist2 && dist < maxdist2) results.add(n); \
         } while(0)
         wpcachenode *curnode;
-        loop(which, NUMWPCACHES) for(curnode = &wpcaches[which].nodes[0], wpcachestack.setsize(0);;)
+        for(int which = 0; which < int(NUMWPCACHES); which++) for(curnode = &wpcaches[which].nodes[0], wpcachestack.setsize(0);;)
         {
             int axis = curnode->axis();
             float dist1 = pos[axis] - curnode->split[0], dist2 = curnode->split[1] - pos[axis];
@@ -318,7 +318,7 @@ namespace ai
             if(w.o.squaredist(pos) < limit2) add(owner, above, n); \
         } while(0)
         wpcachenode *curnode;
-        loop(which, NUMWPCACHES) for(curnode = &wpcaches[which].nodes[0], wpcachestack.setsize(0);;)
+        for(int which = 0; which < int(NUMWPCACHES); which++) for(curnode = &wpcaches[which].nodes[0], wpcachestack.setsize(0);;)
         {
             int axis = curnode->axis();
             float dist1 = pos[axis] - curnode->split[0], dist2 = curnode->split[1] - pos[axis];
@@ -421,7 +421,7 @@ namespace ai
 
         if(d)
         {
-            if(retries <= 1 && d->ai) loopi(ai::NUMPREVNODES) if(d->ai->prevnodes[i] != node && iswaypoint(d->ai->prevnodes[i]))
+            if(retries <= 1 && d->ai) for(int i = 0; i < int(ai::NUMPREVNODES); i++) if(d->ai->prevnodes[i] != node && iswaypoint(d->ai->prevnodes[i]))
             {
                 waypoints[d->ai->prevnodes[i]].route = routeid;
                 waypoints[d->ai->prevnodes[i]].curscore = -1;
@@ -454,7 +454,7 @@ namespace ai
             waypoint &m = *queue.removeheap();
             float prevscore = m.curscore;
             m.curscore = -1;
-            loopi(MAXWAYPOINTLINKS)
+            for(int i = 0; i < int(MAXWAYPOINTLINKS); i++)
             {
                 int link = m.links[i];
                 if(!link) break;
@@ -504,7 +504,7 @@ namespace ai
 
     void linkwaypoint(waypoint &a, int n)
     {
-        loopi(MAXWAYPOINTLINKS)
+        for(int i = 0; i < int(MAXWAYPOINTLINKS); i++)
         {
             if(a.links[i] == n) return;
             if(!a.links[i]) { a.links[i] = n; return; }
@@ -577,7 +577,7 @@ namespace ai
 
     void navigate()
     {
-    	if(shouldnavigate()) loopv(players) ai::navigate(players[i]);
+     if(shouldnavigate()) loopv(players) ai::navigate(players[i]);
         if(invalidatedwpcaches) clearwpcache(false);
     }
 
@@ -623,7 +623,7 @@ namespace ai
             waypoint &w = waypoints[total];
             if(j != total) w = waypoints[j];
             int k = 0;
-            loopi(MAXWAYPOINTLINKS)
+            for(int i = 0; i < int(MAXWAYPOINTLINKS); i++)
             {
                 int link = w.links[i];
                 if(!link) break;
@@ -687,7 +687,7 @@ namespace ai
         waypoints.setsize(0);
         waypoints.add(vec(0, 0, 0));
         ushort numwp = f->getlil<ushort>();
-        loopi(numwp)
+        for(int i = 0; i < int(numwp); i++)
         {
             if(f->end()) break;
             vec o;
@@ -696,7 +696,7 @@ namespace ai
             o.z = f->getlil<float>();
             waypoint &w = waypoints.add(waypoint(o, getweight(o)));
             int numlinks = f->getchar(), k = 0;
-            loopi(numlinks)
+            for(int i = 0; i < int(numlinks); i++)
             {
                 if((w.links[k] = f->getlil<ushort>()))
                 {
@@ -730,9 +730,9 @@ namespace ai
             f->putlil<float>(w.o.y);
             f->putlil<float>(w.o.z);
             int numlinks = 0;
-            loopj(MAXWAYPOINTLINKS) { if(!w.links[j]) break; numlinks++; }
+            for(int j = 0; j < int(MAXWAYPOINTLINKS); j++) { if(!w.links[j]) break; numlinks++; }
             f->putchar(numlinks);
-            loopj(numlinks) f->putlil<ushort>(w.links[j]);
+            for(int j = 0; j < int(numlinks); j++) f->putlil<ushort>(w.links[j]);
         }
 
         delete f;

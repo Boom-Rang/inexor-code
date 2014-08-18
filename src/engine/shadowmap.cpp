@@ -277,7 +277,7 @@ static void calcscissorbox()
    
     vec4 v[8];
     float sx1 = 1, sy1 = 1, sx2 = -1, sy2 = -1;
-    loopi(8)
+    for(int i = 0; i < int(8); i++)
     {
         vec c = i&4 ? top : bottom;
         if(i&1) c.add(vec(right).mul(smw));
@@ -295,11 +295,11 @@ static void calcscissorbox()
         }
     }
     if(sx1 >= sx2 || sy1 >= sy2) return;
-    loopi(8)
+    for(int i = 0; i < int(8); i++)
     {
         const vec4 &p = v[i];
         if(p.z >= -p.w) continue;
-        loopj(3)
+        for(int j = 0; j < int(3); j++)
         {
             const vec4 &o = v[i^(1<<j)];
             if(o.z <= -o.w) continue;

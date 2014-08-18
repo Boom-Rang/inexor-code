@@ -108,7 +108,7 @@ struct decalrenderer
         else
         {
             color = d.color;
-            if(flags&(DF_ADD|DF_INVMOD)) loopk(3) color[k] = uchar((int(color[k])*int(alpha))>>8);
+            if(flags&(DF_ADD|DF_INVMOD)) for(int k = 0; k < int(3); k++) color[k] = uchar((int(color[k])*int(alpha))>>8);
         }
 
         decalvert *vert = &verts[d.startvert],
@@ -349,7 +349,7 @@ struct decalrenderer
         int numout = 0;
         const vec *p = &in[numin-1];
         float pc = dir.dot(*p);
-        loopi(numin)
+        for(int i = 0; i < int(numin); i++)
         {
             const vec &v = in[i];
             float c = dir.dot(v);
@@ -405,7 +405,7 @@ struct decalrenderer
         {
             vertinfo *verts = cu.ext->verts() + cu.ext->surfaces[orient].verts;
             ivec vo = ivec(o).mask(~0xFFF).shl(3);
-            loopj(numverts) pos[j] = verts[j].getxyz().add(vo).tovec().mul(1/8.0f);
+            for(int j = 0; j < int(numverts); j++) pos[j] = verts[j].getxyz().add(vo).tovec().mul(1/8.0f);
             planes[0].cross(pos[0], pos[1], pos[2]).normalize();
             if(numverts >= 4 && !(cu.merged&(1<<orient)) && !flataxisface(cu, orient) && faceconvexity(verts, numverts, size))
             {
@@ -429,7 +429,7 @@ struct decalrenderer
         } 
         else return;
 
-        loopl(numplanes)
+        for(int l = 0; l < int(numplanes); l++)
         {
             const vec &n = planes[l];
             float facing = n.dot(decalnormal);
@@ -482,7 +482,7 @@ struct decalrenderer
                 if(!freedecal()) return;
             }
             availverts -= totalverts;
-            loopk(numv-2)
+            for(int k = 0; k < int(numv-2); k++)
             {
                 verts[endvert++] = dv1;
                 verts[endvert++] = dv2;
@@ -499,7 +499,7 @@ struct decalrenderer
     {
         materialsurface *matbuf = va->matbuf;
         int matsurfs = va->matsurfs;
-        loopi(matsurfs)
+        for(int i = 0; i < int(matsurfs); i++)
         {
             materialsurface &m = matbuf[i];
             if(!isclipped(m.material&MATF_VOLUME)) { i += m.skip; continue; }
@@ -526,7 +526,7 @@ struct decalrenderer
 
     void findescaped(cube *cu, const ivec &o, int size, int escaped)
     {
-        loopi(8)
+        for(int i = 0; i < int(8); i++)
         {
             if(escaped&(1<<i)) 
             {
@@ -535,7 +535,7 @@ struct decalrenderer
                 else
                 {
                     int vismask = cu[i].merged;
-                    if(vismask) loopj(6) if(vismask&(1<<j)) gentris(cu[i], j, co, size);
+                    if(vismask) for(int j = 0; j < int(6); j++) if(vismask&(1<<j)) gentris(cu[i], j, co, size);
                 }
             } 
         }
@@ -544,7 +544,7 @@ struct decalrenderer
     void gentris(cube *cu, const ivec &o, int size, int escaped = 0)
     {
         int overlap = octaboxoverlap(o, size, bbmin, bbmax);
-        loopi(8) 
+        for(int i = 0; i < int(8); i++)
         {
             if(overlap&(1<<i))
             {
@@ -557,8 +557,8 @@ struct decalrenderer
                     int vismask = cu[i].visible;
                     if(vismask&0xC0)
                     {
-                        if(vismask&0x80) loopj(6) gentris(cu[i], j, co, size, NULL, vismask);
-                        else loopj(6) if(vismask&(1<<j)) gentris(cu[i], j, co, size);
+                        if(vismask&0x80) for(int j = 0; j < int(6); j++) gentris(cu[i], j, co, size, NULL, vismask);
+                        else for(int j = 0; j < int(6); j++) if(vismask&(1<<j)) gentris(cu[i], j, co, size);
                     }
                 }
             }
@@ -569,7 +569,7 @@ struct decalrenderer
                 else
                 {
                     int vismask = cu[i].merged;
-                    if(vismask) loopj(6) if(vismask&(1<<j)) gentris(cu[i], j, co, size);
+                    if(vismask) for(int j = 0; j < int(6); j++) if(vismask&(1<<j)) gentris(cu[i], j, co, size);
                 }
             }
         }
@@ -585,12 +585,12 @@ decalrenderer decals[] =
 
 void initdecals()
 {
-    loopi(sizeof(decals)/sizeof(decals[0])) decals[i].init(maxdecaltris);
+    for(int i = 0; i < int(sizeof(decals)/sizeof(decals[0])); i++) decals[i].init(maxdecaltris);
 }
 
 void cleardecals()
 {
-    loopi(sizeof(decals)/sizeof(decals[0])) decals[i].cleardecals();
+    for(int i = 0; i < int(sizeof(decals)/sizeof(decals[0])); i++) decals[i].cleardecals();
 }
 
 VARNP(decals, showdecals, 0, 1, 1);
@@ -598,7 +598,7 @@ VARNP(decals, showdecals, 0, 1, 1);
 void renderdecals(bool mainpass)
 {
     bool rendered = false;
-    loopi(sizeof(decals)/sizeof(decals[0]))
+    for(int i = 0; i < int(sizeof(decals)/sizeof(decals[0])); i++)
     {
         decalrenderer &d = decals[i];
         if(mainpass)

@@ -40,7 +40,7 @@ struct bombclientmode : clientmode
 
 	void senditems(packetbuf &p){
 		vector<spawnloc> v;
-		loopv(entities::ents){
+  loopv(entities::ents){
 			extentity& e = *entities::ents[i];
 			if(e.type != PLAYERSTART) continue;
 			if(m_teammode ? e.attr2 < 1 || e.attr2 > 2 : e.attr2) continue;
@@ -52,9 +52,9 @@ struct bombclientmode : clientmode
 		}
 		putint(p, N_SPAWNLOC);
 		putint(p, v.length());
-		loopv(v){
+  loopv(v){
 			spawnloc &sploc = v[i];
-			loopk(3) putint(p, int(sploc.o[k]*DMF));
+   for(int k = 0; k < int(3); k++) putint(p, int(sploc.o[k]*DMF));
 			putint(p, sploc.team);
 			putint(p, sploc.index);
 		}
@@ -273,7 +273,7 @@ struct bombclientmode : clientmode
     	notgotspawnlocations = true;
     	spawnlocs.deletecontents();
     	if(!notgotitems){
-    		loopv(ments){
+      loopv(ments){
     			if(ments[i].type != PLAYERSTART) continue;
     			entity& e = ments[i];
     			spawnlocs.add(new spawnloc(e.o, e.attr2, i));
@@ -286,9 +286,9 @@ struct bombclientmode : clientmode
     bool parsespawnloc(ucharbuf &p, bool commit)
     {
     	int numsploc = getint(p);
-    	loopi(numsploc){
+     for(int i = 0; i < int(numsploc); i++){
     		vec o;
-    		loopk(3) o[k] = std::max(getint(p)/DMF, 0.0f);
+      for(int k = 0; k < int(3); k++) o[k] = std::max(getint(p)/DMF, 0.0f);
     		int team = getint(p), index = getint(p);
     		if(p.overread()) break;
         	if(m_teammode ? team < 1 || team > 2 : team) return false;
@@ -308,7 +308,7 @@ struct bombclientmode : clientmode
     		if(totalmillis - timecounter >= 10000) {
             sendf(-1, 1, "ri3s ", N_HUDANNOUNCE, 1000, E_STATIC_BOTTOM, "Map load complete (grannies left behind)");
     		} else {
-    			loopv(spawnlocs){
+       loopv(spawnlocs){
     				if(spawnlocs[i]->cn == -1) continue;
     				clientinfo* ci = getinfo(spawnlocs[i]->cn);
     				if(!ci || ci->state.state==CS_SPECTATOR || ci->state.aitype != AI_NONE || ci->clientmap[0] || ci->mapcrc) continue;
@@ -341,7 +341,7 @@ struct bombclientmode : clientmode
 
     void leavegame(clientinfo *ci, bool disconnecting){
     	if(!disconnecting) return;
-    	loopv(spawnlocs) if(spawnlocs[i]->cn == ci->clientnum){
+     loopv(spawnlocs) if(spawnlocs[i]->cn == ci->clientnum){
     		spawnlocs[i]->cn = -1;
     		break;
     	}
@@ -351,14 +351,14 @@ struct bombclientmode : clientmode
 
     void sendspawnlocs(bool resuscitate = false){
     	vector<clientinfo*> activepl;
-    	loopv(clients){
+     loopv(clients){
     		clientinfo* ci = clients[i];
     		if(ci->state.state == CS_SPECTATOR) continue;
     		activepl.add(ci);
     	}
     	vector<spawnloc*> pool[3];
-    	loopv(spawnlocs) pool[spawnlocs[i]->team].add(spawnlocs[i]);
-    	loopi(3) pool[i].shuffle();
+     loopv(spawnlocs) pool[spawnlocs[i]->team].add(spawnlocs[i]);
+     for(int i = 0; i < int(3); i++) pool[i].shuffle();
     	for(int i = 0; i < activepl.length(); i++){
     		vector<spawnloc*>& tpool = pool[m_teammode ? bombteamname(activepl[i]->team) : 0];
     		if(tpool.length()){

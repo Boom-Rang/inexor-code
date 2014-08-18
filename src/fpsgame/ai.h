@@ -36,7 +36,7 @@ namespace ai
 
         int find(int wp)
 		{
-			loopi(MAXWAYPOINTLINKS) if(links[i] == wp) return i;
+   for(int i = 0; i < int(MAXWAYPOINTLINKS); i++) if(links[i] == wp) return i;
 			return -1;
 		}
 
@@ -89,7 +89,7 @@ namespace ai
 		void add(avoidset &avoid)
 		{
 			waypoints.put(avoid.waypoints.getbuf(), avoid.waypoints.length());
-			loopv(avoid.obstacles)
+   loopv(avoid.obstacles)
 			{
 				obstacle &o = avoid.obstacles[i];
 				if(obstacles.empty() || o.owner != obstacles.last().owner) add(o.owner, o.above);
@@ -103,7 +103,7 @@ namespace ai
             if(!(v).obstacles.empty()) \
             { \
                 int cur = 0; \
-                loopv((v).obstacles) \
+                loopv((v).obstacles)\
                 { \
                     const ai::avoidset::obstacle &ob = (v).obstacles[i]; \
                     int next = cur + ob.numwaypoints; \
@@ -196,7 +196,7 @@ namespace ai
         {
             clearsetup();
             reset();
-            loopk(3) views[k] = 0.f;
+            for(int k = 0; k < int(3); k++) views[k] = 0.f;
         }
         ~aiinfo() {}
 
@@ -236,7 +236,7 @@ namespace ai
 
         bool hasprevnode(int n) const
         {
-            loopi(NUMPREVNODES) if(prevnodes[i] == n) return true;
+            for(int i = 0; i < int(NUMPREVNODES); i++) if(prevnodes[i] == n) return true;
             return false;
         }
 

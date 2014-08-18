@@ -291,7 +291,7 @@ struct listrenderer : partrenderer
         if(!parempty)
         {
             listparticle *ps = new listparticle[256];
-            loopi(255) ps[i].next = &ps[i+1];
+            for(int i = 0; i < int(255); i++) ps[i].next = &ps[i+1];
             ps[255].next = parempty;
             parempty = ps;
         }
@@ -407,7 +407,7 @@ struct meterrenderer : listrenderer
         {
             glColor3f(0, 0.8f, 0);
             glBegin(GL_TRIANGLE_STRIP);
-            loopk(10)
+            for(int k = 0; k < int(10); k++)
             {
                 const vec2 &sc = sincos360[k*(180/(10-1))];
                 float c = (0.5f + 0.1f)*sc.y, s = 0.5f - (0.5f + 0.1f)*sc.x;
@@ -420,7 +420,7 @@ struct meterrenderer : listrenderer
         if(basetype==PT_METERVS) glColor3ubv(p->color2);
         else glColor3f(0, 0, 0);
         glBegin(GL_TRIANGLE_STRIP);
-        loopk(10)
+        for(int k = 0; k < int(10); k++)
         {
             const vec2 &sc = sincos360[k*(180/(10-1))];
             float c = 0.5f*sc.y, s = 0.5f - 0.5f*sc.x;
@@ -433,7 +433,7 @@ struct meterrenderer : listrenderer
         {
             glColor3f(0, 0.8f, 0);
             glBegin(GL_TRIANGLE_FAN);
-            loopk(10)
+            for(int k = 0; k < int(10); k++)
             {
                 const vec2 &sc = sincos360[k*(180/(10-1))];
                 float c = (0.5f + 0.1f)*sc.y, s = 0.5f - (0.5f + 0.1f)*sc.x;
@@ -444,7 +444,7 @@ struct meterrenderer : listrenderer
 
         glColor3ubv(color);
         glBegin(GL_TRIANGLE_STRIP);
-        loopk(10)
+        for(int k = 0; k < int(10); k++)
         {
             const vec2 &sc = sincos360[k*(180/(10-1))];
             float c = 0.5f*sc.y, s = 0.5f - 0.5f*sc.x;
@@ -645,7 +645,7 @@ struct varenderer : partrenderer
     void resettracked(physent *owner) 
     {
         if(!(type&PT_TRACK)) return;
-        loopi(numparts)
+        for(int i = 0; i < int(numparts); i++)
         {
             particle *p = parts+i;
             if(!owner || (p->owner == owner)) p->fade = -1;
@@ -746,14 +746,14 @@ struct varenderer : partrenderer
             #define SETCOLOR(r, g, b, a) \
             do { \
                 uchar col[4] = { uchar(r), uchar(g), uchar(b), uchar(a) }; \
-                loopi(4) memcpy(vs[i].color.v, col, sizeof(col)); \
+                for(int i = 0; i < int(4); i++) memcpy(vs[i].color.v, col, sizeof(col));\
             } while(0) 
             #define SETMODCOLOR SETCOLOR((p->color[0]*blend)>>8, (p->color[1]*blend)>>8, (p->color[2]*blend)>>8, 255)
             if(type&PT_MOD) SETMODCOLOR;
             else SETCOLOR(p->color[0], p->color[1], p->color[2], blend);
         }
         else if(type&PT_MOD) SETMODCOLOR;
-        else loopi(4) vs[i].alpha = blend;
+        else for(int i = 0; i < int(4); i++) vs[i].alpha = blend;
 
         if(type&PT_ROT) genrotpos<T>(o, d, p->size, ts, p->gravity, vs, (p->flags>>2)&0x1F);
         else genpos<T>(o, d, p->size, ts, p->gravity, vs);
@@ -764,7 +764,7 @@ struct varenderer : partrenderer
         if(lastmillis == lastupdate) return;
         lastupdate = lastmillis;
       
-        loopi(numparts)
+        for(int i = 0; i < int(numparts); i++)
         {
             particle *p = &parts[i];
             partvert *vs = &verts[i*4];
@@ -813,7 +813,7 @@ struct softquadrenderer : quadrenderer
     {
         if(!depthfxtex.highprecision() && !depthfxtex.emulatehighprecision()) return 0;
         int numsoft = 0;
-        loopi(numparts)
+        for(int i = 0; i < int(numparts); i++)
         {
             particle &p = parts[i];
             float radius = p.size*SQRT2;
@@ -823,7 +823,7 @@ struct softquadrenderer : quadrenderer
             if(!isfoggedsphere(radius, p.o) && (depthfxscissor!=2 || depthfxtex.addscissorbox(p.o, radius))) 
             {
                 numsoft++;
-                loopk(3)
+                for(int k = 0; k < int(3); k++)
                 {
                     bbmin[k] = std::min(bbmin[k], o[k] - radius);
                     bbmax[k] = std::max(bbmax[k], o[k] + radius);
@@ -868,14 +868,14 @@ void finddepthfxranges()
     depthfxmax = vec(0, 0, 0);
     numdepthfxranges = fireballs.finddepthfxranges(depthfxowners, depthfxranges, 0, MAXDFXRANGES, depthfxmin, depthfxmax);
     numdepthfxranges = bluefireballs.finddepthfxranges(depthfxowners, depthfxranges, numdepthfxranges, MAXDFXRANGES, depthfxmin, depthfxmax);
-    loopk(3)
+    for(int k = 0; k < int(3); k++)
     {
         depthfxmin[k] -= depthfxmargin;
         depthfxmax[k] += depthfxmargin;
     }
     if(depthfxparts)
     {
-        loopi(sizeof(parts)/sizeof(parts[0]))
+        for(int i = 0; i < int(sizeof(parts)/sizeof(parts[0])); i++)
         {
             partrenderer *p = parts[i];
             if(p->type&PT_SOFT && p->adddepthfx(depthfxmin, depthfxmax))
@@ -899,23 +899,23 @@ void particleinit()
 {
     if(!particleshader) particleshader = lookupshaderbyname("particle");
     if(!particlenotextureshader) particlenotextureshader = lookupshaderbyname("particlenotexture");
-    loopi(sizeof(parts)/sizeof(parts[0])) parts[i]->init(parts[i]->type&PT_FEW ? std::min(fewparticles, maxparticles) : maxparticles);
+    for(int i = 0; i < int(sizeof(parts)/sizeof(parts[0])); i++) parts[i]->init(parts[i]->type&PT_FEW ? std::min(fewparticles, maxparticles) : maxparticles);
 }
 
 void clearparticles()
 {   
-    loopi(sizeof(parts)/sizeof(parts[0])) parts[i]->reset();
+    for(int i = 0; i < int(sizeof(parts)/sizeof(parts[0])); i++) parts[i]->reset();
     clearparticleemitters();
 }   
 
 void cleanupparticles()
 {
-    loopi(sizeof(parts)/sizeof(parts[0])) parts[i]->cleanup();
+    for(int i = 0; i < int(sizeof(parts)/sizeof(parts[0])); i++) parts[i]->cleanup();
 }
 
 void removetrackedparticles(physent *owner)
 {
-    loopi(sizeof(parts)/sizeof(parts[0])) parts[i]->resettracked(owner);
+    for(int i = 0; i < int(sizeof(parts)/sizeof(parts[0])); i++) parts[i]->resettracked(owner);
 }
 
 VARP(particleglare, 0, 2, 100);
@@ -939,7 +939,7 @@ void renderparticles(bool mainpass)
         glDisable(GL_DEPTH_TEST);
         glEnable(GL_BLEND);
         defaultshader->set();
-        loopi(n) 
+        for(int i = 0; i < int(n); i++)
         {
             int type = parts[i]->type;
             const char *title = parts[i]->texname ? strrchr(parts[i]->texname, '/')+1 : NULL;
@@ -965,7 +965,7 @@ void renderparticles(bool mainpass)
 
     if(glaring && !particleglare) return;
     
-    loopi(sizeof(parts)/sizeof(parts[0])) 
+    for(int i = 0; i < int(sizeof(parts)/sizeof(parts[0])); i++)
     {
         if(glaring && !(parts[i]->type&PT_GLARE)) continue;
         parts[i]->update();
@@ -978,7 +978,7 @@ void renderparticles(bool mainpass)
    
     if(binddepthfxtex()) flagmask |= PT_SOFT;
 
-    loopi(sizeof(parts)/sizeof(parts[0]))
+    for(int i = 0; i < int(sizeof(parts)/sizeof(parts[0])); i++)
     {
         partrenderer *p = parts[i];
         if(glaring && !(p->type&PT_GLARE)) continue;
@@ -1087,7 +1087,7 @@ static void splash(int type, int color, int radius, int num, int fade, const vec
     float collidez = parts[type]->collide ? p.z - raycube(p, vec(0, 0, -1), COLLIDERADIUS, RAY_CLIPMAT) + (parts[type]->collide >= 0 ? COLLIDEERROR : 0) : -1; 
     int fmin = 1;
     int fmax = fade*3;
-    loopi(num)
+    for(int i = 0; i < int(num); i++)
     {
         int x, y, z;
         do
@@ -1136,7 +1136,7 @@ void particle_trail(int type, int fade, const vec &s, const vec &e, int color, f
     int steps = clamp(int(d*2), 1, maxtrail);
     v.div(steps);
     vec p = s;
-    loopi(steps)
+    for(int i = 0; i < int(steps); i++)
     {
         p.add(v);
         vec tmp = vec(float(rnd(11)-5), float(rnd(11)-5), float(rnd(11)-5));
@@ -1231,7 +1231,7 @@ void regularshape(int type, int radius, int color, int dir, int num, int fade, c
     bool flare = (basetype == PT_TAPE) || (basetype == PT_LIGHTNING),
          inv = (dir&0x20)!=0, taper = (dir&0x40)!=0 && !seedemitter;
     dir &= 0x1F;
-    loopi(num)
+    for(int i = 0; i < int(num); i++)
     {
         vec to, from;
         if(dir < 12) 
@@ -1332,7 +1332,7 @@ static void regularflame(int type, const vec &p, float radius, float height, int
     
     float size = scale * std::min(radius, height);
     vec v(0, 0, std::min(1.0f, height)*speed);
-    loopi(density)
+    for(int i = 0; i < int(density); i++)
     {
         vec s = p;        
         s.x += rndscale(radius*2.0f)-radius;

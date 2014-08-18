@@ -600,7 +600,7 @@ struct fpsstate
         gunwait = 0;
         bombradius = 1;
         bombdelay = 1;
-        loopi(NUMGUNS) ammo[i] = 0;
+        for(int i = 0; i < int(NUMGUNS); i++) ammo[i] = 0;
         if (m_bomb) backupweapon = GUN_BOMB;
         else backupweapon = GUN_FIST;
         ammo[backupweapon] = 1;
@@ -643,7 +643,7 @@ struct fpsstate
         {
             armourtype = A_GREEN;
             armour = 100;
-            loopi(5) baseammo(i+1);
+            for(int i = 0; i < int(5); i++) baseammo(i+1);
             gunselect = GUN_CG;
             ammo[GUN_CG] /= 2;
         }

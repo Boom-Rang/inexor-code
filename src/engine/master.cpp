@@ -59,7 +59,7 @@ void addban(vector<baninfo> &bans, const char *name)
     union { uchar b[sizeof(enet_uint32)]; enet_uint32 i; } ip, mask;
     ip.i = 0;
     mask.i = 0;
-    loopi(4)
+    for(int i = 0; i < int(4); i++)
     {
         char *end = NULL;
         int n = strtol(name, &end, 10);
@@ -82,10 +82,10 @@ char *printban(const baninfo &ban, char *buf)
     ip.i = ban.ip;
     mask.i = ban.mask;
     int lastdigit = -1;
-    loopi(4) if(mask.b[i])
+    for(int i = 0; i < int(4); i++) if(mask.b[i])
     {
         if(lastdigit >= 0) *buf++ = '.';
-        loopj(i - lastdigit - 1) { *buf++ = '*'; *buf++ = '.'; }
+        for(int j = 0; j < int(i - lastdigit - 1); j++) { *buf++ = *; *buf++ = .; }
         buf += sprintf(buf, "%d", ip.b[i]);
         lastdigit = i;
     }

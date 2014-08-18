@@ -144,8 +144,8 @@ struct animmodel : model
                         diffusecol[4] = { color.x*diffusek, color.y*diffusek, color.z*diffusek, 1 };
                 float ambientmax = std::max(ambientcol[0], std::max(ambientcol[1], ambientcol[2])),
                       diffusemax = std::max(diffusecol[0], std::max(diffusecol[1], diffusecol[2]));
-                if(ambientmax>1e-3f) loopk(3) ambientcol[k] *= std::min(1.5f, 1.0f/std::min(ambientmax, 1.0f));
-                if(diffusemax>1e-3f) loopk(3) diffusecol[k] *= std::min(1.5f, 1.0f/std::min(diffusemax, 1.0f));
+                if(ambientmax>1e-3f) for(int k = 0; k < int(3); k++) ambientcol[k] *= std::min(1.5f, 1.0f/std::min(ambientmax, 1.0f));
+                if(diffusemax>1e-3f) for(int k = 0; k < int(3); k++) diffusecol[k] *= std::min(1.5f, 1.0f/std::min(diffusemax, 1.0f));
                 glLightfv(GL_LIGHT0, GL_AMBIENT, ambientcol);
                 glLightfv(GL_LIGHT0, GL_DIFFUSE, diffusecol);
             }
@@ -377,14 +377,14 @@ struct animmodel : model
             hashtable<vec, int> share;
             int *next = new int[numverts];
             memset(next, -1, numverts*sizeof(int));
-            loopi(numverts)
+            for(int i = 0; i < int(numverts); i++)
             {
                 V &v = verts[i];
                 v.norm = vec(0, 0, 0);
                 int idx = share.access(v.pos, i);
                 if(idx != i) { next[i] = next[idx]; next[idx] = i; }
             }
-            loopi(numtris)
+            for(int i = 0; i < int(numtris); i++)
             {
                 T &t = tris[i];
                 V &v1 = verts[t.vert[0]], &v2 = verts[t.vert[1]], &v3 = verts[t.vert[2]];
@@ -397,7 +397,7 @@ struct animmodel : model
             }
             vec *norms = new vec[numverts];
             memset(norms, 0, numverts*sizeof(vec));
-            loopi(numverts)
+            for(int i = 0; i < int(numverts); i++)
             {
                 V &v = verts[i];
                 norms[i].add(v.norm);
@@ -415,15 +415,15 @@ struct animmodel : model
                     }
                 }
             }
-            loopi(numverts) verts[i].norm = norms[i].normalize();
+            for(int i = 0; i < int(numverts); i++) verts[i].norm = norms[i].normalize();
             delete[] next;
             delete[] norms;
         }
 
         template<class V, class T> void buildnorms(V *verts, int numverts, T *tris, int numtris, bool areaweight)
         {
-            loopi(numverts) verts[i].norm = vec(0, 0, 0);
-            loopi(numtris)
+            for(int i = 0; i < int(numverts); i++) verts[i].norm = vec(0, 0, 0);
+            for(int i = 0; i < int(numtris); i++)
             {
                 T &t = tris[i];
                 V &v1 = verts[t.vert[0]], &v2 = verts[t.vert[1]], &v3 = verts[t.vert[2]];
@@ -434,14 +434,14 @@ struct animmodel : model
                 v2.norm.add(norm);
                 v3.norm.add(norm);
             }
-            loopi(numverts) verts[i].norm.normalize();
+            for(int i = 0; i < int(numverts); i++) verts[i].norm.normalize();
         }
         
         template<class B, class V, class TC, class T> void calctangents(B *bumpverts, V *verts, TC *tcverts, int numverts, T *tris, int numtris, bool areaweight)
         {
             vec *tangent = new vec[2*numverts], *bitangent = tangent+numverts;
             memset(tangent, 0, 2*numverts*sizeof(vec));
-            loopi(numtris)
+            for(int i = 0; i < int(numtris); i++)
             {
                 const T &t = tris[i];
                 const vec &e0 = verts[t.vert[0]].pos;
@@ -468,13 +468,13 @@ struct animmodel : model
                     v.normalize();
                 }
 
-                loopj(3)
+                for(int j = 0; j < int(3); j++)
                 {
                     tangent[t.vert[j]].sub(u);
                     bitangent[t.vert[j]].add(v);
                 }
             }
-            loopi(numverts)
+            for(int i = 0; i < int(numverts); i++)
             {
                 const vec &n = verts[i].norm,
                           &t = tangent[i],
@@ -572,11 +572,11 @@ struct animmodel : model
 
         part() : meshes(NULL), numanimparts(1), pitchscale(1), pitchoffset(0), pitchmin(0), pitchmax(0), translate(0, 0, 0)
         {
-            loopk(MAXANIMPARTS) anims[k] = NULL;
+            for(int k = 0; k < int(MAXANIMPARTS); k++) anims[k] = NULL;
         }
         virtual ~part()
         {
-            loopk(MAXANIMPARTS) DELETEA(anims[k]);
+            for(int k = 0; k < int(MAXANIMPARTS); k++) DELETEA(anims[k]);
         }
 
         virtual void cleanup()
@@ -784,7 +784,7 @@ struct animmodel : model
 
         void render(int anim, int basetime, int basetime2, float pitch, const vec &axis, const vec &forward, dynent *d, animstate *as)
         {
-            if(!(anim&ANIM_REUSE)) loopi(numanimparts)
+            if(!(anim&ANIM_REUSE)) for(int i = 0; i < int(numanimparts); i++)
             {
                 animinfo info;
                 int interp = d && index+numanimparts<=MAXANIMPARTS ? index+i : -1, aitime = animationinterpolationtime;
@@ -1219,7 +1219,7 @@ struct animmodel : model
     void setglow(float glow, float delta, float pulse)
     {
         if(parts.empty()) loaddefaultparts();
-        loopv(parts) loopvj(parts[i]->skins) 
+        loopv(parts) loopvj(parts[i]->skins)
         {
             skin &s = parts[i]->skins[j];
             s.glow = glow;
@@ -1445,7 +1445,7 @@ template<class MDL, class MESH> struct modelcommands
         if(!MDL::loading || MDL::loading->parts.empty()) { conoutf("not loading an %s", MDL::formatname()); return; } \
         part &mdl = *MDL::loading->parts.last(); \
         if(!mdl.meshes) return; \
-        loopv(mdl.meshes->meshes) \
+        loopv(mdl.meshes->meshes)\
         { \
             MESH &m = *(MESH *)mdl.meshes->meshes[i]; \
             if(!strcmp(meshname, "*") || (m.name && !strcmp(m.name, meshname))) \

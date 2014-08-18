@@ -59,7 +59,7 @@ bool glmatrixf::invert(const glmatrixf &m, float mindet)
     float det = a1*v[0] + b1*v[1] + c1*v[2] + d1*v[3]; // float det = m.determinant(); 
     if(fabs(det) < mindet) return false;
     float invdet = 1/det;
-    loopi(16) v[i] *= invdet;
+    for(int i = 0; i < int(16); i++) v[i] *= invdet;
     return true;
 }
 
@@ -78,7 +78,7 @@ bool raysphereintersect(const vec &center, float radius, const vec &o, const vec
 
 bool rayboxintersect(const vec &b, const vec &s, const vec &o, const vec &ray, float &dist, int &orient)
 {
-    loop(d, 3) if(ray[d])
+    for(int d = 0; d < int(3); d++) if(ray[d])
     {
         int dc = ray[d]<0 ? 1 : 0;
         float pdist = (b[d]+s[d]*dc - o[d]) / ray[d];

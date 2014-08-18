@@ -307,7 +307,7 @@ namespace game
             if(m_classicsp)
             {
                 conoutf(CON_GAMEINFO, "\f2You wasted another life! The monsters stole your armour and some ammo...");
-                loopi(NUMGUNS) if(i!=GUN_PISTOL && (player1->ammo[i] = savedammo[i]) > 5) player1->ammo[i] = std::max(player1->ammo[i]/3, 5);
+                for(int i = 0; i < int(NUMGUNS); i++) if(i!=GUN_PISTOL && (player1->ammo[i] = savedammo[i]) > 5) player1->ammo[i] = std::max(player1->ammo[i]/3, 5);
             }
         }
     }
@@ -374,7 +374,7 @@ namespace game
         {
             if(deathscore) showscores(true);
             disablezoom();
-            if(!restore) loopi(NUMGUNS) savedammo[i] = player1->ammo[i];
+            if(!restore) for(int i = 0; i < int(NUMGUNS); i++) savedammo[i] = player1->ammo[i];
             d->attacking = false;
             if(!restore) d->deaths++;
             //d->pitch = 0;
@@ -754,17 +754,17 @@ namespace game
 
     ICOMMAND(ammohudup, "V", (tagval *args, int numargs),
     {
-        loopi(3) ammohudup[i] = i < numargs ? getweapon(args[i].getstr()) : -1;
+        for(int i = 0; i < int(3); i++) ammohudup[i] = i < numargs ? getweapon(args[i].getstr()) : -1;
     });
 
     ICOMMAND(ammohuddown, "V", (tagval *args, int numargs),
     {
-        loopi(3) ammohuddown[i] = i < numargs ? getweapon(args[i].getstr()) : -1;
+        for(int i = 0; i < int(3); i++) ammohuddown[i] = i < numargs ? getweapon(args[i].getstr()) : -1;
     });
 
     ICOMMAND(ammohudcycle, "V", (tagval *args, int numargs),
     {
-        loopi(8) ammohudcycle[i] = i < numargs ? getweapon(args[i].getstr()) : -1;
+        for(int i = 0; i < int(8); i++) ammohudcycle[i] = i < numargs ? getweapon(args[i].getstr()) : -1;
     });
 
     VARP(ammohud, 0, 1, 1);
@@ -775,7 +775,7 @@ namespace game
         glPushMatrix();
         glScalef(1/3.2f, 1/3.2f, 1);
         float xup = (x+sz)*3.2f, yup = y*3.2f + 0.1f*sz;
-        loopi(3)
+        for(int i = 0; i < int(3); i++)
         {
             int gun = ammohudup[i];
             if(gun < GUN_FIST || gun > GUN_BOMB || gun == d->gunselect || !d->ammo[gun]) continue;
@@ -783,7 +783,7 @@ namespace game
             yup += sz;
         }
         float xdown = x*3.2f - sz, ydown = (y+sz)*3.2f - 0.1f*sz;
-        loopi(3)
+        for(int i = 0; i < int(3); i++)
         {
             int gun = ammohuddown[3-i-1];
             if(gun < GUN_FIST || gun > GUN_BOMB || gun == d->gunselect || !d->ammo[gun]) continue;
@@ -791,7 +791,7 @@ namespace game
             drawicon(HICON_FIST+gun, xdown, ydown, sz);
         }
         int offset = 0, num = 0;
-        loopi(8)
+        for(int i = 0; i < int(8); i++)
         {
             int gun = ammohudcycle[i];
             if(gun < GUN_FIST || gun > GUN_BOMB) continue;
@@ -799,7 +799,7 @@ namespace game
             else if(d->ammo[gun]) num++;
         }
         float xcycle = (x+sz/2)*3.2f + 0.5f*num*sz, ycycle = y*3.2f-sz;
-        loopi(8)
+        for(int i = 0; i < int(8); i++)
         {
             int gun = ammohudcycle[(i + offset)%8];
             if(gun < GUN_FIST || gun > GUN_BOMB || gun == d->gunselect || !d->ammo[gun]) continue;
