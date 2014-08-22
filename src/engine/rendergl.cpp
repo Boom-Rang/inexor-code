@@ -1423,7 +1423,7 @@ void drawglare()
     renderwater();
     rendermaterials();
     renderalphageom();
-    renderparticles();
+    ps.render_particles();
 
     glFogf(GL_FOG_START, oldfogstart);
     glFogf(GL_FOG_END, oldfogend);
@@ -1568,7 +1568,7 @@ void drawreflection(float z, bool refract, int fogdepth, const bvec &col)
     if(refracting) rendergrass();
     rendermaterials();
     renderalphageom(fogging);
-    renderparticles();
+    ps.render_particles();
 
     if(fading) glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
 
@@ -2105,6 +2105,7 @@ void gl_drawframe(int w, int h)
 
     addmotionblur();
     addglare();
+
     if(isliquid(fogmat&MATF_VOLUME)) drawfogoverlay(fogmat, fogblend, abovemat);
     renderpostfx();
 
