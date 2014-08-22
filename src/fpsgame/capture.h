@@ -475,39 +475,32 @@ struct captureclientmode : clientmode
         if(minimapalpha >= 1) glEnable(GL_BLEND);
         glColor3f(1, 1, 1);
         float margin = 0.04f, roffset = s*margin, rsize = s + 2*roffset;
-        defformatstring(capture_blip_radar_filename)("%s/%s", radardir, radar_frame);
-        settexture(capture_blip_radar_filename, 3);
+        setradartex();
         drawradar(x - roffset, y - roffset, rsize);
         bool showenemies = lastmillis%1000 >= 500;
         int fw = 1, fh = 1;
-        if(basenumbers) {
+        if(basenumbers)
+        {
             pushfont();
             setfont("digit_blue");
             text_bounds(" ", fw, fh);
-        } else {
-            defformatstring(capture_blip_blue_filename)("%s/%s", radardir, blip_blue);
-        	settexture(capture_blip_blue_filename, 3);
         }
+        else setbliptex(TEAM_OWN);
         glPushMatrix();
         glTranslatef(x + 0.5f*s, y + 0.5f*s, 0);
         float blipsize = basenumbers ? 0.1f : 0.05f;
         glScalef((s*blipsize)/fw, (s*blipsize)/fh, 1.0f);
         drawblips(d, blipsize, fw, fh, 1, showenemies);
-        if(basenumbers) {
-        	setfont("digit_grey");
-        } else {
-            defformatstring(capture_blip_grey_filename)("%s/%s", radardir, blip_grey);
-        	settexture(capture_blip_grey_filename, 3);
-        }
+
+        if(basenumbers) setfont("digit_grey");
+        else setbliptex(TEAM_NONE);
         drawblips(d, blipsize, fw, fh, 0, showenemies);
-        if(basenumbers) {
-        	setfont("digit_red");
-        } else {
-            defformatstring(capture_blip_red_filename)("%s/%s", radardir, blip_red);
-        	settexture(capture_blip_red_filename, 3);
-        }
+
+        if(basenumbers) setfont("digit_red");
+        else setbliptex(TEAM_OPPONENT);
         drawblips(d, blipsize, fw, fh, -1, showenemies);
         if(showenemies) drawblips(d, blipsize, fw, fh, -2);
+
         glPopMatrix();
         if(basenumbers) popfont();
         drawteammates(d, x, y, s);

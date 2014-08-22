@@ -1922,7 +1922,7 @@ static void addname(vector<char> &key, Slot &slot, Slot::Tex &t, bool combined =
 {
     if(combined) key.add('&');
     if(prefix) { while(*prefix) key.add(*prefix++); }
-    defformatstring(tname)("%s/%s", mediadir, t.name);
+    defformatstring(tname)("%s/%s", texturedir, t.name);
     for(const char *s = path(tname); *s; key.add(*s++));
 }
 

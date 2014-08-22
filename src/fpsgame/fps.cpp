@@ -1,5 +1,4 @@
 #include "game.h"
-#include "hud.h"
 
 namespace game
 {
@@ -934,9 +933,9 @@ namespace game
     	string crosshair;
         switch(index)
         {
-            case 2: formatstring(crosshair)("%s/hit.png", crosshairdir);
-            case 1: formatstring(crosshair)("%s/teammate.png", crosshairdir);
-            default: formatstring(crosshair)("%s/crosshair.png", crosshairdir);
+            case 2: formatstring(crosshair)("%s/default_hit.png", crosshairdir); break;
+            case 1: formatstring(crosshair)("%s/default_teammate.png", crosshairdir); break;
+            default: formatstring(crosshair)("%s/default_crosshair.png", crosshairdir); break;
         }
     	return crosshair;
     }
@@ -1105,11 +1104,11 @@ namespace game
     void writegamedata(vector<char> &extras) {}
     void readgamedata(vector<char> &extras) {}
 
-    const char *savedconfig() { return "config.cfg"; }
-    const char *restoreconfig() { return "restore.cfg"; }
-    const char *defaultconfig() { return "data/defaults.cfg"; }
-    const char *autoexec() { return "autoexec.cfg"; }
-    const char *savedservers() { return "servers.cfg"; }
+    const char *savedconfig() { return "config/saved.cfg"; }
+    const char *restoreconfig() { return "config/restore.cfg"; }
+    const char *defaultconfig() { return "config/default.cfg"; }
+    const char *autoexec() { return "config/autoexec.cfg"; }
+    const char *savedservers() { return "config/servers.cfg"; }
 
     void loadconfigs()
     {

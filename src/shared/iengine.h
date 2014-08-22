@@ -7,8 +7,6 @@ extern int totalmillis;                 // total elapsed time
 extern uint totalsecs;
 extern int gamespeed, paused;
 
-extern string mediadir;
-
 enum
 {
     MATF_INDEX_SHIFT  = 0,

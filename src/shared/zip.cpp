@@ -208,13 +208,13 @@ static bool checkprefix(vector<zipfile> &files, const char *prefix, int prefixle
 
 static void mountzip(ziparchive &arch, vector<zipfile> &files, const char *mountdir, const char *stripdir)
 {
-    string mediadir = "media/";
-    path(mediadir);
+	defformatstring(mediadir_pathed) ("%s/", mediadir);
+    path(mediadir_pathed);
     int striplen = stripdir ? (int)strlen(stripdir) : 0;
     if(!mountdir && !stripdir) loopv(files)
     {
         zipfile &f = files[i];
-        const char *foundmedia = strstr(f.name, mediadir);
+        const char *foundmedia = strstr(f.name, mediadir_pathed);
         if(foundmedia)
         {
             if(foundmedia > f.name) 

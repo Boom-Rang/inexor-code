@@ -100,8 +100,7 @@ struct bombclientmode : clientmode
         if(minimapalpha >= 1) glEnable(GL_BLEND);
         glColor3f(1, 1, 1);
         float margin = 0.04f, roffset = s*margin, rsize = s + 2*roffset;
-        defformatstring(bomb_radar_filename)("%s/%s", radardir, radar_frame);
-        settexture(bomb_radar_filename, 3);
+        setradartex();
         drawradar(x - roffset, y - roffset, rsize);
 
         // show obstacles on minimap
@@ -117,11 +116,12 @@ struct bombclientmode : clientmode
         // show other players on minimap
         loopv(players)
         {
-            fpsent *p = players[i];
-            if(p == player1 || p->state!=CS_ALIVE) continue;
-            defformatstring(bomb_blip_filename)("%s/%s", radardir, (!m_teammode || strcmp(p->team, player1->team) != 0) ? blip_red : blip_blue);
-        	settexture(bomb_blip_filename, 3);
-            drawblip(d, x, y, s, p->o, 2.0f);
+            fpsent *o = players[i];
+            if(o != d && o->state == CS_ALIVE)
+            {
+				setbliptex(!m_teammode || !isteam(o->team, player1->team) ? TEAM_OPPONENT : TEAM_OWN);
+                drawblip(d, x, y, s, o->o, 2.0f);
+            }
         }
 
         // show fired bombs on minimap
@@ -129,8 +129,7 @@ struct bombclientmode : clientmode
         {
             bouncer *p = bouncers[i];
             if(p->bouncetype != BNC_BOMB) continue;
-            defformatstring(bomb_blip_orange_filename)("%s/%s", radardir, blip_bomb_orange);
-            settexture(bomb_blip_orange_filename, 3);
+            settexture("packages/hud/blip_bomb_orange.png", 3);
             drawblip(d, x, y, s, p->o, (p->owner->bombradius * 1.5f + p->owner->bombradius * 1.5f * sin((SDL_GetTicks() / (5.5f-p->owner->bombdelay)) / 75.0f))/1.5f);
         }
 

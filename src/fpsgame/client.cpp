@@ -1,5 +1,4 @@
 #include "game.h"
-#include "hud.h"
 
 namespace game
 {
@@ -34,6 +33,12 @@ namespace game
         glEnd();
     }
 
+    void setradartex()
+    {
+		defformatstring(radar_filename)("%s/%s", radardir, radar_frame);
+        settexture(radar_filename, 3);
+    }
+
     void drawradar(float x, float y, float s)
     {
         glBegin(GL_TRIANGLE_STRIP);
@@ -62,6 +67,12 @@ namespace game
         glTexCoord2f(0.0f, 1.0f); glVertex2f(bx - bs*v.y, by + bs*v.x);
     }
 
+    void setbliptex(int team, const char *type = "")
+    {
+        defformatstring(blipname)("%s/blip%s%s.png", radardir, teamblipcolor[team], type);
+        settexture(blipname, 3);
+    }
+
     void drawteammates(fpsent *d, float x, float y, float s)
     {
         if(!radarteammates) return;
@@ -74,8 +85,7 @@ namespace game
             {
                 if(!alive++) 
                 {
-                	defformatstring(blip_alive)("%s/%s", radardir, isteam(d->team, player1->team) ? blip_blue_alive : blip_red_alive);
-                    settexture(blip_alive);
+                    setbliptex(TEAM_OWN, "_alive");
                     glBegin(GL_QUADS);
                 }
                 drawteammate(d, x, y, s, o, scale);
@@ -89,8 +99,7 @@ namespace game
             {
                 if(!dead++) 
                 {
-                	defformatstring(blip_dead)("%s/%s", radardir, isteam(d->team, player1->team) ? blip_blue_dead : blip_red_dead);
-                    settexture(blip_dead);
+                    setbliptex(TEAM_OWN, "_dead");
                     glBegin(GL_QUADS);
                 }
                 drawteammate(d, x, y, s, o, scale);
@@ -1507,7 +1516,7 @@ namespace game
             }
 
             case N_TEAMINFO:
-                for(;;)
+                loopi(MAXTEAMS)
                 {
                     getstring(text, p);
                     if(p.overread() || !text[0]) break;

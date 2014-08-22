@@ -1,7 +1,6 @@
 // worldio.cpp: loading & saving of maps and savegames
 
 #include "engine.h"
-#include "io.h"
 
 void cutogz(char *s) 
 {   

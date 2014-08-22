@@ -112,8 +112,7 @@ struct raceclientmode : clientmode
       if(minimapalpha >= 1) glEnable(GL_BLEND);
       glColor3f(1, 1, 1);
       float margin = 0.04f, roffset = s*margin, rsize = s + 2*roffset;
-      defformatstring(race_radar_filename)("%s/%s", radardir, radar_frame);
-      settexture(race_radar_filename, 3);
+      setradartex();
       drawradar(x - roffset, y - roffset, rsize);
 
       // show obstacles on minimap
@@ -127,15 +126,14 @@ struct raceclientmode : clientmode
       }
 
       // show other players on minimap
-      defformatstring(race_blip_red_filename)("%s/%s", radardir, blip_red);
-      defformatstring(race_blip_blue_filename)("%s/%s", radardir, blip_blue);
       loopv(players)
       {
-          fpsent *p = players[i];
-          if(p == player1 || p->state!=CS_ALIVE) continue;
-          if(!m_teammode || strcmp(p->team, player1->team) != 0) settexture(race_blip_red_filename, 3);
-          else settexture(race_blip_blue_filename, 3);
-          drawblip(d, x, y, s, p->o, 2.0f);
+        fpsent *o = players[i];
+        if(o != d && o->state == CS_ALIVE)
+        {
+			setbliptex(!m_teammode || !isteam(o->team, player1->team) ? TEAM_OPPONENT : TEAM_OWN);
+            drawblip(d, x, y, s, o->o, 2.0f);
+        }
       }
 
     }

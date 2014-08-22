@@ -433,8 +433,7 @@ struct collectclientmode : clientmode
     void drawbaseblip(fpsent *d, float x, float y, float s, int i)
     {
         base &b = bases[i];
-        defformatstring(collect_blip_filename)("%s/%s", radardir, b.team == collectteambase(player1->team) ? blip_blue : blip_red);
-        settexture(collect_blip_filename, 3);
+        setbliptex(b.team==collectteambase(player1->team) ? TEAM_OWN : TEAM_OPPONENT);
         drawblip(d, x, y, s, b.o);
     }
 
@@ -464,8 +463,8 @@ struct collectclientmode : clientmode
         if(minimapalpha >= 1) glEnable(GL_BLEND);
         glColor3f(1, 1, 1);
         float margin = 0.04f, roffset = s*margin, rsize = s + 2*roffset;
-        defformatstring(collect_radar_filename)("%s/%s", radardir, radar_frame);
-        settexture(collect_radar_filename, 3);
+
+        setradartex();
         drawradar(x - roffset, y - roffset, rsize);
         loopv(bases)
         {
@@ -473,14 +472,15 @@ struct collectclientmode : clientmode
             if(!collectbaseteam(b.team)) continue;
             drawbaseblip(d, x, y, s, i);
         }
-        int team = collectteambase(d->team);
-        defformatstring(collect_skull_filename)("%s/%s", radardir, team == collectteambase(player1->team) ? blip_red_skull : blip_blue_skull);
-        settexture(collect_skull_filename, 3);
+
         loopv(players)
         {
             fpsent *o = players[i];
-            if(o != d && o->state == CS_ALIVE && o->tokens > 0 && collectteambase(o->team) != team)
+            if(o != d && o->state == CS_ALIVE && o->tokens > 0 && !isteam(o->team, d->team))
+            { //todo fix eventually
+                setbliptex(TEAM_OPPONENT, "_skull");
                 drawblip(d, x, y, s, o->o, 0.07f);
+            }
         }
         drawteammates(d, x, y, s);
         if(d->state == CS_DEAD)

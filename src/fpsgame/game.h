@@ -339,9 +339,11 @@ struct demoheader
     char magic[16];
     int version, protocol;
 };
-
+#define MAXTEAMS 128
 #define MAXNAMELEN 15
 #define MAXTEAMLEN 4
+enum { TEAM_NONE, TEAM_OWN, TEAM_OPPONENT, TEAM_NUM };
+static const char * const teamblipcolor[TEAM_NUM] = { "_neutral", "_blue", "_red" };
 
 enum
 {
@@ -814,8 +816,6 @@ struct teamscore
 
 static inline uint hthash(const teamscore &t) { return hthash(t.team); }
 static inline bool htcmp(const char *key, const teamscore &t) { return htcmp(key, t.team); }
-
-#define MAXTEAMS 128
 
 struct teaminfo
 {
