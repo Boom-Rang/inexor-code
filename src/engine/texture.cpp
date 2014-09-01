@@ -3051,7 +3051,39 @@ void screenshot(char *filename)
     }
     else
     {
+		#define NEW_SCREENSHOT_NAME_FORMAT
+		#ifndef NEW_SCREENSHOT_NAME_FORMAT
         defformatstring(name)("screenshot_%d", totalmillis);
+		#else
+
+		/**
+		* New screenshot format
+		* 01.Aug.2014 - 17:00
+		*/
+
+		// get time
+        time_t current_time = time(NULL);
+        struct tm *localvals = localtime(&current_time);
+
+        string tmp_buf;				
+		/* Screenshot format:
+			%p		AM or PM designation
+			%A		Full weekday name
+			%d		Zero-padded day of the month
+			%b		Abbreviated month name
+			%Y		Year
+			%I		Hour in 12h format
+			%M		Minute (00-59)
+			%S		Second (00-61)
+		*/
+
+		// strftime is in ctime.h, should be OS-independant
+		strftime(tmp_buf, sizeof(tmp_buf), "%A-%d-%b-%Y_%Ih-%p-%Mm-%Ss", localvals);
+
+		// final screenshot name is combines date and millis
+		defformatstring(name)("screenshot_%s_%d", tmp_buf, totalmillis);
+		#endif
+
         concatstring(buf, name);
     }
     if(format < 0)
