@@ -633,7 +633,23 @@ namespace server
 
     bool demonextmatch = false;
     stream *demotmp = NULL, *demorecord = NULL, *demoplayback = NULL;
-    int nextplayback = 0, demomillis = 0;
+
+	// New demo playback feature
+    //int nextplayback = 0, demomillis = 0;
+	/**
+	* "You can scroll back in time"
+	*/
+	VARP(nextplayback, 0, 0, 4*1024*1024);
+	VARP(demomillis, 0, 0, 4*1024*104);
+	void set_demomillis(int val)
+    {
+		// set values
+		demomillis = val;
+		nextplayback = val;
+    }
+	// Set demo playback time
+    ICOMMAND(demopos, "i", (int *val), set_demomillis(*val));
+
 
     VAR(maxdemos, 0, 5, 25);
     VAR(maxdemosize, 0, 16, 64);
@@ -1079,7 +1095,10 @@ namespace server
         loopi(n) delete[] demos[i].data;
         demos.remove(0, n);
     }
- 
+	
+	/**
+	* Add demo to demo list
+	*/ 
     void adddemo()
     {
         if(!demotmp) return;
@@ -1096,20 +1115,29 @@ namespace server
         demotmp->read(d.data, len);
         DELETEP(demotmp);
     }
-        
+       
+	/**
+	* Stop demo recording
+	*/
     void enddemorecord()
     {
+		// Abort if no demo recording is going on
         if(!demorecord) return;
-
+		// delete demo recording stream pointer
         DELETEP(demorecord);
 
+		// abort and clean up if poimters are invalid
         if(!demotmp) return;
         if(!maxdemos || !maxdemosize) { DELETEP(demotmp); return; }
 
         prunedemos(1);
+		// add demo to demo list
         adddemo();
     }
 
+	/**
+	* Write recorded packages to demo file
+	*/
     void writedemo(int chan, void *data, int len)
     {
         if(!demorecord) return;
@@ -1120,6 +1148,9 @@ namespace server
         if(demorecord->rawtell() >= (maxdemosize<<20)) enddemorecord();
     }
 
+	/**
+	* Write a recorded packet to demo
+	*/
     void recordpacket(int chan, void *data, int len)
     {
         writedemo(chan, data, len);
@@ -1130,27 +1161,50 @@ namespace server
 
     void setupdemorecord()
     {
+		// Dont record demos for coop edit!
         if(!m_mp(gamemode) || m_edit) return;
-
+		// Open tmp file for demo recording
         demotmp = opentempfile("demorecord", "w+b");
+		// Abort if file is invalid
         if(!demotmp) return;
-
+		// open temp file as gzip stream
         stream *f = opengzfile(NULL, "wb", demotmp);
-        if(!f) { DELETEP(demotmp); return; }
+        // abort if file stream is invalid
+		if(!f) { DELETEP(demotmp); return; }
 
+		// send server message
         sendservmsg("recording demo");
 
+		// set demo record stream
         demorecord = f;
 
+		// demo header structure
         demoheader hdr;
-        memcpy(hdr.magic, DEMO_MAGIC, sizeof(hdr.magic));
+
+		/**
+		* Format demo header
+		* 1) write demo magic number "SAUERBRATEN_DEMO"
+		* 2) write demo version
+		* 3) write protocol version
+		*/
+		memcpy(hdr.magic, DEMO_MAGIC, sizeof(hdr.magic));
         hdr.version = DEMO_VERSION;
         hdr.protocol = PROTOCOL_VERSION;
-        lilswap(&hdr.version, 2);
-        demorecord->write(&hdr, sizeof(demoheader));
 
+        lilswap(&hdr.version, 2);
+        
+		/**
+		* Write demo header to file
+		*/
+		demorecord->write(&hdr, sizeof(demoheader));
+
+		/**
+		* Format welcome packet for demo
+		*/
         packetbuf p(MAXTRANS, ENET_PACKET_FLAG_RELIABLE);
         welcomepacket(p, NULL);
+
+		// Write welcome packet to demo
         writedemo(1, p.buf, p.len);
     }
 
@@ -1245,6 +1299,9 @@ namespace server
 
         sendservmsgf("playing demo \"%s\"", file);
 
+		/**
+		* Reset demo playback millis
+		*/
         demomillis = 0;
         sendf(-1, 1, "ri3", N_DEMOPLAYBACK, 1, -1);
 
@@ -1259,18 +1316,48 @@ namespace server
     void readdemo()
     {
         if(!demoplayback) return;
-        demomillis += curtime;
+        
+		/**
+		* If you multiply this value with curtime, you can slow down
+		* or speed up demo playback (similar to gamespeed!)
+		* curtime is the result of scaletime/100
+		* This means we can modify speed without modifying gamespeed
+		*/
+		float demo_playback_scale = 1.0f;
+		/**
+		* Add the time which passed to the progress time of the demo
+		*/
+		demomillis += demo_playback_scale * curtime;
+
+		/**
+		* Demo position debug message
+		*/
+		if(SDL_GetTicks() % 3000 < 30) 
+		{
+			conoutf(CON_DEBUG, "demomillis: %d, nextplayback: %d", demomillis, nextplayback);
+		}
+
+
         while(demomillis>=nextplayback)
         {
             int chan, len;
+
+			/**
+			* Try to read network messages
+			*/
             if(demoplayback->read(&chan, sizeof(chan))!=sizeof(chan) ||
                demoplayback->read(&len, sizeof(len))!=sizeof(len))
             {
                 enddemoplayback();
                 return;
             }
-            lilswap(&chan, 1);
+            
+			/**
+			* What do these macros do?
+			*/
+			lilswap(&chan, 1);
             lilswap(&len, 1);
+
             ENetPacket *packet = enet_packet_create(NULL, len+1, 0);
             if(!packet || demoplayback->read(packet->data+1, len)!=len)
             {
@@ -1278,8 +1365,13 @@ namespace server
                 enddemoplayback();
                 return;
             }
-            packet->data[0] = N_DEMOPACKET;
+
+            /**
+			* Format network package to make it a demo
+			*/
+			packet->data[0] = N_DEMOPACKET;
             sendpacket(-1, chan, packet);
+
             if(!packet->referenceCount) enet_packet_destroy(packet);
             if(!demoplayback) break;
             if(demoplayback->read(&nextplayback, sizeof(nextplayback))!=sizeof(nextplayback))
@@ -1641,7 +1733,14 @@ namespace server
     {
         if(wsbuf.empty()) return;
         int wslen = wsbuf.length();
-        recordpacket(0, wsbuf.buf, wslen);
+        
+		
+		/**
+		* Positions are parts of demos as well
+		*/
+		recordpacket(0, wsbuf.buf, wslen);
+
+
         wsbuf.put(wsbuf.buf, wslen);
         loopv(clients)
         {
@@ -1675,7 +1774,19 @@ namespace server
     {
         if(wsbuf.empty()) return;
         int wslen = wsbuf.length();
-        recordpacket(1, wsbuf.buf, wslen);
+        
+		/**
+		* Demo recording debug message
+		*/
+		conoutf(CON_DEBUG, "sendmessages called!");
+
+		
+		/**
+		* What kind of messages?
+		*/
+		recordpacket(1, wsbuf.buf, wslen);
+
+
         wsbuf.put(wsbuf.buf, wslen);
         loopv(clients)
         {

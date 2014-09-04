@@ -3051,6 +3051,10 @@ void screenshot(char *filename)
     }
     else
     {
+		/**
+		* Comment out (or remove) this line if you want to built
+		* with the old screenshot format!
+		*/
 		#define NEW_SCREENSHOT_NAME_FORMAT
 		#ifndef NEW_SCREENSHOT_NAME_FORMAT
         defformatstring(name)("screenshot_%d", totalmillis);
@@ -3058,7 +3062,7 @@ void screenshot(char *filename)
 
 		/**
 		* New screenshot format
-		* 01.Aug.2014 - 17:00
+		* implementation date: 01.Aug.2014 - 17:00
 		*/
 
 		// get time
