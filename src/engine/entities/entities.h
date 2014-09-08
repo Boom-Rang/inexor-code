@@ -287,8 +287,23 @@ struct entity_initializer_instance : public entity_instance<ENTITY_TYPE>
 
 };
 
+template<class SPECIALIZED_ENTITY_INSTANCE>
+struct entity_implementation_base {
 
+	/**
+	 * The name of the implementation.
+	 */
+	std::string name;
 
+	entity_implementation_base() { }
+	entity_implementation_base(const std::string& name) {
+		this->name = name;
+	}
+	virtual ~entity_implementation_base() { };
+
+	virtual void render_edit_overlay(SPECIALIZED_ENTITY_INSTANCE *entity_instance) = 0;
+
+};
 
 /*************************** 	future     ***************************/
 
