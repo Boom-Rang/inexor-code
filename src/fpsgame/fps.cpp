@@ -937,7 +937,7 @@ namespace game
             case 1: formatstring(crosshair)("%s/default_teammate.png", crosshairdir); break;
             default: formatstring(crosshair)("%s/default_crosshair.png", crosshairdir); break;
         }
-    	return crosshair;
+    	return newstring(crosshair);
     }
 
     int selectcrosshair(float &r, float &g, float &b)
