@@ -1010,12 +1010,7 @@ int getclockmillis()
 
 VAR(numcpus, 1, 1, 16);
 
-// FIXME: WTF? - main is in macutils.mm?
-#ifdef __APPLE__
-int real_main(int argc, char **argv)
-#else
 int main(int argc, char **argv)
-#endif
 {
     #ifdef WIN32
     //atexit((void (__cdecl *)(void))_CrtDumpMemoryLeaks);
@@ -1171,8 +1166,6 @@ int main(int argc, char **argv)
 
     logoutf("init: cfg");
     execfile("data/keymap.cfg");
-    execfile("data/cubescript/music.cfg");
-    execfile("data/cubescript/guis.cfg");
     execfile("data/stdedit.cfg");
     execfile("data/menus.cfg");
     execfile("data/sounds.cfg");
