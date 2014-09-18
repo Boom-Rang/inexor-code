@@ -3123,27 +3123,3 @@ void clearsleep_(int *clearoverrides)
 
 COMMANDN(clearsleep, clearsleep_, "i");
 #endif
-
-//todo refractor, smth like "globals.cpp"
-//Core file paths:
-SVARP(configdir, "config");
-SVARP(mediadir, "media");
-SVARP(mapdir, "media/map");
-SVARP(modeldir, "media/model");
-SVARP(texturedir, "media/texture");
-SVARP(skyboxdir, "media/skybox");
-SVARP(interfacedir, "media/interface");
-SVARP(crosshairdir, "media/interface/crosshair");
-SVARP(radardir, "media/interface/radar");
-SVARP(icondir, "media/interface/icon");
-SVARP(particledir, "media/particle");
-SVARP(causticdir, "media/texture/caustic");
-SVARP(sounddir, "media/sound");
-
-//hud file names:
-SVARP(radar_frame, "radar.png");
-SVARP(interface_items, "items.png");
-SVARP(interface_bomb_items, "bomb_items.png");
-SVARP(bliptex, "blip");
-SVARP(blip_block_yellow, "block_yellow_t.png");
-SVARP(blip_bomb_orange, "blip_bomb_orange.png");

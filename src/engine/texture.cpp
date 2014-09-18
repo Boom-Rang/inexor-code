@@ -421,6 +421,8 @@ void texagrad(ImageData &s, float x2, float y2, float x1, float y1)
     }
 }
 
+SVARP(texturedir, "media/texture");
+
 VAR(hwtexsize, 1, 0, 0);
 VAR(hwcubetexsize, 1, 0, 0);
 VAR(hwmaxaniso, 1, 0, 0);

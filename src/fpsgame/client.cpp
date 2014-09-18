@@ -6,6 +6,8 @@ namespace game
     VARP(maxradarscale, 1, 1024, 10000);
     VARP(radarteammates, 0, 1, 1);
     FVARP(minimapalpha, 0, 1, 1);
+    SVARP(radar_frame, "radar.png");
+    SVARP(radardir, "media/interface/radar");
 
     int hudannounce_begin = 0;
     int hudannounce_timeout = 0;
@@ -32,7 +34,7 @@ namespace game
         }
         glEnd();
     }
-
+	
     void setradartex()
     {
 		defformatstring(radar_filename)("%s/%s", radardir, radar_frame);

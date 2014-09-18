@@ -2,6 +2,9 @@
 
 #include "engine.h"
 
+SVARP(mediadir, "media");
+SVARP(mapdir, "media/map");
+
 void cutogz(char *s) 
 {   
     char *ogzp = strstr(s, ".ogz");
@@ -1236,8 +1239,7 @@ bool load_world(const char *mname, const char *cname)        // still supports a
     clearmainmenu();
 
     identflags |= IDF_OVERRIDDEN;
-	defformatstring(default_map_settings) ("%s/default_map_settings.cfg", configdir);
-    execfile(default_map_settings, false);
+    execfile("config/default_map_settings.cfg", false);
     execfile(cfgname, false);
     identflags &= ~IDF_OVERRIDDEN;
    

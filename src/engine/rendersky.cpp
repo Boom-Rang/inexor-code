@@ -2,6 +2,7 @@
 
 Texture *sky[6] = { 0, 0, 0, 0, 0, 0 }, *clouds[6] = { 0, 0, 0, 0, 0, 0 };
 
+SVARP(skyboxdir, "media/skybox");
 void loadsky(const char *basename, Texture *texs[6])
 {
     const char *wildcard = strchr(basename, '*');

@@ -60,7 +60,7 @@ struct hideandseekclientmode : clientmode
         if(showminimapobstacles) loopv(movables) {
             dynent *m = (dynent *) movables[i];
             if(!isobstaclealive((movable *) m)) continue;
-            defformatstring(has_block_yellow_filename)("%s/%s", radardir, blip_block_yellow);
+            defformatstring(has_block_yellow_filename)("%s/blip_block.png", radardir);
             settexture(has_block_yellow_filename, 3);
             drawblip(d, x, y, s, m->o, 1.0f);
         }

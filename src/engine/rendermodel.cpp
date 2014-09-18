@@ -1,5 +1,6 @@
 #include "engine.h"
 
+SVARP(modeldir, "media/model");
 VARP(oqdynent, 0, 1, 1);
 VARP(animationinterpolationtime, 0, 150, 1000);
 

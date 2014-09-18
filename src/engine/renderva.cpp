@@ -1966,6 +1966,8 @@ static GLuint createattenztex(int size)
 
 static Texture *caustictex[NUMCAUSTICS] = { NULL };
 
+SVARP(causticdir, "media/texture/caustic");
+
 void loadcaustics(bool force)
 {
     static bool needcaustics = false;

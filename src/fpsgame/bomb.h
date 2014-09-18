@@ -59,11 +59,11 @@ struct bombclientmode : clientmode
 			putint(p, sploc.index);
 		}
 	}
-
-    void drawicon(int icon, float x, float y, float sz)
+	
+    void drawicon(int icon, float x, float y, float sz) //todo merge with other items
     {
         int bicon = icon - HICON_BOMBRADIUS;
-        defformatstring(bomb_items_filename)("%s/%s", interfacedir, interface_bomb_items);
+        defformatstring(bomb_items_filename)("%s/bomb_items.png", interfacedir);
         settexture(bomb_items_filename);
         glBegin(GL_TRIANGLE_STRIP);
         float tsz = 0.25f, tx = tsz*(bicon%4), ty = tsz*(bicon/4);
@@ -104,12 +104,12 @@ struct bombclientmode : clientmode
         drawradar(x - roffset, y - roffset, rsize);
 
         // show obstacles on minimap
+        defformatstring(bomb_block_filename)("%s/blip_block.png", radardir);
         if(showminimapobstacles) loopv(movables)
         {
             dynent *m = (dynent *) movables[i];
             if(!isobstaclealive((movable *) m)) continue;
-            defformatstring(bomb_block_yellow_filename)("%s/%s", radardir, blip_block_yellow);
-            settexture(bomb_block_yellow_filename, 3);
+            settexture(bomb_block_filename, 3);
             drawblip(d, x, y, s, m->o, 1.0f);
         }
 
@@ -125,11 +125,12 @@ struct bombclientmode : clientmode
         }
 
         // show fired bombs on minimap
+		defformatstring(blip) ("%s/blip_bomb.png", radardir);
         loopv(bouncers)
         {
             bouncer *p = bouncers[i];
             if(p->bouncetype != BNC_BOMB) continue;
-            settexture("packages/hud/blip_bomb_orange.png", 3);
+            settexture(blip, 3);
             drawblip(d, x, y, s, p->o, (p->owner->bombradius * 1.5f + p->owner->bombradius * 1.5f * sin((SDL_GetTicks() / (5.5f-p->owner->bombdelay)) / 75.0f))/1.5f);
         }
 

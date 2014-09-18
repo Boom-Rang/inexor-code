@@ -20,6 +20,8 @@ enum
 #define DNF 100.0f              // for normalized vectors
 #define DVELF 1.0f              // for playerspeed based velocity vectors
 
+extern char *radardir;
+
 enum                            // static entity types
 {
     NOTUSED = ET_EMPTY,         // entity slot not in use in map

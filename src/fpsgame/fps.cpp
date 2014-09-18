@@ -723,7 +723,8 @@ namespace game
     ICOMMAND(kill, "", (), suicide(player1));
 
     bool needminimap() { return m_ctf || m_protect || m_hold || m_capture || m_collect|| m_bomb || m_race; }
-
+	
+    SVARP(interface_items, "items.png");
     void drawicon(int icon, float x, float y, float sz)
     {
         defformatstring(fps_items_filename)("%s/%s", interfacedir, interface_items);
@@ -927,15 +928,16 @@ namespace game
 
     VARP(teamcrosshair, 0, 1, 1);
     VARP(hitcrosshair, 0, 425, 1000);
+    SVARP(crosshairdir, "crosshair");
 
     const char *defaultcrosshair(int index)
     {
     	string crosshair;
         switch(index)
         {
-            case 2: formatstring(crosshair)("%s/default_hit.png", crosshairdir); break;
-            case 1: formatstring(crosshair)("%s/default_teammate.png", crosshairdir); break;
-            default: formatstring(crosshair)("%s/default_crosshair.png", crosshairdir); break;
+            case 2: formatstring(crosshair)("%s/%s/default_hit.png", interfacedir, crosshairdir); break;
+            case 1: formatstring(crosshair)("%s/%s/default_teammate.png", interfacedir, crosshairdir); break;
+            default: formatstring(crosshair)("%s/%s/default_crosshair.png", interfacedir, crosshairdir); break;
         }
     	return newstring(crosshair);
     }
@@ -1112,7 +1114,7 @@ namespace game
 
     void loadconfigs()
     {
-        execfile("auth.cfg", false);
+        execfile("config/auth.cfg", false);
     }
 }
 

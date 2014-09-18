@@ -125,28 +125,3 @@ namespace server
     extern int scaletime(int t);
 }
 
-
-
-//Core file paths:
-extern char *configdir;
-extern char *mediadir; 
-extern char *mapdir;
-extern char *modeldir;
-extern char *texturedir;
-extern char *skyboxdir;
-extern char *interfacedir;
-extern char *crosshairdir;
-extern char *radardir;
-extern char *icondir;
-extern char *particledir;
-extern char *causticdir;
-extern char *sounddir;
-
-//hud file names:
-extern char *radar_frame;
-extern char *interface_items;
-extern char *interface_bomb_items;
-extern char *bliptex;
-extern char *blip_block_yellow;
-extern char *blip_bomb_orange;
-

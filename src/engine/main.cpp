@@ -121,6 +121,8 @@ void writeinitcfg()
 
 COMMAND(quit, "");
 
+SVARP(interfacedir, "media/interface");
+
 static void getbackgroundres(int &w, int &h)
 {
     float wk = 1, hk = 1;

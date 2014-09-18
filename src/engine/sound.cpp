@@ -123,6 +123,7 @@ void stopchannels()
 void setmusicvol(int musicvol);
 VARFP(soundvol, 0, 255, 255, if(!soundvol) { stopchannels(); setmusicvol(0); });
 VARFP(musicvol, 0, 128, 255, setmusicvol(soundvol ? musicvol : 0));
+SVARP(sounddir, "media/sound");
 
 char *musicfile = NULL, *musicdonecmd = NULL;
 
