@@ -1424,6 +1424,7 @@ void drawglare()
     rendermaterials();
     renderalphageom();
     ps.render_particles();
+    renderparticles();
 
     glFogf(GL_FOG_START, oldfogstart);
     glFogf(GL_FOG_END, oldfogend);
@@ -1569,6 +1570,7 @@ void drawreflection(float z, bool refract, int fogdepth, const bvec &col)
     rendermaterials();
     renderalphageom(fogging);
     ps.render_particles();
+    renderparticles();
 
     if(fading) glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
 
