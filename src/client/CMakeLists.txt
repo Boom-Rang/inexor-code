@@ -102,6 +102,8 @@ set(CLIENT_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/../engine/particles/initializers/randomposition
     ${CMAKE_CURRENT_SOURCE_DIR}/../engine/particles/initializers/randomparticletype
     ${CMAKE_CURRENT_SOURCE_DIR}/../engine/particles/initializers/springweaver
+    ${CMAKE_CURRENT_SOURCE_DIR}/../engine/particles/initializers/clothfaces
+    ${CMAKE_CURRENT_SOURCE_DIR}/../engine/particles/initializers/jellyfaces
     ${CMAKE_CURRENT_SOURCE_DIR}/../engine/particles/ptest
     ${CMAKE_CURRENT_SOURCE_DIR}/../engine/particles/mu/muParser.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/../engine/particles/mu/muParserBase.cpp
