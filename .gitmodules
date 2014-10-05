@@ -10,3 +10,6 @@
 	path = src/platform_osx
 	url = https://github.com/Theintercooler/Platform-osx.git
 	branch = master
+[submodule "src/platform_linux"]
+	path = src/platform_linux
+	url = https://github.com/sauerbraten-fork/Platform-linux.git
