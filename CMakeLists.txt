@@ -75,7 +75,7 @@ message(STATUS "Compiling for ${BUILD_TARGET_OS} ${BUILD_TARGET_ARCH} (${CMAKE_S
 
 # Compiler flags
 
-set(BUILD_FLAGS "")
+set(BUILD_FLAGS "-fPIC")
 
 if(BUILD_TARGET_WINDOWS)
     set(BUILD_FLAGS "${BUILD_FLAGS} -DWIN32 -DWINDOWS")

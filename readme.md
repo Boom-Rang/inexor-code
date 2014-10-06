@@ -1,3 +1,17 @@
+# Sauerbraten Fork – Node.js Branch
+
+This branch implements experimental support for node.js. Currently linux-only.
+
+At the moment rudimentary support for running node and the sauer server is implemented, they can not interact however.
+This works by compiling the sauer server as a node module (basically a shared library) and adding a bit of glue code that can run the sauer main in an own thread.
+
+In the next step support for evaluating JS code from Cubescript and the other way around. With a bit of JS magic we should be able to implement convenient bindings to cubescript functions.
+In order to synchronize those threads wer're basically going to lock both threads while one requests stuff from the other.
+
+## Running
+
+Compile the application as usual; now copy the server binary and rename it to 'sauer.node'; run a node.js interpreter (there is a binary called node in the platform\_linux); require the native module and call main in it: `require('./sauer').main()`. It should immediately return 'fnord' and you should see messages about the server starting.
+
 # Sauerbraten Fork
 
 Sauerbraten Fork is a fork of the quake-like fps Sauerbraten/Cube2. It is compatible to the current Sauerbraten/Cube 2 release.

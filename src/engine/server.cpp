@@ -1154,7 +1154,7 @@ bool serveroption(char *opt)
 vector<const char *> gameargs;
 
 #ifdef STANDALONE
-int main(int argc, char **argv)
+int sauermain(int argc, char **argv)
 {   
     setlogfile(NULL);
     if(enet_initialize()<0) fatal("Unable to initialise network module");
