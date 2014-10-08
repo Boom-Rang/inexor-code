@@ -70,8 +70,7 @@ namespace game
 
     void setbliptex(int team, const char *type = "")
     {
-        defformatstring(blipname)("%s/blip%s%s.png", radardir, teamblipcolor[team], type);
-        settexture(blipname, 3);
+        settexture(tempformatstring("%s/blip%s%s.png", radardir, teamblipcolor[team], type), 3);
     }
 
     void drawteammates(fpsent *d, float x, float y, float s)
