@@ -918,15 +918,18 @@ namespace game
 
     VARP(teamcrosshair, 0, 1, 1);
     VARP(hitcrosshair, 0, 425, 1000);
+    SVARP(crosshairdir, "crosshair");
 
     const char *defaultcrosshair(int index)
     {
+    	string crosshair;
         switch(index)
         {
-            case 2: return "data/hit.png";
-            case 1: return "data/teammate.png";
-            default: return "data/crosshair.png";
+            case 2: formatstring(crosshair)("%s/default_hit.png", crosshairdir); break;
+            case 1: formatstring(crosshair)("%s/default_teammate.png", crosshairdir); break;
+            default: formatstring(crosshair)("%s/default_crosshair.png", crosshairdir); break;
         }
+    	return newstring(crosshair);
     }
 
     int selectcrosshair(float &r, float &g, float &b)
