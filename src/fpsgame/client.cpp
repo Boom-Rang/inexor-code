@@ -6,6 +6,7 @@ namespace game
     VARP(maxradarscale, 1, 1024, 10000);
     VARP(radarteammates, 0, 1, 1);
     FVARP(minimapalpha, 0, 1, 1);
+    SVARP(radardir, "media/interface/radar");
 
     int hudannounce_begin = 0;
     int hudannounce_timeout = 0;
@@ -31,6 +32,12 @@ namespace game
             glVertex2f(x + 0.5f*s*(1.0f + v.x), y + 0.5f*s*(1.0f + v.y));
         }
         glEnd();
+    }
+
+    void setradartex()
+    {
+		defformatstring(radar_filename)("%s/radar_frame.png", radardir);
+        settexture(radar_filename, 3);
     }
 
     void drawradar(float x, float y, float s)
@@ -61,6 +68,12 @@ namespace game
         glTexCoord2f(0.0f, 1.0f); glVertex2f(bx - bs*v.y, by + bs*v.x);
     }
 
+    void setbliptex(int team, const char *type = "")
+    {
+        defformatstring(blipname)("%s/blip%s%s.png", radardir, teamblipcolor[team], type);
+        settexture(blipname, 3);
+    }
+
     void drawteammates(fpsent *d, float x, float y, float s)
     {
         if(!radarteammates) return;
@@ -73,7 +86,7 @@ namespace game
             {
                 if(!alive++) 
                 {
-                    settexture(isteam(d->team, player1->team) ? "packages/hud/blip_blue_alive.png" : "packages/hud/blip_red_alive.png");
+                    setbliptex(TEAM_OWN, "_alive");
                     glBegin(GL_QUADS);
                 }
                 drawteammate(d, x, y, s, o, scale);
@@ -87,7 +100,7 @@ namespace game
             {
                 if(!dead++) 
                 {
-                    settexture(isteam(d->team, player1->team) ? "packages/hud/blip_blue_dead.png" : "packages/hud/blip_red_dead.png");
+                    setbliptex(TEAM_OWN, "_dead");
                     glBegin(GL_QUADS);
                 }
                 drawteammate(d, x, y, s, o, scale);
@@ -1502,7 +1515,7 @@ namespace game
             }
 
             case N_TEAMINFO:
-                for(;;)
+                loopi(MAXTEAMS)
                 {
                     getstring(text, p);
                     if(p.overread() || !text[0]) break;
