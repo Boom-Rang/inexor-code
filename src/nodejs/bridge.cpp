@@ -42,10 +42,25 @@ Handle<Value> CallMain(const Arguments& js_args) {
   return scope.Close(String::New("fnord"));
 }
 
+Handle<Value> EvalCubescript(const Arguments& js_args) {
+  HandleScope scope;
+
+  Local<String> js_s = js_args[0]->ToString();
+  size_t len = js_s->Utf8Length();
+
+  char* c_s = (char*)alloca(len);
+  js_s->WriteUtf8(c_s, len);
+
+  execute(c_s);
+
+  return scope.Close(String::New("fnord"));
+}
+
 void init(Handle<Object> exports) {
   exports->Set(String::NewSymbol("main"),
       FunctionTemplate::New(CallMain)->GetFunction());
-
+  exports->Set(String::NewSymbol("eval"),
+      FunctionTemplate::New(EvalCubescript)->GetFunction());
 }
 
 NODE_MODULE(sauer, init)
