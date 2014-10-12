@@ -1,5 +1,9 @@
 add_definitions(-DCLIENT)
 
+set(EXTRA_LIBS ${EXTRA_LIBS} -shared -pthread -rdynamic -m64)
+
+add_definitions("-I/home/mapc/pr0j/sb/fork/code/src/platform_linux/linux64/include -I/home/mapc/pr0j/sb/fork/code/src/platform_linux/linux64/include/cares -I/home/mapc/pr0j/sb/fork/code/src/platform_linux/linux64/include/http_parser -I/home/mapc/pr0j/sb/fork/code/src/platform_linux/linux64/include/node -I/home/mapc/pr0j/sb/fork/code/src/platform_linux/linux64/include/npm -I/home/mapc/pr0j/sb/fork/code/src/platform_linux/linux64/include/openssl -I/home/mapc/pr0j/sb/fork/code/src/platform_linux/linux64/include/uv -I/home/mapc/pr0j/sb/fork/code/src/platform_linux/linux64/include/v8 -I/home/mapc/pr0j/sb/fork/code/src/platform_linux/linux64/include/zlib  '-D_LARGEFILE_SOURCE' '-D_FILE_OFFSET_BITS=64' '-DBUILDING_NODE_EXTENSION'  -fPIC -Wall -Wextra -Wno-unused-parameter -pthread -m64  -fno-exceptions")
+
 if(${BUILD_TARGET_WINDOWS})
     set(BUILD_EXTRA_LIBS ${BUILD_EXTRA_LIBS} opengl32 ws2_32 winmm)
     add_definitions(-mwindows)
@@ -10,6 +14,8 @@ elseif(${BUILD_TARGET_SOLARIS})
 endif()
 
 set(CLIENT_SOURCES
+    ${CMAKE_CURRENT_SOURCE_DIR}/../nodejs/bridge
+
     ${CMAKE_CURRENT_SOURCE_DIR}/../shared/crypto
     ${CMAKE_CURRENT_SOURCE_DIR}/../shared/geom
     ${CMAKE_CURRENT_SOURCE_DIR}/../shared/stream
@@ -87,18 +93,19 @@ elseif(${BUILD_TARGET_WINDOWS})
     endif()
 endif()
 
-set(SB_CLIENT_BINARY client_${BUILD_PLATFORM_BIN}_${BUILD_TARGET_ARCH} CACHE INTERNAL "Client binary name.")
-add_executable(${SB_CLIENT_BINARY} ${CLIENT_SOURCES})
-target_link_libraries(${SB_CLIENT_BINARY}
+set(SB_CLIENT_LIBRARY client_${BUILD_PLATFORM_BIN}_${BUILD_TARGET_ARCH} CACHE INTERNAL "Client binary name.")
+add_executable(${SB_CLIENT_LIBRARY} ${CLIENT_SOURCES})
+target_link_libraries(${SB_CLIENT_LIBRARY}
     ${ENET_LIBRARIES}
     ${SDL_LIBRARIES}
     ${OPENGL_LIBRARIES}
     ${ZLIB_LIBRARIES}
     ${BUILD_EXTRA_LIBS}
-)
+    ${UV_LIBRARIES}
+    ${EXTRA_LIBS})
 
 install(TARGETS
-    ${SB_CLIENT_BINARY}
+    ${SB_CLIENT_LIBRARY}
     RUNTIME DESTINATION ${INSTALL_RUNTIME_DIR}
     LIBRARY DESTINATION ${INSTALL_LIBRARY_DIR}
     ARCHIVE DESTINATION ${INSTALL_ARCHIVE_DIR})

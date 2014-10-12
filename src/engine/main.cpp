@@ -504,13 +504,17 @@ void screenres(int *w, int *h)
 COMMAND(screenres, "ii");
 
 static int curgamma = 100;
+static float gamma = 100;
+/* Disabled because it causes problems with node.
+
 VARFP(gamma, 30, 100, 300,
 {
     if(gamma == curgamma) return;
     curgamma = gamma;
-	float f = gamma/100.0f;
+	  float f = gamma/100.0f;
     if(SDL_SetGamma(f,f,f)==-1) conoutf(CON_ERROR, "Could not set gamma: %s", SDL_GetError());
 });
+*/
 
 void restoregamma()
 {
@@ -1014,7 +1018,7 @@ VAR(numcpus, 1, 1, 16);
 #ifdef __APPLE__
 int real_main(int argc, char **argv)
 #else
-int main(int argc, char **argv)
+int sauermain(int argc, char **argv)
 #endif
 {
     #ifdef WIN32
